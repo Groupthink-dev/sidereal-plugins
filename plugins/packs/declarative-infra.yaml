@@ -1,14 +1,8 @@
-pack: "1.8"
+pack: "1.12"
 name: Declarative Infrastructure
 description: >
-  Provision and manage GPU cloud compute instances declaratively. Stands up
-  stallari-gpu-worker nodes (11C distribution — Ubuntu 24.04 + CUDA 12.8.1)
-  on Vultr with Tailscale mesh authentication: embedded one-shot pre-auth
-  key for unattended standup, or QR-code interactive flow when present.
-  Includes fleet health monitoring, cost trend rollup, image upgrade
-  planning, post-provision verification, safe teardown, and cloud-init
-  generation with security refinement.
-version: "0.3.0"
+  Provision and manage GPU cloud compute instances declaratively. Stands up stallari-gpu-worker nodes (11C distribution — Ubuntu 24.04 + CUDA 12.8.1) on Vultr with Tailscale mesh authentication: embedded one-shot pre-auth key for unattended standup, or QR-code interactive flow when present. Includes fleet health monitoring, cost trend rollup, image upgrade planning, post-provision verification, safe teardown, and cloud-init generation with security refinement.
+version: "0.4.0"
 icon: server
 author:
   name: Groupthink Dev
@@ -42,14 +36,11 @@ recommends:
     - service: overlay-network
       contract: overlay-network-v1
       description: >
-        Tailscale overlay network for pre-auth key provisioning and fleet
-        device verification. Required for unattended pre-auth-key standup
-        mode; QR-code and manual flows work without it.
+        Tailscale overlay network for pre-auth key provisioning and fleet device verification. Required for unattended pre-auth-key standup mode; QR-code and manual flows work without it.
     - service: documentation
       contract: documentation-v1
       description: >
-        Optional: cloud-init, NVIDIA CUDA, and Tailscale documentation lookup
-        during cloud-init generation and troubleshooting. Read-only.
+        Optional: cloud-init, NVIDIA CUDA, and Tailscale documentation lookup during cloud-init generation and troubleshooting. Read-only.
 
 data:
   reads:
@@ -88,33 +79,22 @@ agents:
   provision-operator:
     role: operator
     description: >
-      VM lifecycle writes only. Assembles cloud-init payloads, selects plans
-      and regions, creates GPU instances, starts, stops, snapshots, and
-      deletes. Scoped to write-path operations — never used for read-only
-      audits.
+      VM lifecycle writes only. Assembles cloud-init payloads, selects plans and regions, creates GPU instances, starts, stops, snapshots, and deletes. Scoped to write-path operations — never used for read-only audits.
 
   audit-operator:
     role: operator
     description: >
-      Read-only fleet observer. Lists VMs, retrieves status and metrics,
-      aggregates cost and health data. Strictly no write operations.
-      Designed for periodic scheduled health digests, cost trend reporting,
-      and upgrade window planning.
+      Read-only fleet observer. Lists VMs, retrieves status and metrics, aggregates cost and health data. Strictly no write operations. Designed for periodic scheduled health digests, cost trend reporting, and upgrade window planning.
 
   verify-specialist:
     role: specialist
     description: >
-      Post-provision health checker. Polls VM until running, validates tsnet
-      join against the overlay-network device list, and confirms GPU
-      detection. Uses deterministic retry logic with pass/warn/fail outcomes.
+      Post-provision health checker. Polls VM until running, validates tsnet join against the overlay-network device list, and confirms GPU detection. Uses deterministic retry logic with pass/warn/fail outcomes.
 
   bootstrap-classifier:
     role: classifier
     description: >
-      Tailscale auth mode router. Inspects overlay-network availability and
-      user inputs to classify the deployment mode — pre-auth-key
-      (unattended), QR-code (interactive), or manual. Emits a route decision
-      consumed by gpu-standup.
+      Tailscale auth mode router. Inspects overlay-network availability and user inputs to classify the deployment mode — pre-auth-key (unattended), QR-code (interactive), or manual. Emits a route decision consumed by gpu-standup.
 
 # ---------------------------------------------------------------------------
 # Skills — 8 skills. Tier-portable; structured graphs per workload.
@@ -125,12 +105,10 @@ skills:
   # 1. gpu-standup — plan-execute, write-path with HITL
   - name: gpu-standup
     description: >
-      Full GPU worker standup: plan selection, cloud-init assembly for the
-      11C distribution (Ubuntu 24.04 + CUDA 12.8.1 + stallari-gpu-worker),
-      Tailscale auth injection, VM creation. Emits a standup receipt.
+      Full GPU worker standup: plan selection, cloud-init assembly for the 11C distribution (Ubuntu 24.04 + CUDA 12.8.1 + stallari-gpu-worker), Tailscale auth injection, VM creation. Emits a standup receipt.
     agent: provision-operator
     category: transform
-    tier: standard  # cloud-init assembly is templated; tier resolves to whatever the user has configured
+    tier: standard # cloud-init assembly is templated; tier resolves to whatever the user has configured
     trigger:
       on_demand: true
     graph: plan-execute
@@ -140,23 +118,19 @@ skills:
       - key: worker_name
         label: Worker hostname
         description: >
-          Tailnet hostname for this GPU worker (e.g. "gpu-1"). Must be unique
-          across the tailnet.
+          Tailnet hostname for this GPU worker (e.g. "gpu-1"). Must be unique across the tailnet.
         type: string
         required: true
       - key: ts_auth_key
         label: Tailscale pre-auth key
         description: >
-          Single-use ephemeral Tailscale pre-auth key for unattended tailnet
-          join. Leave blank to trigger QR-code flow (VM boots with tailscale
-          up; scan QR from console log).
+          Single-use ephemeral Tailscale pre-auth key for unattended tailnet join. Leave blank to trigger QR-code flow (VM boots with tailscale up; scan QR from console log).
         type: secret
         required: false
       - key: bearer_token
         label: MCP bearer token
         description: >
-          Bearer token the stallari-gpu-worker MCP server will require on all
-          inbound tool calls.
+          Bearer token the stallari-gpu-worker MCP server will require on all inbound tool calls.
         type: secret
         required: true
       - key: image_tag
@@ -309,16 +283,23 @@ skills:
       - If step 1 finds a duplicate, abort — do not proceed.
       - If step 3 finds the plan exceeds cost cap, abort — do not proceed.
       - Step 8 confirmation is mandatory. Never skip it.
+    required_services:
+      - virtualisation.vm_list
+      - virtualisation.vm_list_plans
+      - virtualisation.vm_list_regions
+      - virtualisation.vm_list_images
+      - virtualisation.vm_ssh_keys
+      - virtualisation.vm_create
+    allow_request_service: true
+    allow_request_tool: false
 
   # 2. ts-auth-provision — gate, classifier-then-route
   - name: ts-auth-provision
     description: >
-      Classify Tailscale auth deployment mode and emit the chosen flow.
-      Routes to pre-auth-key (unattended overlay-network inject), QR-code
-      (interactive console scan), or manual SSH fallback.
+      Classify Tailscale auth deployment mode and emit the chosen flow. Routes to pre-auth-key (unattended overlay-network inject), QR-code (interactive console scan), or manual SSH fallback.
     agent: bootstrap-classifier
     category: triage
-    tier: fast  # classify a 3-way enum from a small input — 8B model is sufficient
+    tier: fast # classify a 3-way enum from a small input — 8B model is sufficient
     trigger:
       on_demand: true
     graph: gate
@@ -330,7 +311,7 @@ skills:
         manual: react
     services_used:
       - service: overlay-network
-        operations: [keys, manage_keys]
+        operations: [ keys, manage_keys ]
     prompt: |
       Determine which Tailscale auth mode to use for this standup.
 
@@ -360,16 +341,19 @@ skills:
 
       Output: { mode, ts_auth_key, instructions }
       Pass mode and ts_auth_key to gpu-standup as inputs.
+    required_services:
+      - overlay-network.keys
+      - overlay-network.manage_keys
+    allow_request_service: true
+    allow_request_tool: false
 
   # 3. worker-verify — react-verify, post-provision health check
   - name: worker-verify
     description: >
-      Post-provision health check with deterministic retry. Polls VM status
-      until running, checks GPU availability, and verifies Tailscale tailnet
-      join via overlay-network device list.
+      Post-provision health check with deterministic retry. Polls VM status until running, checks GPU availability, and verifies Tailscale tailnet join via overlay-network device list.
     agent: verify-specialist
     category: review
-    tier: standard  # tool-loop with self-check; standard tier sufficient
+    tier: standard # tool-loop with self-check; standard tier sufficient
     trigger:
       on_demand: true
     graph: react-verify
@@ -386,9 +370,9 @@ skills:
         required: true
     services_used:
       - service: virtualisation
-        operations: [vm_get, vm_status]
+        operations: [ vm_get, vm_status ]
       - service: overlay-network
-        operations: [devices]
+        operations: [ devices ]
     prompt: |
       Verify a newly provisioned stallari-gpu-worker VM. Retry up to 5 times
       with 30-second backoff on non-terminal states.
@@ -432,14 +416,17 @@ skills:
           "notification_priority": 4,
           "notification_category": "alert"
         }
+    required_services:
+      - virtualisation.vm_get
+      - virtualisation.vm_status
+      - overlay-network.devices
+    allow_request_service: true
+    allow_request_tool: false
 
   # 4. fleet-health — react-extract, briefing-card-friendly read-only snapshot
   - name: fleet-health
     description: >
-      Read-only GPU fleet snapshot. Lists all VM instances, checks power
-      state, aggregates estimated hourly cost, and flags degraded or error
-      instances. Surfaces as a Today briefing card for at-a-glance fleet
-      awareness; emits a notification when degraded count > 0.
+      Read-only GPU fleet snapshot. Lists all VM instances, checks power state, aggregates estimated hourly cost, and flags degraded or error instances. Surfaces as a Today briefing card for at-a-glance fleet awareness; emits a notification when degraded count > 0.
     agent: audit-operator
     category: digest
     tier: standard
@@ -449,12 +436,12 @@ skills:
     graph: react-extract
     services_used:
       - service: virtualisation
-        operations: [vm_list, vm_get, vm_status]
+        operations: [ vm_list, vm_get, vm_status ]
     briefing:
       card_id: declarative-infra-fleet
       refresh_interval: 1h
       priority: 5
-      dismissal: none  # situational awareness — never dismiss
+      dismissal: none # situational awareness — never dismiss
     prompt: |
       Produce a fleet health snapshot for all GPU worker instances.
 
@@ -502,26 +489,29 @@ skills:
 
       6. Return a one-paragraph summary suitable for the briefing card —
          total, running, degraded count, total hourly burn.
+    required_services:
+      - virtualisation.vm_list
+      - virtualisation.vm_get
+      - virtualisation.vm_status
+    allow_request_service: true
+    allow_request_tool: false
 
   # 5. cost-trend — critique-refine digest, weekly briefing card
   - name: cost-trend
     description: >
-      Weekly cost rollup briefing. Aggregates per-VM cost over trailing 7
-      and 30 days, identifies cost trend (rising/flat/falling), and
-      surfaces top-3 cost contributors. Today briefing card; weekly digest
-      notification.
+      Weekly cost rollup briefing. Aggregates per-VM cost over trailing 7 and 30 days, identifies cost trend (rising/flat/falling), and surfaces top-3 cost contributors. Today briefing card; weekly digest notification.
     agent: audit-operator
     category: digest
     tier: standard
     trigger:
-      schedule: "0 7 * * 1"  # Mondays 07:00
+      schedule: "0 7 * * 1" # Mondays 07:00
     graph: critique-refine
     graph_config:
-      critique_criteria: [completeness, accuracy, trend-clarity]
+      critique_criteria: [ completeness, accuracy, trend-clarity ]
       max_critique_rounds: 2
     services_used:
       - service: virtualisation
-        operations: [vm_list, vm_get]
+        operations: [ vm_list, vm_get ]
     briefing:
       card_id: declarative-infra-costs
       refresh_interval: 1d
@@ -551,14 +541,16 @@ skills:
          }
       6. Return a per-instance summary table (Label | Hourly | Weekly |
          Monthly) suitable for the briefing card.
+    required_services:
+      - virtualisation.vm_list
+      - virtualisation.vm_get
+    allow_request_service: true
+    allow_request_tool: false
 
   # 6. image-upgrade-planner — react-extract, HITL upgrade planning
   - name: image-upgrade-planner
     description: >
-      Given a target stallari-gpu-worker image tag, identify which VMs are
-      stale (running an older tag), surface their workload status, and plan
-      a rolling-upgrade window respecting cost and capacity. HITL — emits
-      a plan, never auto-executes.
+      Given a target stallari-gpu-worker image tag, identify which VMs are stale (running an older tag), surface their workload status, and plan a rolling-upgrade window respecting cost and capacity. HITL — emits a plan, never auto-executes.
     agent: audit-operator
     category: review
     tier: standard
@@ -574,14 +566,13 @@ skills:
       - key: max_concurrent_offline
         label: Max VMs offline at once
         description: >
-          Cap on how many VMs may be in upgrade (stopped + restarted) at
-          the same time during the rolling upgrade window. Default 1.
+          Cap on how many VMs may be in upgrade (stopped + restarted) at the same time during the rolling upgrade window. Default 1.
         type: int
         default: 1
         required: false
     services_used:
       - service: virtualisation
-        operations: [vm_list, vm_get]
+        operations: [ vm_list, vm_get ]
     prompt: |
       Build a rolling-upgrade plan for the GPU fleet.
 
@@ -607,13 +598,16 @@ skills:
       6. Do NOT execute the upgrade. The user reviews this plan and runs
          `instance-teardown` + `gpu-standup` per instance, or invokes a
          future `rolling-upgrade-execute` skill (not yet shipped).
+    required_services:
+      - virtualisation.vm_list
+      - virtualisation.vm_get
+    allow_request_service: true
+    allow_request_tool: false
 
   # 7. instance-teardown — plan-execute, write-path with mandatory HITL
   - name: instance-teardown
     description: >
-      Safely decommission a GPU worker: stop, optionally snapshot, then
-      delete. Shows full instance identity before any destructive action.
-      Human confirmation required before vm_delete.
+      Safely decommission a GPU worker: stop, optionally snapshot, then delete. Shows full instance identity before any destructive action. Human confirmation required before vm_delete.
     agent: provision-operator
     category: transform
     tier: standard
@@ -631,14 +625,13 @@ skills:
       - key: snapshot_before_delete
         label: Snapshot before deletion
         description: >
-          Create a VM snapshot before deleting. Recommended if you may want
-          to restore (incurs brief additional cost while snapshot is taken).
+          Create a VM snapshot before deleting. Recommended if you may want to restore (incurs brief additional cost while snapshot is taken).
         type: boolean
         required: false
         default: false
     services_used:
       - service: virtualisation
-        operations: [vm_get, vm_stop, vm_snapshots, vm_delete]
+        operations: [ vm_get, vm_stop, vm_snapshots, vm_delete ]
     prompt: |
       Safely decommission a stallari-gpu-worker VM. Build a plan, confirm,
       then execute.
@@ -680,14 +673,18 @@ skills:
             "notification_priority": 3,
             "notification_category": "task"
           }
+    required_services:
+      - virtualisation.vm_get
+      - virtualisation.vm_stop
+      - virtualisation.vm_snapshots
+      - virtualisation.vm_delete
+    allow_request_service: true
+    allow_request_tool: false
 
   # 8. cloud-init-draft — critique-refine, security-aware draft
   - name: cloud-init-draft
     description: >
-      Generate and refine a cloud-init YAML for the 11C distribution
-      (Ubuntu 24.04 + CUDA 12.8.1 + stallari-gpu-worker). Self-critiques
-      for secret safety, idempotency, and Tailscale auth correctness before
-      emitting the final payload. Accepts QR-code or pre-auth-key auth mode.
+      Generate and refine a cloud-init YAML for the 11C distribution (Ubuntu 24.04 + CUDA 12.8.1 + stallari-gpu-worker). Self-critiques for secret safety, idempotency, and Tailscale auth correctness before emitting the final payload. Accepts QR-code or pre-auth-key auth mode.
     agent: provision-operator
     category: transform
     tier: standard
@@ -695,7 +692,7 @@ skills:
       on_demand: true
     graph: critique-refine
     graph_config:
-      critique_criteria: [secret-safety, idempotency, tailscale-auth, compose-correctness]
+      critique_criteria: [ secret-safety, idempotency, tailscale-auth, compose-correctness ]
       max_critique_rounds: 2
     inputs:
       - key: auth_mode
@@ -724,7 +721,7 @@ skills:
         default: latest
     services_used:
       - service: documentation
-        operations: [search, samples]
+        operations: [ search, samples ]
     prompt: |
       Generate a cloud-init YAML payload for the stallari-gpu-worker 11C
       distribution (Ubuntu 24.04 LTS + CUDA 12.8.1 base).
@@ -784,6 +781,11 @@ skills:
         - env_file path matches the .env write location
 
       Return: fenced cloud-init YAML block + one-line critique summary.
+    required_services:
+      - documentation.search
+      - documentation.samples
+    allow_request_service: true
+    allow_request_tool: false
 
 # ---------------------------------------------------------------------------
 # Workflows — three composed pipelines.
@@ -792,14 +794,13 @@ skills:
 workflows:
   - name: full-standup
     description: >
-      End-to-end GPU worker provisioning. Classifies Tailscale auth mode,
-      provisions the VM, then verifies health.
+      End-to-end GPU worker provisioning. Classifies Tailscale auth mode, provisions the VM, then verifies health.
     steps:
       - skill: ts-auth-provision
       - skill: gpu-standup
-        depends_on: [ts-auth-provision]
+        depends_on: [ ts-auth-provision ]
       - skill: worker-verify
-        depends_on: [gpu-standup]
+        depends_on: [ gpu-standup ]
 
   - name: safe-teardown
     description: >
@@ -807,12 +808,11 @@ workflows:
     steps:
       - skill: worker-verify
       - skill: instance-teardown
-        depends_on: [worker-verify]
+        depends_on: [ worker-verify ]
 
   - name: weekly-review
     description: >
-      Weekly fleet snapshot + cost trend rollup. Both surface as Today
-      briefing cards.
+      Weekly fleet snapshot + cost trend rollup. Both surface as Today briefing cards.
     schedule: "0 7 * * 1"
     steps:
       - skill: fleet-health
@@ -827,24 +827,21 @@ config:
     - key: default_region
       label: Preferred Vultr region
       description: >
-        Default datacenter slug for new GPU workers (e.g. ewr, lax, sjc, nrt).
-        Leave blank to auto-select nearest region with GPU availability.
+        Default datacenter slug for new GPU workers (e.g. ewr, lax, sjc, nrt). Leave blank to auto-select nearest region with GPU availability.
       type: string
       required: false
 
     - key: default_gpu_plan
       label: Default GPU plan
       description: >
-        Preferred Vultr GPU plan slug (e.g. vcg-a40-1c-6g, vcg-a100-80g-sxm4).
-        Leave blank to select cheapest available GPU plan.
+        Preferred Vultr GPU plan slug (e.g. vcg-a40-1c-6g, vcg-a100-80g-sxm4). Leave blank to select cheapest available GPU plan.
       type: string
       required: false
 
     - key: max_hourly_cost_cap
       label: Max hourly cost per VM (USD)
       description: >
-        Hard cap on per-VM hourly cost. gpu-standup aborts if the selected
-        plan's cost_per_hour exceeds this value. Identity-001 guardrail.
+        Hard cap on per-VM hourly cost. gpu-standup aborts if the selected plan's cost_per_hour exceeds this value. Identity-001 guardrail.
       type: float
       default: 5.00
       min: 0.10
@@ -877,29 +874,29 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: data-002
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: identity-001
       category: identity
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: identity-002
       category: identity
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"

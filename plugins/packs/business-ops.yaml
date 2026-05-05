@@ -1,15 +1,11 @@
-pack: "1.10"
+pack: "1.12"
 name: business-ops
 title: "Business Operations"
 featured: false
-version: "2.0.0"
+version: "3.0.0"
 tagline: "Revenue, accounting, payroll, and compliance in one operator"
 description: >-
-  Multi-service business operations automation — subscription revenue tracking,
-  double-entry accounting reconciliation, payroll compliance, weekly cash
-  rollup, aged-receivables alerts, and regulatory reporting. Three services,
-  one operator, sixteen skills that follow the money from billing to BAS
-  lodgement.
+  Multi-service business operations automation — subscription revenue tracking, double-entry accounting reconciliation, payroll compliance, weekly cash rollup, aged-receivables alerts, and regulatory reporting. Three services, one operator, sixteen skills that follow the money from billing to BAS lodgement.
 icon: /icons/business-ops.svg
 author:
   name: groupthink-dev
@@ -94,17 +90,17 @@ readme:
       Accounting-only mode works without billing, skipping revenue skills.
 
 highlights:
-  - icon: "\U0001F4B0"
+  - icon: "💰"
     text: "Revenue tracking — MRR, churn, ARPU, LTV from your billing provider"
-  - icon: "\U0001F4CA"
+  - icon: "📊"
     text: "Reconciliation + weekly cash + monthly financials briefing cards"
   - icon: "⚠️"
     text: "Aged-receivables daily alert — chase overdue invoices proactively"
-  - icon: "\U0001F4B3"
+  - icon: "💳"
     text: "Payroll visibility — pay run status, leave balances, super compliance (read-only)"
-  - icon: "\U0001F4CB"
+  - icon: "📋"
     text: "Compliance automation — BAS prep, vendor reconciliation, deadline tracking"
-  - icon: "\U0001F512"
+  - icon: "🔒"
     text: "All writes require human approval — refund authority capped, no auto-posting"
 
 links:
@@ -147,7 +143,7 @@ suggested_plugins:
 requires:
   services:
     - service: vault
-      operations: [read, search, create]
+      operations: [ read, search, create ]
     - service: accounting
       operations:
         - invoices
@@ -182,8 +178,8 @@ recommends:
         - customer
 
 data:
-  reads: [accounting, billing, vault]
-  writes: [accounting, billing, vault]
+  reads: [ accounting, billing, vault ]
+  writes: [ accounting, billing, vault ]
   stores: nothing
   phones_home: false
 
@@ -193,24 +189,18 @@ scenarios:
   - type: pairs_with
     target: saas-revenue-ops
     target_type: pack
-    shared_services: [billing]
+    shared_services: [ billing ]
     label: "Combine with SaaS Revenue Ops for end-to-end billing + accounting"
     body: >-
-      SaaS Revenue Ops monitors the billing pipeline (subscriptions, orders,
-      delivery). Business Ops picks up where revenue lands — reconciling
-      billing against accounting, tracking expenses, managing payroll, and
-      preparing compliance reports. Together they cover checkout to BAS.
+      SaaS Revenue Ops monitors the billing pipeline (subscriptions, orders, delivery). Business Ops picks up where revenue lands — reconciling billing against accounting, tracking expenses, managing payroll, and preparing compliance reports. Together they cover checkout to BAS.
 
   - type: pairs_with
     target: product-operations-starter
     target_type: pack
-    shared_services: [billing, vault]
+    shared_services: [ billing, vault ]
     label: "Combine with Product Operations Starter for comms + accounting"
     body: >-
-      Product Operations Starter handles release announcements, customer
-      onboarding, and contact sync. Business Ops handles the financial
-      back-office — reconciliation, expenses, payroll, compliance. Together
-      they cover the full product operations lifecycle.
+      Product Operations Starter handles release announcements, customer onboarding, and contact sync. Business Ops handles the financial back-office — reconciliation, expenses, payroll, compliance. Together they cover the full product operations lifecycle.
 
 # ── Agent ───────────────────────────────────────────────────────────
 
@@ -277,9 +267,9 @@ skills:
     graph: react-extract
     services_used:
       - service: billing
-        operations: [subscriptions, customers, products, transactions]
+        operations: [ subscriptions, customers, products, transactions ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
     prompt: |
@@ -301,6 +291,14 @@ skills:
          to nearest dollar in output (data-004 + vault-001).
       8. Archive the full report to vault with {{vault.create}} —
          publish: false, exact unrounded figures in the vault note.
+    required_services:
+      - billing.subscriptions
+      - billing.customers
+      - billing.products
+      - billing.transactions
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: churn-alert
     agent: bizops
@@ -310,9 +308,9 @@ skills:
     graph: react-extract
     services_used:
       - service: billing
-        operations: [subscriptions, subscription, transactions]
+        operations: [ subscriptions, subscription, transactions ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       schedule: "0 7 * * *"
     prompt: |
@@ -341,20 +339,27 @@ skills:
            "notification_priority": 4,
            "notification_category": "alert"
          }
+    required_services:
+      - billing.subscriptions
+      - billing.subscription
+      - billing.transactions
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: refund-processor
     agent: bizops
     description: Policy-checked refund — plan, confirm, execute (high-blast-radius write)
     tier: standard
     category: review
-    graph: plan-execute  # high-blast-radius billing write — plan + confirm + execute
+    graph: plan-execute # high-blast-radius billing write — plan + confirm + execute
     graph_config:
       max_replan_attempts: 1
     services_used:
       - service: billing
-        operations: [subscription, customer, transactions, create_adjustment]
+        operations: [ subscription, customer, transactions, create_adjustment ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
     prompt: |
@@ -395,6 +400,14 @@ skills:
            "notification_priority": 4,
            "notification_category": "task"
          }
+    required_services:
+      - billing.subscription
+      - billing.customer
+      - billing.transactions
+      - billing.create_adjustment
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Accounting ──────────────────────────────────────────────────
 
@@ -406,11 +419,11 @@ skills:
     graph: react-extract
     services_used:
       - service: billing
-        operations: [transactions, subscriptions]
+        operations: [ transactions, subscriptions ]
       - service: accounting
-        operations: [invoices, payments]
+        operations: [ invoices, payments ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       schedule: "0 8 1,15 * *"
     prompt: |
@@ -445,6 +458,14 @@ skills:
 
       If billing service is not configured, report that reconciliation
       requires both billing and accounting services, and exit.
+    required_services:
+      - billing.transactions
+      - billing.subscriptions
+      - accounting.invoices
+      - accounting.payments
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: monthly-financials
     agent: bizops
@@ -454,9 +475,9 @@ skills:
     graph: react-extract
     services_used:
       - service: accounting
-        operations: [profit_loss, balance_sheet, trial_balance, accounts]
+        operations: [ profit_loss, balance_sheet, trial_balance, accounts ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       schedule: "0 8 1 * *"
     briefing:
@@ -486,6 +507,14 @@ skills:
          publish: false, exact figures in vault note.
       7. Return a one-paragraph summary (top-line revenue, expenses,
          net, MoM direction) for the briefing card.
+    required_services:
+      - accounting.profit_loss
+      - accounting.balance_sheet
+      - accounting.trial_balance
+      - accounting.accounts
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: weekly-cash-summary
     agent: bizops
@@ -494,15 +523,15 @@ skills:
     category: digest
     graph: critique-refine
     graph_config:
-      critique_criteria: [completeness, accuracy, trend-clarity]
+      critique_criteria: [ completeness, accuracy, trend-clarity ]
       max_critique_rounds: 2
     services_used:
       - service: accounting
-        operations: [bank_transactions, invoices, bills, balance_sheet]
+        operations: [ bank_transactions, invoices, bills, balance_sheet ]
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
     trigger:
-      schedule: "0 7 * * 1"  # Mondays 07:00
+      schedule: "0 7 * * 1" # Mondays 07:00
     briefing:
       card_id: business-ops-weekly-cash
       refresh_interval: 1d
@@ -536,20 +565,30 @@ skills:
            "notification_category": "digest"
          }
       9. Return the per-line rollup table for the briefing card.
+    required_services:
+      - accounting.bank_transactions
+      - accounting.invoices
+      - accounting.bills
+      - accounting.balance_sheet
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: aged-receivables-alert
     agent: bizops
     description: Daily aged-receivables check (5/15/30/60 day buckets)
-    tier: fast  # date-bucket filter, no reasoning needed
+    tier: fast # date-bucket filter, no reasoning needed
     category: triage
     graph: react-extract
     services_used:
       - service: accounting
-        operations: [aged_receivables, contacts]
+        operations: [ aged_receivables, contacts ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
-      schedule: "0 8 * * *"  # daily 08:00
+      schedule: "0 8 * * *" # daily 08:00
     prompt: |
       Identify overdue invoices via the accounting aged-receivables
       report.
@@ -572,20 +611,26 @@ skills:
          }
       5. Archive to vault with {{vault.create}} — publish: false. Full
          contact names + invoice references in the note (vault-001).
+    required_services:
+      - accounting.aged_receivables
+      - accounting.contacts
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: expense-entry
     agent: bizops
     description: Plan-confirm-execute bill posting from user input or vault cost notes
     tier: standard
     category: sync
-    graph: plan-execute  # high-blast-radius accounting write — plan + confirm + execute
+    graph: plan-execute # high-blast-radius accounting write — plan + confirm + execute
     graph_config:
       max_replan_attempts: 1
     services_used:
       - service: accounting
-        operations: [contacts, accounts, create_bill]
+        operations: [ contacts, accounts, create_bill ]
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
     trigger:
       on_demand: true
     prompt: |
@@ -616,6 +661,15 @@ skills:
            "notification_priority": 3,
            "notification_category": "task"
          }
+    required_services:
+      - accounting.contacts
+      - accounting.accounts
+      - accounting.create_bill
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: cost-anomaly
     agent: bizops
@@ -625,9 +679,9 @@ skills:
     graph: react-extract
     services_used:
       - service: accounting
-        operations: [bills, bank_transactions, profit_loss]
+        operations: [ bills, bank_transactions, profit_loss ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       schedule: "0 8 * * 1"
     briefing:
@@ -663,6 +717,13 @@ skills:
            "notification_category": "alert"
          }
       7. Return the trend table for the briefing card.
+    required_services:
+      - accounting.bills
+      - accounting.bank_transactions
+      - accounting.profit_loss
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: tax-prep
     agent: bizops
@@ -672,9 +733,9 @@ skills:
     graph: react-extract
     services_used:
       - service: accounting
-        operations: [tax_rates, profit_loss, balance_sheet, invoices, bills]
+        operations: [ tax_rates, profit_loss, balance_sheet, invoices, bills ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       schedule: "0 9 1 1,4,7,10 *"
     prompt: |
@@ -700,6 +761,15 @@ skills:
          external accountant. Tables and totals.
       5. Archive: create vault note with {{vault.create}} —
          publish: false.
+    required_services:
+      - accounting.tax_rates
+      - accounting.profit_loss
+      - accounting.balance_sheet
+      - accounting.invoices
+      - accounting.bills
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: vendor-reconciliation
     agent: bizops
@@ -709,11 +779,11 @@ skills:
     graph: react-extract
     services_used:
       - service: accounting
-        operations: [bills, contacts, payments]
+        operations: [ bills, contacts, payments ]
       - service: billing
-        operations: [transactions]
+        operations: [ transactions ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       schedule: "0 9 1 * *"
     prompt: |
@@ -735,6 +805,14 @@ skills:
 
       If billing service is not configured, produce an accounting-only
       vendor summary (bills and payment status).
+    required_services:
+      - accounting.bills
+      - accounting.contacts
+      - accounting.payments
+      - billing.transactions
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Payroll ─────────────────────────────────────────────────────
 
@@ -746,9 +824,9 @@ skills:
     graph: react-extract
     services_used:
       - service: accounting
-        operations: [employees, payslips]
+        operations: [ employees, payslips ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
     prompt: |
@@ -769,6 +847,12 @@ skills:
       Format as markdown table. Hash employee names in stdout per
       data-004 — full details only in vault note. Archive with
       {{vault.create}} — publish: false.
+    required_services:
+      - accounting.employees
+      - accounting.payslips
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: super-compliance
     agent: bizops
@@ -778,9 +862,9 @@ skills:
     graph: react-verify
     services_used:
       - service: accounting
-        operations: [employees, employee, payslips, payslip]
+        operations: [ employees, employee, payslips, payslip ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       schedule: "0 9 28 * *"
     briefing:
@@ -830,6 +914,14 @@ skills:
            "notification_category": "alert"
          }
       7. Return per-employee compliance table for the briefing card.
+    required_services:
+      - accounting.employees
+      - accounting.employee
+      - accounting.payslips
+      - accounting.payslip
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: leave-balances
     agent: bizops
@@ -839,9 +931,9 @@ skills:
     graph: react-extract
     services_used:
       - service: accounting
-        operations: [employees, employee]
+        operations: [ employees, employee ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
     prompt: |
@@ -860,6 +952,12 @@ skills:
       Format as markdown table: employee (hashed in stdout per data-004),
       annual leave balance, personal leave balance, flags. Archive with
       {{vault.create}} — publish: false, full names in vault note only.
+    required_services:
+      - accounting.employees
+      - accounting.employee
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Compliance ──────────────────────────────────────────────────
 
@@ -871,9 +969,9 @@ skills:
     graph: react-extract
     services_used:
       - service: accounting
-        operations: [tax_rates, profit_loss, balance_sheet, invoices, bills, aged_receivables, aged_payables]
+        operations: [ tax_rates, profit_loss, balance_sheet, invoices, bills, aged_receivables, aged_payables ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       schedule: "0 9 1 1,4,7,10 *"
     prompt: |
@@ -910,6 +1008,17 @@ skills:
            "notification_priority": 3,
            "notification_category": "task"
          }
+    required_services:
+      - accounting.tax_rates
+      - accounting.profit_loss
+      - accounting.balance_sheet
+      - accounting.invoices
+      - accounting.bills
+      - accounting.aged_receivables
+      - accounting.aged_payables
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: compliance-digest
     agent: bizops
@@ -919,7 +1028,7 @@ skills:
     graph: react-extract
     services_used:
       - service: vault
-        operations: [search, read]
+        operations: [ search, read ]
     trigger:
       schedule: "0 8 1 * *"
     briefing:
@@ -959,6 +1068,11 @@ skills:
            "notification_category": "alert"
          }
       7. Return the digest grouped by category for the briefing card.
+    required_services:
+      - vault.search
+      - vault.read
+    allow_request_service: true
+    allow_request_tool: false
 
 # ── Workflows ───────────────────────────────────────────────────────
 
@@ -969,9 +1083,9 @@ workflows:
     steps:
       - skill: invoice-reconciliation
       - skill: monthly-financials
-        depends_on: [invoice-reconciliation]
+        depends_on: [ invoice-reconciliation ]
       - skill: vendor-reconciliation
-        depends_on: [invoice-reconciliation]
+        depends_on: [ invoice-reconciliation ]
 
   - name: quarterly-compliance
     description: Quarterly tax and BAS preparation
@@ -979,7 +1093,7 @@ workflows:
     steps:
       - skill: tax-prep
       - skill: bas-lodgement-prep
-        depends_on: [tax-prep]
+        depends_on: [ tax-prep ]
 
   - name: monthly-compliance
     description: Monthly compliance and payroll checks
@@ -1019,8 +1133,7 @@ config:
       type: number
       label: Max refund amount (USD)
       description: >
-        Hard cap on refund authority. refund-processor aborts if the
-        calculated refund exceeds this. identity-001 enforcement.
+        Hard cap on refund authority. refund-processor aborts if the calculated refund exceeds this. identity-001 enforcement.
       default: 500
       required: false
     - key: churn_threshold
@@ -1033,8 +1146,7 @@ config:
       type: number
       label: Aged-receivables alert threshold (USD)
       description: >
-        Combined 30+/60+ day overdue total above which aged-receivables-alert
-        fires a P4 notification.
+        Combined 30+/60+ day overdue total above which aged-receivables-alert fires a P4 notification.
       default: 1000
       required: false
     - key: super_due_day
@@ -1053,41 +1165,41 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: data-002
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: data-003
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: data-004
       category: data-handling
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: vault-001
       category: vault
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: identity-001
       category: identity
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"

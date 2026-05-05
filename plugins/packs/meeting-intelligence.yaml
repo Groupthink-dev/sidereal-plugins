@@ -1,14 +1,12 @@
-pack: "1.6"
+pack: "1.12"
 name: meeting-intelligence
 title: "Meeting Intelligence"
 featured: false
-version: "1.0.0"
+version: "2.0.0"
 author_type: community
 readiness: experimental
 description: >-
-  Privacy-first meeting processing — on-device transcription via mlx-whisper,
-  attendee extraction matched to vault people cards, action item tracking, and
-  weekly commitments digest. Audio never leaves your machine.
+  Privacy-first meeting processing — on-device transcription via mlx-whisper, attendee extraction matched to vault people cards, action item tracking, and weekly commitments digest. Audio never leaves your machine.
 icon: /icons/meeting-intelligence.svg
 author:
   name: digitalassistants-au
@@ -77,15 +75,15 @@ readme:
       financials review, COI disclosure)
 
 highlights:
-  - icon: "\U0001F3A4"
+  - icon: "🎤"
     text: "On-device transcription — audio never leaves your machine"
-  - icon: "\U0001F4DD"
+  - icon: "📝"
     text: "4 skills — transcribe, extract, weekly digest, and ad-hoc processing"
-  - icon: "\U0001F465"
+  - icon: "👥"
     text: "Attendee matching — Lens search links speakers to vault people cards"
-  - icon: "\U0001F4CB"
+  - icon: "📋"
     text: "Action tracking — decisions and action items with assignees and due dates"
-  - icon: "\U0001F512"
+  - icon: "🔒"
     text: "Zero data egress — all processing local, nothing phones home"
 
 links:
@@ -99,18 +97,18 @@ min_stallari: "0.38"
 requires:
   services:
     - service: vault
-      operations: [read, search, create, append, files, lens_fts]
+      operations: [ read, search, create, append, files, lens_fts ]
 
 recommends:
   services:
     - service: calendar
-      operations: [events, today]
+      operations: [ events, today ]
     - service: notifications
-      operations: [send]
+      operations: [ send ]
 
 data:
-  reads: [vault, calendar]
-  writes: [vault]
+  reads: [ vault, calendar ]
+  writes: [ vault ]
   stores: nothing
   phones_home: false
 
@@ -134,7 +132,7 @@ skills:
     graph: react-extract
     services_used:
       - service: vault
-        operations: [read, create, files]
+        operations: [ read, create, files ]
     trigger:
       watch:
         - "+/ingest/meetings/"
@@ -162,6 +160,12 @@ skills:
       After saving, move the original file to +/ingest/meetings/processed/
       to prevent re-processing. Set notification_body with the filename and
       word count.
+    required_services:
+      - vault.read
+      - vault.create
+      - vault.files
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: extract-minutes
     agent: meeting-processor
@@ -171,7 +175,7 @@ skills:
     graph: react-extract
     services_used:
       - service: vault
-        operations: [read, search, create, append, lens_fts]
+        operations: [ read, search, create, append, lens_fts ]
     trigger:
       on_demand: true
     depends_on:
@@ -212,6 +216,14 @@ skills:
       Link the minutes note back to the transcript note via the transcript
       frontmatter field. Set notification_body with attendee count and
       action item count.
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+      - vault.append
+      - vault.lens_fts
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: weekly-commitments
     agent: meeting-processor
@@ -221,9 +233,9 @@ skills:
     graph: react-extract
     services_used:
       - service: vault
-        operations: [read, search, files, query_properties]
+        operations: [ read, search, files, query_properties ]
       - service: notifications
-        operations: [send]
+        operations: [ send ]
     trigger:
       schedule: "0 9 * * 1"
     outputs:
@@ -253,6 +265,14 @@ skills:
 
       Set notification_body: "{total_open} open commitments, {total_overdue}
       overdue" and notification_priority: 3.
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.files
+      - vault.query_properties
+      - notifications.send
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: process-meeting
     agent: meeting-processor
@@ -262,7 +282,7 @@ skills:
     graph: react-extract
     services_used:
       - service: vault
-        operations: [read, search, create, append, files, lens_fts]
+        operations: [ read, search, create, append, files, lens_fts ]
     trigger:
       on_demand: true
     inputs:
@@ -270,8 +290,7 @@ skills:
         type: string
         label: Path to audio file or transcript
         description: >-
-          Absolute path or vault-relative path to the audio file (.mp3, .m4a,
-          .wav, .webm) or transcript (.txt, .md) to process.
+          Absolute path or vault-relative path to the audio file (.mp3, .m4a, .wav, .webm) or transcript (.txt, .md) to process.
         required: true
     outputs:
       - type: vault_note
@@ -301,3 +320,12 @@ skills:
 
       Set notification_body with the meeting title, attendee count, and
       action item count.
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+      - vault.append
+      - vault.files
+      - vault.lens_fts
+    allow_request_service: true
+    allow_request_tool: false

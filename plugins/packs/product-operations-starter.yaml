@@ -1,13 +1,10 @@
-pack: "1.10"
+pack: "1.12"
 name: product-operations-starter
 title: "Product Operations Starter"
 featured: false
-version: "2.0.0"
+version: "3.0.0"
 description: >-
-  Starter pack for running product operations with Stallari — release
-  announcements, customer onboarding, subscription monitoring, MRR digest,
-  lapsing-subscription alerts, and contact management. Fork and customise
-  for your own product.
+  Starter pack for running product operations with Stallari — release announcements, customer onboarding, subscription monitoring, MRR digest, lapsing-subscription alerts, and contact management. Fork and customise for your own product.
 icon: /icons/product-operations-starter.svg
 author:
   name: groupthink-dev
@@ -90,17 +87,17 @@ readme:
     - Contact sync is **one-way** (vault → provider) and batch-reviewed.
 
 highlights:
-  - icon: "\U0001F4E3"
+  - icon: "📣"
     text: "Release announcements — compose, critique-refine, review, send"
-  - icon: "\U0001F44B"
+  - icon: "👋"
     text: "Customer onboarding — personalised welcome with HITL"
-  - icon: "\U0001F4CA"
+  - icon: "📊"
     text: "Subscription dashboard + weekly MRR briefing card"
   - icon: "⚠️"
     text: "Lapsing-subscription alerts — daily check, proactive notification"
-  - icon: "\U0001F4C7"
+  - icon: "📇"
     text: "Contact sync — one-way vault → provider, batch-reviewed"
-  - icon: "\U0001F512"
+  - icon: "🔒"
     text: "All sends require human approval — no auto-send, ever"
 
 links:
@@ -116,20 +113,20 @@ min_stallari: "0.77"
 requires:
   services:
     - service: transactional-email
-      operations: [send, list_contacts, list_templates, get_template, list_domains]
+      operations: [ send, list_contacts, list_templates, get_template, list_domains ]
     - service: vault
-      operations: [read, search, create]
+      operations: [ read, search, create ]
 
 recommends:
   services:
     - service: billing
-      operations: [subscriptions, customers, products]
+      operations: [ subscriptions, customers, products ]
     - service: transactional-email
-      operations: [create_contact, list_segments, create_broadcast, send_broadcast]
+      operations: [ create_contact, list_segments, create_broadcast, send_broadcast ]
 
 data:
-  reads: [transactional-email, billing, vault]
-  writes: [transactional-email, vault]
+  reads: [ transactional-email, billing, vault ]
+  writes: [ transactional-email, vault ]
   stores: nothing
   phones_home: false
 
@@ -175,13 +172,13 @@ skills:
     category: notify
     graph: critique-refine
     graph_config:
-      critique_criteria: [accuracy, tone, completeness, no-overclaim]
+      critique_criteria: [ accuracy, tone, completeness, no-overclaim ]
       max_critique_rounds: 2
     services_used:
       - service: transactional-email
-        operations: [send, list_templates, list_contacts, list_segments]
+        operations: [ send, list_templates, list_contacts, list_segments ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
     prompt: |
@@ -216,20 +213,28 @@ skills:
            "notification_priority": 3,
            "notification_category": "task"
          }
+    required_services:
+      - transactional-email.send
+      - transactional-email.list_templates
+      - transactional-email.list_contacts
+      - transactional-email.list_segments
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: customer-welcome
     agent: comms-ops
     description: Send a personalised welcome email to a new customer
-    tier: fast  # highly templated single-recipient personalisation; 8B-class is sufficient
+    tier: fast # highly templated single-recipient personalisation; 8B-class is sufficient
     category: notify
-    graph: plan-execute  # high-blast-radius (email send) — plan, confirm, execute
+    graph: plan-execute # high-blast-radius (email send) — plan, confirm, execute
     graph_config:
       max_replan_attempts: 1
     services_used:
       - service: transactional-email
-        operations: [send, list_contacts, create_contact, get_template]
+        operations: [ send, list_contacts, create_contact, get_template ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
     prompt: |
@@ -263,6 +268,14 @@ skills:
            "notification_priority": 3,
            "notification_category": "task"
          }
+    required_services:
+      - transactional-email.send
+      - transactional-email.list_contacts
+      - transactional-email.create_contact
+      - transactional-email.get_template
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   # --- Bizops (read-only) ---
 
@@ -271,12 +284,12 @@ skills:
     description: Read-only on-demand subscription dashboard
     tier: standard
     category: report
-    graph: react-extract  # tool-loop ending in a structured dashboard JSON
+    graph: react-extract # tool-loop ending in a structured dashboard JSON
     services_used:
       - service: billing
-        operations: [subscriptions, customers, products]
+        operations: [ subscriptions, customers, products ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
     prompt: |
@@ -296,6 +309,13 @@ skills:
          Frontmatter: `kind: subscription-dashboard, mrr, churn_rate,
          trial_count, past_due_count, llm_generated: true, publish: false`
       6. Return a one-paragraph summary suitable for inline display.
+    required_services:
+      - billing.subscriptions
+      - billing.customers
+      - billing.products
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: weekly-mrr-digest
     agent: bizops
@@ -304,15 +324,15 @@ skills:
     category: digest
     graph: critique-refine
     graph_config:
-      critique_criteria: [completeness, accuracy, trend-clarity]
+      critique_criteria: [ completeness, accuracy, trend-clarity ]
       max_critique_rounds: 2
     services_used:
       - service: billing
-        operations: [subscriptions]
+        operations: [ subscriptions ]
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
     trigger:
-      schedule: "0 7 * * 1"  # Mondays 07:00
+      schedule: "0 7 * * 1" # Mondays 07:00
     briefing:
       card_id: product-ops-weekly-mrr
       refresh_interval: 1d
@@ -347,18 +367,25 @@ skills:
          }
       7. Return a per-status table + one-paragraph narrative for the
          briefing card.
+    required_services:
+      - billing.subscriptions
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: lapsing-subscription-alert
     agent: bizops
     description: Daily check for trials about to expire and subs heading for payment failure
-    tier: fast  # filter API result by date — no reasoning required
+    tier: fast # filter API result by date — no reasoning required
     category: report
     graph: react-extract
     services_used:
       - service: billing
-        operations: [subscriptions]
+        operations: [ subscriptions ]
     trigger:
-      schedule: "0 8 * * *"  # daily 08:00
+      schedule: "0 8 * * *" # daily 08:00
     prompt: |
       Identify subscriptions at risk of lapsing in the next
       {{config.lapsing_window_days}} days.
@@ -380,6 +407,10 @@ skills:
          }
       5. Return a structured JSON payload — no vault archive (transient
          alert; the underlying subscription data lives in billing).
+    required_services:
+      - billing.subscriptions
+    allow_request_service: true
+    allow_request_tool: false
 
   # --- Contact sync (HITL batch) ---
 
@@ -391,9 +422,9 @@ skills:
     graph: react-extract
     services_used:
       - service: transactional-email
-        operations: [list_contacts, create_contact]
+        operations: [ list_contacts, create_contact ]
       - service: vault
-        operations: [read, search]
+        operations: [ read, search ]
     trigger:
       on_demand: true
     prompt: |
@@ -420,6 +451,13 @@ skills:
            "notification_priority": 3,
            "notification_category": "task"
          }
+    required_services:
+      - transactional-email.list_contacts
+      - transactional-email.create_contact
+      - vault.read
+      - vault.search
+    allow_request_service: true
+    allow_request_tool: false
 
 workflows:
   - name: new-customer
@@ -427,7 +465,7 @@ workflows:
     steps:
       - skill: customer-welcome
       - skill: contact-sync
-        depends_on: [customer-welcome]
+        depends_on: [ customer-welcome ]
 
   - name: weekly-review
     description: Weekly MRR digest + lapsing-subscription check
@@ -452,8 +490,7 @@ config:
       type: int
       label: Lapsing-subscription alert window (days)
       description: >
-        Trials whose trial_end is within this many days are flagged by
-        the lapsing-subscription-alert skill. Default 5.
+        Trials whose trial_end is within this many days are flagged by the lapsing-subscription-alert skill. Default 5.
       default: 5
       min: 1
       max: 30
@@ -466,17 +503,17 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: identity-001
       category: identity
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"

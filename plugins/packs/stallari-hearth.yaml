@@ -1,15 +1,12 @@
-pack: "1.10"
+pack: "1.12"
 name: stallari-hearth
-aliases: [stallari-hearth]
+aliases: [ stallari-hearth ]
 title: "Stallari Hearth"
 featured: false
-version: "2.0.0"
+version: "3.0.0"
 readiness: beta
 description: >-
-  Smart home intelligence for Stallari — site status monitoring, device
-  inventory tracking, daily home briefing, unavailable-device watcher,
-  and scene management across your connected home. Multi-site Home
-  Assistant native.
+  Smart home intelligence for Stallari — site status monitoring, device inventory tracking, daily home briefing, unavailable-device watcher, and scene management across your connected home. Multi-site Home Assistant native.
 icon: /icons/stallari-hearth.svg
 author:
   name: Stallari
@@ -88,17 +85,17 @@ readme:
     - Every action logged to the vault decision ledger
 
 highlights:
-  - icon: "\U0001F3E0"
+  - icon: "🏠"
     text: "Multi-site monitoring — health summaries across all your HA instances"
-  - icon: "\U0001F305"
+  - icon: "🌅"
     text: "Daily home brief — overnight activity + anomalies as a Today card"
-  - icon: "\U0001F4CB"
+  - icon: "📋"
     text: "Device inventory — full entity enumeration with change detection"
   - icon: "⚠️"
     text: "Unavailable watcher — daily alert on entities going offline"
-  - icon: "\U0001F3AC"
+  - icon: "🎬"
     text: "Scene management — HITL plan-execute with extra confirmation on security scenes"
-  - icon: "\U0001F50C"
+  - icon: "🔌"
     text: "Home Assistant native — built on the HA entity and area model"
 
 links:
@@ -114,18 +111,18 @@ min_stallari: "0.77"
 requires:
   services:
     - service: vault
-      operations: [read, search, create, append]
+      operations: [ read, search, create, append ]
     - service: home
-      operations: [entity_list, entity_state, area_list]
+      operations: [ entity_list, entity_state, area_list ]
 
 recommends:
   services:
     - service: home
-      operations: [scene_activate, entity_history, automation_list, automation_traces]
+      operations: [ scene_activate, entity_history, automation_list, automation_traces ]
 
 data:
-  reads: [vault, home]
-  writes: [vault]
+  reads: [ vault, home ]
+  writes: [ vault ]
   stores: nothing
   phones_home: false
 
@@ -170,16 +167,16 @@ skills:
     graph: react-extract
     services_used:
       - service: home
-        operations: [entity_state, area_list]
+        operations: [ entity_state, area_list ]
       - service: vault
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
     briefing:
       card_id: stallari-hearth-status
       refresh_interval: 1h
       priority: 5
-      dismissal: none  # situational awareness — never dismiss
+      dismissal: none # situational awareness — never dismiss
     prompt: |
       Generate a per-site health summary across all configured HA sites.
 
@@ -207,6 +204,12 @@ skills:
          }
       6. Return a per-site one-paragraph summary suitable for the
          briefing card — counts + status flags only.
+    required_services:
+      - home.entity_state
+      - home.area_list
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: daily-home-brief
     agent: home-operator
@@ -215,15 +218,15 @@ skills:
     category: digest
     graph: critique-refine
     graph_config:
-      critique_criteria: [completeness, accuracy, brevity]
+      critique_criteria: [ completeness, accuracy, brevity ]
       max_critique_rounds: 2
     services_used:
       - service: home
-        operations: [entity_state, automation_list, automation_traces]
+        operations: [ entity_state, automation_list, automation_traces ]
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
     trigger:
-      schedule: "0 7 * * *"  # daily 07:00
+      schedule: "0 7 * * *" # daily 07:00
     briefing:
       card_id: stallari-hearth-daily
       refresh_interval: 1d
@@ -255,20 +258,29 @@ skills:
            "notification_category": "digest"
          }
       6. Return a per-site summary table for the briefing card.
+    required_services:
+      - home.entity_state
+      - home.automation_list
+      - home.automation_traces
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: unavailable-watcher
     agent: home-operator
     description: Daily check for entities going offline / unavailable
-    tier: fast  # filter entities by state — no reasoning
+    tier: fast # filter entities by state — no reasoning
     category: triage
     graph: react-extract
     services_used:
       - service: home
-        operations: [entity_state]
+        operations: [ entity_state ]
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
     trigger:
-      schedule: "0 8 * * *"  # daily 08:00
+      schedule: "0 8 * * *" # daily 08:00
     prompt: |
       Detect entities that have been in `unavailable` state across runs.
 
@@ -292,6 +304,13 @@ skills:
            "notification_priority": 4,
            "notification_category": "alert"
          }
+    required_services:
+      - home.entity_state
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: device-inventory
     agent: home-operator
@@ -301,9 +320,9 @@ skills:
     graph: react-extract
     services_used:
       - service: home
-        operations: [entity_list, area_list]
+        operations: [ entity_list, area_list ]
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     prompt: |
@@ -335,20 +354,27 @@ skills:
            "notification_priority": 3,
            "notification_category": "task"
          }
+    required_services:
+      - home.entity_list
+      - home.area_list
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: scene-manager
     agent: home-operator
     description: List + activate scenes with HITL plan-execute (extra confirmation on security scenes)
     tier: standard
     category: transform
-    graph: plan-execute  # high-blast-radius — scene activation may trigger physical state changes
+    graph: plan-execute # high-blast-radius — scene activation may trigger physical state changes
     graph_config:
       max_replan_attempts: 1
     services_used:
       - service: home
-        operations: [entity_list, scene_activate]
+        operations: [ entity_list, scene_activate ]
       - service: vault
-        operations: [append]
+        operations: [ append ]
     trigger:
       on_demand: true
     prompt: |
@@ -388,6 +414,12 @@ skills:
            "notification_priority": 3,        // 4 if security-relevant
            "notification_category": "task"
          }
+    required_services:
+      - home.entity_list
+      - home.scene_activate
+      - vault.append
+    allow_request_service: true
+    allow_request_tool: false
 
 workflows:
   - name: site-check
@@ -395,7 +427,7 @@ workflows:
     steps:
       - skill: device-inventory
       - skill: site-status
-        depends_on: [device-inventory]
+        depends_on: [ device-inventory ]
 
   - name: morning-brief
     description: Daily home brief + unavailable watcher
@@ -411,16 +443,14 @@ config:
       label: HA Sites
       required: true
       description: >-
-        Map of site slugs to HA instance names and vault paths. Example:
-        { "sandy-bay": { "ha_instance": "homeassistant-sandybay",
+        Map of site slugs to HA instance names and vault paths. Example: { "sandy-bay": { "ha_instance": "homeassistant-sandybay",
           "vault_path": "spaces/Family Living/Areas/Property - Sandy Bay" } }
 
     - key: unavailable_threshold
       type: int
       label: Unavailable-watcher alert threshold
       description: >
-        Number of persistently-unavailable entities (across two runs)
-        above which unavailable-watcher fires a P4 alert.
+        Number of persistently-unavailable entities (across two runs) above which unavailable-watcher fires a P4 alert.
       default: 3
       min: 1
       max: 50
@@ -433,17 +463,17 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: exfil-001
       category: exfiltration
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"

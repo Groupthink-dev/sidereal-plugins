@@ -1,15 +1,11 @@
-pack: "1.10"
+pack: "1.12"
 name: speculator
 title: "Speculator"
 featured: true
-version: "2.0.0"
-tagline: "Betting exchanges, prediction markets, and brokerage — cross-market pricing in one conversation"
+version: "3.0.0"
+tagline: "Prediction markets and brokerage — cross-market pricing in one conversation"
 description: >-
-  Cross-market speculation and analysis — Betfair exchange odds,
-  Polymarket prediction prices, and Interactive Brokers portfolio data.
-  Three market types, one agent, seven skills (incl. opening + closing
-  briefs, watchlist movement alerts, exposure briefing card). Strictly
-  read-only — no order execution under any circumstance.
+  Cross-market speculation and analysis — Polymarket prediction prices and Interactive Brokers portfolio data. Two market types, one agent, seven skills (incl. opening + closing briefs, watchlist movement alerts, exposure briefing card). Strictly read-only — no order execution under any circumstance.
 icon: /icons/speculator.svg
 author:
   name: Stallari
@@ -27,31 +23,28 @@ readme:
   body: |
     # Speculator
 
-    Cross-market pricing intelligence for Stallari — betting exchanges,
-    prediction markets, and securities brokerage unified in one
-    conversation. The same event priced three different ways, compared
-    in seconds.
+    Cross-market pricing intelligence for Stallari — prediction
+    markets and securities brokerage unified in one conversation. The
+    same event priced two different ways, compared in seconds.
 
     ## What it does
 
-    Markets disagree. An election has odds on Betfair, a price on
-    Polymarket, and options pricing on IB. A sporting event has
-    exchange odds on Betfair and correlated futures on IB. This pack
-    lets your agent see all three price sources simultaneously and
-    flag when they diverge.
+    Markets disagree. An election has a price on Polymarket and
+    options pricing on IB. A binary outcome can be cross-checked
+    against correlated futures. This pack lets your agent see both
+    price sources simultaneously and flag when they diverge.
 
     ## Market stack
 
     | Layer | Service | Contract | What you see |
     |-------|---------|----------|-------------|
-    | **Exchange** | Betting exchange | `betting-exchange-v1` | Sports/event odds, market books, P&L, settlements |
     | **Prediction** | Prediction market | `prediction-market-v1` | Binary outcomes, orderbooks, analytics, leaderboards |
     | **Securities** | Brokerage | `brokerage-v1` | Portfolio, quotes, historical data, scanners |
 
     ## Skills overview
 
     ### Analysis
-    - **market-scan** — Cross-market event search (3 price sources)
+    - **market-scan** — Cross-market event search (2 price sources)
     - **price-check** — Implied probability comparison
 
     ### Portfolio
@@ -78,8 +71,8 @@ readme:
     positions.
 
 highlights:
-  - "Three market types — betting exchange, prediction market, and brokerage in one view"
-  - "Cross-market pricing — same event compared across Betfair, Polymarket, and IB"
+  - "Two market types — prediction market and brokerage in one view"
+  - "Cross-market pricing — same event compared across Polymarket and IB"
   - "Three Today briefing cards — exposure, opening brief, closing brief"
   - "Watchlist movement alerts — daily >X% move detection across configured markets"
   - "STRICTLY read-only — no order execution under any circumstance (identity-001)"
@@ -88,8 +81,6 @@ highlights:
 links:
   - label: Stallari Marketplace
     url: https://marketplace.stallari.app
-  - label: Betting exchange contract
-    url: https://stallari.dev/schemas/contracts/betting-exchange-v1
   - label: Prediction market contract
     url: https://stallari.dev/schemas/contracts/prediction-market-v1
   - label: Brokerage contract
@@ -110,15 +101,6 @@ suggested_plugins:
         title: "Prediction Markets (Multi)"
         author_type: community
         note: "Polymarket + Kalshi in one server. Community plugin."
-
-  - service: betting-exchange
-    required: false
-    note: "Requires Betfair account with API access and client certificate."
-    plugins:
-      - name: betfair-blade-mcp
-        title: "Betfair Exchange"
-        author_type: first-party
-        note: "22 tools. Certificate auth, weight-aware rate limiting."
 
   - service: brokerage
     required: false
@@ -152,19 +134,6 @@ recommends:
         - positions
         - portfolio_value
         - trade_history
-    - service: betting-exchange
-      operations:
-        - event_types
-        - events
-        - market_catalogue
-        - market_book
-        - account_funds
-        - current_orders
-        - competitions
-        - runner_book
-        - cleared_orders
-        - market_pnl
-        - account_statement
     - service: brokerage
       operations:
         - status
@@ -179,11 +148,11 @@ recommends:
         - pnl
         - trades
     - service: vault
-      operations: [read, search, create]
+      operations: [ read, search, create ]
 
 data:
-  reads: [prediction-market, betting-exchange, brokerage, vault]
-  writes: [vault]
+  reads: [ prediction-market, brokerage, vault ]
+  writes: [ vault ]
   stores: nothing
   phones_home: false
 
@@ -253,16 +222,14 @@ skills:
   - name: market-scan
     agent: markets-analyst
     description: Cross-market event search — same event priced across all sources
-    tier: reasoning  # cross-market correlation + implied-probability conversion + divergence interpretation is reasoning-bound
+    tier: reasoning # cross-market correlation + implied-probability conversion + divergence interpretation is reasoning-bound
     category: report
-    graph: react  # genuinely freeform exploratory analysis across 3 disparate market shapes
+    graph: react # genuinely freeform exploratory analysis across 3 disparate market shapes
     services_used:
       - service: prediction-market
-        operations: [search, events, markets, prices, orderbook]
-      - service: betting-exchange
-        operations: [event_types, events, market_catalogue, market_book]
+        operations: [ search, events, markets, prices, orderbook ]
       - service: brokerage
-        operations: [contract_search, quote]
+        operations: [ contract_search, quote ]
     inputs:
       - key: query
         type: string
@@ -287,14 +254,7 @@ skills:
          c. Call {{prediction-market.orderbook}} for liquidity depth on
             the most relevant market.
          d. Convert prices to implied probabilities.
-      2. **Betting Exchange** (if configured):
-         a. Call {{betting-exchange.events}} with relevant filters.
-         b. If found, call {{betting-exchange.market_catalogue}} for
-            market list.
-         c. Call {{betting-exchange.market_book}} for live odds.
-         d. Convert decimal odds: implied_prob = 1 / decimal_odds
-            (adjust for overround).
-      3. **Brokerage** (if configured):
+      2. **Brokerage** (if configured):
          a. Call {{brokerage.contract_search}} for related instruments
             (election futures, sector ETFs, event-correlated stocks).
          b. Call {{brokerage.quote}} for current pricing.
@@ -305,16 +265,26 @@ skills:
 
          **"{{config.query}}" — Cross-Market Pricing**
 
-         | Outcome | Prediction | Exchange | Securities proxy |
-         |---------|-----------|----------|-----------------|
-         | Yes/Win | 65.2% ($0.652) | 62.5% (1.60) | — |
-         | No/Lose | 34.8% ($0.348) | 37.5% (2.67) | — |
+         | Outcome | Prediction | Securities proxy |
+         |---------|-----------|-----------------|
+         | Yes/Win | 65.2% ($0.652) | — |
+         | No/Lose | 34.8% ($0.348) | — |
 
       5. Analysis:
          - Price divergence: X% between sources
          - Liquidity: which market has the deepest book
          - Note any structural reasons for the gap (fees, settlement
            timing, market hours, geo-restrictions)
+    required_services:
+      - prediction-market.search
+      - prediction-market.events
+      - prediction-market.markets
+      - prediction-market.prices
+      - prediction-market.orderbook
+      - brokerage.contract_search
+      - brokerage.quote
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: price-check
     agent: markets-analyst
@@ -324,22 +294,20 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [markets, prices, spread, price_history]
-      - service: betting-exchange
-        operations: [market_book, runner_book]
+        operations: [ markets, prices, spread, price_history ]
       - service: brokerage
-        operations: [quote, historical]
+        operations: [ quote, historical ]
     inputs:
       - key: market_id
         type: string
         label: Market or token ID
-        description: "Prediction market ID, Betfair market ID, or ticker symbol"
+        description: "Prediction market ID or brokerage ticker symbol"
         required: true
       - key: market_type
         type: choice
         label: Market type
         description: "Which market system to query"
-        choices: [prediction, exchange, brokerage, all]
+        choices: [ prediction, exchange, brokerage, all ]
         default: all
         required: false
     trigger:
@@ -357,10 +325,7 @@ skills:
          - {{prediction-market.prices}} — current bid/ask/mid/last
          - {{prediction-market.spread}} — bid-ask spread
          - {{prediction-market.price_history}} if available — recent trend
-      3. **Betting exchange**:
-         - {{betting-exchange.market_book}} — live back/lay prices
-         - {{betting-exchange.runner_book}} — depth for specific selection
-      4. **Brokerage**:
+      3. **Brokerage**:
          - {{brokerage.quote}} — last, bid, ask, volume, change
          - {{brokerage.historical}} — recent price bars
       5. Present:
@@ -369,6 +334,15 @@ skills:
          |--------|-----|-----|-----|-------------|--------|
 
          Add: spread analysis, 24h price movement, notable volume.
+    required_services:
+      - prediction-market.markets
+      - prediction-market.prices
+      - prediction-market.spread
+      - prediction-market.price_history
+      - brokerage.quote
+      - brokerage.historical
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Portfolio ────────────────────────────────────────────────────
 
@@ -380,18 +354,16 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [positions, portfolio_value]
-      - service: betting-exchange
-        operations: [account_funds, current_orders, market_pnl]
+        operations: [ positions, portfolio_value ]
       - service: brokerage
-        operations: [positions, portfolio_summary, cash_balances, pnl]
+        operations: [ positions, portfolio_summary, cash_balances, pnl ]
     trigger:
       on_demand: true
     briefing:
       card_id: speculator-exposure
       refresh_interval: 1h
       priority: 5
-      dismissal: none  # situational awareness — exposure is always relevant
+      dismissal: none # situational awareness — exposure is always relevant
     outputs:
       - type: report
         description: "Cross-market exposure and P&L summary"
@@ -402,11 +374,7 @@ skills:
       1. **Prediction Markets** (if configured with auth):
          - {{prediction-market.positions}} — open with entry price
          - {{prediction-market.portfolio_value}} if available — total
-      2. **Betting Exchange** (if configured):
-         - {{betting-exchange.account_funds}} — balance, exposure
-         - {{betting-exchange.current_orders}} — active/unmatched bets
-         - {{betting-exchange.market_pnl}} — P&L per selection
-      3. **Brokerage** (if configured):
+      2. **Brokerage** (if configured):
          - {{brokerage.portfolio_summary}} — NAV, cash, unrealised P&L,
            margin
          - {{brokerage.positions}} — open positions with P&L and market
@@ -420,11 +388,10 @@ skills:
          | Source | Balance/NAV | Exposure | Unrealised P&L | Positions |
          |--------|------------|----------|---------------|-----------|
          | Predictions | — | $X | +$Y | N |
-         | Exchange | $X | $Y | +$Z | N bets |
          | Brokerage | $X NAV | $Y margin | +$Z | N positions |
 
       5. Detail positions by source. For brokerage, group by asset class
-         (equity, options, futures, forex). For exchange, group by sport.
+         (equity, options, futures, forex).
       6. End with total cross-market exposure estimate. Note that
          positions across markets may hedge each other.
       7. Return briefing-card body using **percentage changes only**
@@ -432,6 +399,15 @@ skills:
          that may surface in shared / synced contexts:
          "Exposure across <N> sources; today: <+X.X% / -X.X%>; <N>
          positions across <M> asset classes."
+    required_services:
+      - prediction-market.positions
+      - prediction-market.portfolio_value
+      - brokerage.positions
+      - brokerage.portfolio_summary
+      - brokerage.cash_balances
+      - brokerage.pnl
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: settlement-review
     agent: markets-analyst
@@ -441,11 +417,9 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [trade_history]
-      - service: betting-exchange
-        operations: [cleared_orders, account_statement]
+        operations: [ trade_history ]
       - service: brokerage
-        operations: [trades, orders]
+        operations: [ trades, orders ]
     trigger:
       on_demand: true
     outputs:
@@ -458,11 +432,7 @@ skills:
       1. **Prediction Markets**:
          - {{prediction-market.trade_history}} — resolved markets, P&L
            per trade
-      2. **Betting Exchange** (if configured):
-         - {{betting-exchange.cleared_orders}} — settled bets with P&L
-         - {{betting-exchange.account_statement}} — transactions incl
-           commission
-      3. **Brokerage** (if configured):
+      2. **Brokerage** (if configured):
          - {{brokerage.trades}} — recent executions with fill prices
          - {{brokerage.orders}} — completed orders
       4. Present chronologically (most recent first):
@@ -472,6 +442,12 @@ skills:
 
       5. Summarise: total realised P&L by source, win/loss ratio,
          largest single outcome.
+    required_services:
+      - prediction-market.trade_history
+      - brokerage.trades
+      - brokerage.orders
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Discovery ────────────────────────────────────────────────────
 
@@ -483,11 +459,9 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [trending, events, closing_soon]
-      - service: betting-exchange
-        operations: [events, account_funds]
+        operations: [ trending, events, closing_soon ]
       - service: brokerage
-        operations: [portfolio_summary, pnl]
+        operations: [ portfolio_summary, pnl ]
     trigger:
       schedule: "0 7 * * *"
     briefing:
@@ -506,10 +480,7 @@ skills:
          - {{prediction-market.closing_soon}} if available — markets
            resolving today
          - {{prediction-market.events}} — notable new events
-      2. **Betting Exchange** (if configured):
-         - {{betting-exchange.events}} — today's live events by sport
-         - {{betting-exchange.account_funds}} — current balance
-      3. **Brokerage** (if configured):
+      2. **Brokerage** (if configured):
          - {{brokerage.portfolio_summary}} — overnight NAV change
          - {{brokerage.pnl}} — unrealised P&L
       4. Format inline report:
@@ -534,6 +505,14 @@ skills:
            "notification_priority": 2,
            "notification_category": "digest"
          }
+    required_services:
+      - prediction-market.trending
+      - prediction-market.events
+      - prediction-market.closing_soon
+      - brokerage.portfolio_summary
+      - brokerage.pnl
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: closing-bell-brief
     agent: markets-analyst
@@ -543,13 +522,11 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [trending, trade_history]
-      - service: betting-exchange
-        operations: [cleared_orders, market_pnl]
+        operations: [ trending, trade_history ]
       - service: brokerage
-        operations: [pnl, portfolio_summary]
+        operations: [ pnl, portfolio_summary ]
     trigger:
-      schedule: "0 17 * * *"  # daily 17:00 (post-close for most western markets)
+      schedule: "0 17 * * *" # daily 17:00 (post-close for most western markets)
     briefing:
       card_id: speculator-closing
       refresh_interval: 1d
@@ -565,10 +542,7 @@ skills:
          - {{prediction-market.trade_history}} — today's resolved markets
            and P&L deltas
          - {{prediction-market.trending}} — what moved today
-      2. **Betting Exchange** (if configured):
-         - {{betting-exchange.cleared_orders}} — today's settled bets
-         - {{betting-exchange.market_pnl}} — today's exposure changes
-      3. **Brokerage** (if configured):
+      2. **Brokerage** (if configured):
          - {{brokerage.pnl}} — today's realised + unrealised
          - {{brokerage.portfolio_summary}} — NAV close vs open
       4. Format inline report:
@@ -587,36 +561,37 @@ skills:
            "notification_priority": 2,
            "notification_category": "digest"
          }
+    required_services:
+      - prediction-market.trending
+      - prediction-market.trade_history
+      - brokerage.pnl
+      - brokerage.portfolio_summary
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Watchers ─────────────────────────────────────────────────────
 
   - name: watchlist-movement-alert
     agent: markets-analyst
     description: Daily check for >X% moves on watched markets
-    tier: fast  # filter market list by % change — no reasoning
+    tier: fast # filter market list by % change — no reasoning
     category: triage
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [markets, prices, price_history]
-      - service: betting-exchange
-        operations: [market_book]
+        operations: [ markets, prices, price_history ]
       - service: brokerage
-        operations: [quote, historical]
+        operations: [ quote, historical ]
       - service: vault
-        operations: [read, search]
+        operations: [ read, search ]
     trigger:
-      schedule: "0 8 * * *"  # daily 08:00
+      schedule: "0 8 * * *" # daily 08:00
     inputs:
       - key: watchlist
         type: string_array
         label: Watchlist market IDs
         description: >
-          Array of market identifiers to watch — prediction-market IDs,
-          Betfair market IDs, brokerage tickers. Source determined by
-          format. If empty, reads watchlist from
-          atlas/registers/markets/watchlist.md frontmatter `markets:`
-          field (one wikilink-list of identifiers).
+          Array of market identifiers to watch — prediction-market IDs or brokerage tickers. Source determined by format. If empty, reads watchlist from atlas/registers/markets/watchlist.md frontmatter `markets:` field (one wikilink-list of identifiers).
         required: false
     prompt: |
       Detect significant moves on watched markets in the trailing 24h.
@@ -630,12 +605,11 @@ skills:
            configured".
       2. For each market in the watchlist:
          - Determine source from identifier shape (numeric IB ticker →
-           brokerage; UUID → prediction; long numeric → exchange).
+           brokerage; UUID → prediction).
          - Fetch current price and 24h-prior price via the appropriate
            service:
            {{prediction-market.price_history}} /
-           {{betting-exchange.market_book}} (compare to last
-           archived) / {{brokerage.historical}}.
+           {{brokerage.historical}}.
          - Compute % change.
       3. Filter markets where abs(% change) >
          {{config.watchlist_threshold_pct}}.
@@ -650,6 +624,16 @@ skills:
          }
       5. Return structured JSON: per-market name + source + % change
          for any caller that wants to chain.
+    required_services:
+      - prediction-market.markets
+      - prediction-market.prices
+      - prediction-market.price_history
+      - brokerage.quote
+      - brokerage.historical
+      - vault.read
+      - vault.search
+    allow_request_service: true
+    allow_request_tool: false
 
 workflows:
   - name: morning-markets
@@ -671,8 +655,7 @@ config:
       type: float
       label: Watchlist movement threshold (%)
       description: >
-        Absolute percentage change above which watchlist-movement-alert
-        fires a P4 alert per market. Default 5.0%.
+        Absolute percentage change above which watchlist-movement-alert fires a P4 alert per market. Default 5.0%.
       default: 5.0
       min: 0.5
       max: 50.0
@@ -685,29 +668,29 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: data-002
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: identity-001
       category: identity
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: exfil-001
       category: exfiltration
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"

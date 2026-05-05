@@ -1,14 +1,11 @@
-pack: "1.10"
+pack: "1.12"
 name: gaming-lounge
 title: "Gaming Lounge"
 featured: true
-version: "2.0.0"
+version: "3.0.0"
 tagline: "PlayStation, Xbox, and Steam in one conversation — friends, trophies, and game night coordination"
 description: >-
-  Cross-platform gaming presence — friends online, achievement progress,
-  game libraries, weekly play summary, and session coordination across
-  PlayStation, Xbox, and Steam. Three platforms, one agent, zero
-  tab-switching.
+  Cross-platform gaming presence — friends online, achievement progress, game libraries, weekly play summary, and session coordination across PlayStation, Xbox, and Steam. Three platforms, one agent, zero tab-switching.
 icon: /icons/gaming-lounge.svg
 author:
   name: Stallari
@@ -136,11 +133,11 @@ recommends:
         - game_details
         - search_games
     - service: vault
-      operations: [read, search, create]
+      operations: [ read, search, create ]
 
 data:
-  reads: [gaming, vault]
-  writes: [vault]
+  reads: [ gaming, vault ]
+  writes: [ vault ]
   stores: nothing
   phones_home: false
 
@@ -197,7 +194,7 @@ skills:
     graph: react-extract
     services_used:
       - service: gaming
-        operations: [friends, presence]
+        operations: [ friends, presence ]
     trigger:
       on_demand: true
     outputs:
@@ -229,16 +226,21 @@ skills:
          playing the same game." Highlight cross-platform friends
          (same display name appearing on multiple platforms — note
          heuristic).
+    required_services:
+      - gaming.friends
+      - gaming.presence
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: game-night
     agent: gaming-operator
     description: Coordinate a gaming session — find common games and available friends
     tier: standard
     category: triage
-    graph: react-extract  # tool-loop ending in structured recommendation
+    graph: react-extract # tool-loop ending in structured recommendation
     services_used:
       - service: gaming
-        operations: [friends, presence, games_played, games_recent, search_users]
+        operations: [ friends, presence, games_played, games_recent, search_users ]
     inputs:
       - key: friends
         type: string
@@ -280,6 +282,14 @@ skills:
            and [Friend2] on [Platform]"
       9. If a friend appears on multiple platforms, note which platform
          has the game in common.
+    required_services:
+      - gaming.friends
+      - gaming.presence
+      - gaming.games_played
+      - gaming.games_recent
+      - gaming.search_users
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Collection ───────────────────────────────────────────────────
 
@@ -291,7 +301,7 @@ skills:
     graph: react-extract
     services_used:
       - service: gaming
-        operations: [achievement_summary, achievements, achievement_compare, achievement_groups, games_recent]
+        operations: [ achievement_summary, achievements, achievement_compare, achievement_groups, games_recent ]
     inputs:
       - key: game
         type: string
@@ -339,6 +349,14 @@ skills:
 
           | Platform | Level/Score | Completion | Recent highlight |
           |----------|------------|------------|------------------|
+    required_services:
+      - gaming.achievement_summary
+      - gaming.achievements
+      - gaming.achievement_compare
+      - gaming.achievement_groups
+      - gaming.games_recent
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: library-census
     agent: gaming-operator
@@ -348,7 +366,7 @@ skills:
     graph: react-extract
     services_used:
       - service: gaming
-        operations: [games_played, games_recent, games_purchased, game_details]
+        operations: [ games_played, games_recent, games_purchased, game_details ]
     trigger:
       on_demand: true
     outputs:
@@ -377,6 +395,13 @@ skills:
          - Most-played game overall
          - Games owned on multiple platforms (duplicates)
          - "Shame pile" — games with 0 hours played
+    required_services:
+      - gaming.games_played
+      - gaming.games_recent
+      - gaming.games_purchased
+      - gaming.game_details
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Discovery ────────────────────────────────────────────────────
 
@@ -388,7 +413,7 @@ skills:
     graph: react-extract
     services_used:
       - service: gaming
-        operations: [search_games, game_details]
+        operations: [ search_games, game_details ]
     inputs:
       - key: query
         type: string
@@ -418,6 +443,11 @@ skills:
       3. Note which platforms carry the game and any platform-exclusive
          status. If the user already owns it (cross-reference with
          their library if possible), note that too.
+    required_services:
+      - gaming.search_games
+      - gaming.game_details
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Reflection ───────────────────────────────────────────────────
 
@@ -428,15 +458,15 @@ skills:
     category: digest
     graph: critique-refine
     graph_config:
-      critique_criteria: [completeness, accuracy, brevity]
+      critique_criteria: [ completeness, accuracy, brevity ]
       max_critique_rounds: 2
     services_used:
       - service: gaming
-        operations: [games_recent, games_played, achievement_summary, achievements]
+        operations: [ games_recent, games_played, achievement_summary, achievements ]
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
     trigger:
-      schedule: "0 18 * * 0"  # Sundays 18:00
+      schedule: "0 18 * * 0" # Sundays 18:00
     briefing:
       card_id: gaming-lounge-weekly
       refresh_interval: 7d
@@ -472,6 +502,16 @@ skills:
          }
       6. Return per-platform table for the briefing card. Game titles
          are public (not personal) — OK to include in card body.
+    required_services:
+      - gaming.games_recent
+      - gaming.games_played
+      - gaming.achievement_summary
+      - gaming.achievements
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
 workflows:
   - name: friday-night
@@ -479,7 +519,7 @@ workflows:
     steps:
       - skill: whos-online
       - skill: game-night
-        depends_on: [whos-online]
+        depends_on: [ whos-online ]
 
   - name: weekly-reflection
     description: Sunday weekly play summary
@@ -494,17 +534,17 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: exfil-001
       category: exfiltration
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"

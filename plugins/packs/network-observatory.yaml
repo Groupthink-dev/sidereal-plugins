@@ -1,15 +1,11 @@
-pack: "1.10"
+pack: "1.12"
 name: network-observatory
 title: "Network Observatory"
 featured: true
-version: "2.0.0"
+version: "3.0.0"
 tagline: "Full-stack network visibility — from satellite downlink to DNS query, every layer in one conversation"
 description: >-
-  Cross-layer network monitoring and diagnosis — ISP accounts, DNS filtering,
-  local infrastructure, overlay networks, and LEO satellite terminals. Five
-  services, one agent, eight skills that correlate across the entire stack.
-  Daily new-device alerts, weekly digest briefing card, and at-a-glance
-  stack-health card.
+  Cross-layer network monitoring and diagnosis — ISP accounts, DNS filtering, local infrastructure, overlay networks, and LEO satellite terminals. Five services, one agent, eight skills that correlate across the entire stack. Daily new-device alerts, weekly digest briefing card, and at-a-glance stack-health card.
 icon: /icons/network-observatory.svg
 author:
   name: Stallari
@@ -160,28 +156,28 @@ suggested_plugins:
 requires:
   services:
     - service: isp
-      operations: [info, services, usage, outages]
+      operations: [ info, services, usage, outages ]
     - service: protective_dns
-      operations: [info, profiles, filters, rules, devices]
+      operations: [ info, profiles, filters, rules, devices ]
 
 recommends:
   services:
     - service: isp
-      operations: [billing, tickets, diagnostics_list]
+      operations: [ billing, tickets, diagnostics_list ]
     - service: protective_dns
-      operations: [services, service_catalog, network, access]
+      operations: [ services, service_catalog, network, access ]
     - service: network
-      operations: [info, devices, device, clients, client, firewall, port_forwards, traffic_routes]
+      operations: [ info, devices, device, clients, client, firewall, port_forwards, traffic_routes ]
     - service: overlay-network
-      operations: [info, devices, device, device_routes, acl, dns, keys, audit_log]
+      operations: [ info, devices, device, device_routes, acl, dns, keys, audit_log ]
     - service: leo-modem
-      operations: [status, alerts, obstruction, history, diagnostics]
+      operations: [ status, alerts, obstruction, history, diagnostics ]
     - service: vault
-      operations: [read, search, create, append]
+      operations: [ read, search, create, append ]
 
 data:
-  reads: [isp, protective_dns, network, overlay-network, leo-modem, vault]
-  writes: [vault]
+  reads: [ isp, protective_dns, network, overlay-network, leo-modem, vault ]
+  writes: [ vault ]
   stores: nothing
   phones_home: false
 
@@ -238,22 +234,22 @@ skills:
     graph: react-extract
     services_used:
       - service: isp
-        operations: [info, usage, outages]
+        operations: [ info, usage, outages ]
       - service: protective_dns
-        operations: [info, profiles, devices]
+        operations: [ info, profiles, devices ]
       - service: network
-        operations: [info, devices, clients]
+        operations: [ info, devices, clients ]
       - service: overlay-network
-        operations: [info, devices]
+        operations: [ info, devices ]
       - service: leo-modem
-        operations: [status, alerts]
+        operations: [ status, alerts ]
     trigger:
       on_demand: true
     briefing:
       card_id: network-observatory-stack
       refresh_interval: 1h
       priority: 5
-      dismissal: none  # situational awareness
+      dismissal: none # situational awareness
     outputs:
       - type: report
         description: "Cross-layer health summary with per-layer status"
@@ -305,6 +301,22 @@ skills:
       20. List any flags below the table grouped by severity.
       21. Return a one-paragraph summary suitable for the briefing card —
           per-layer status with counts, no PII.
+    required_services:
+      - isp.info
+      - isp.usage
+      - isp.outages
+      - protective_dns.info
+      - protective_dns.profiles
+      - protective_dns.devices
+      - network.info
+      - network.devices
+      - network.clients
+      - overlay-network.info
+      - overlay-network.devices
+      - leo-modem.status
+      - leo-modem.alerts
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: network-census
     agent: network-operator
@@ -314,15 +326,15 @@ skills:
     graph: react-extract
     services_used:
       - service: isp
-        operations: [info, services]
+        operations: [ info, services ]
       - service: protective_dns
-        operations: [profiles, devices]
+        operations: [ profiles, devices ]
       - service: network
-        operations: [devices, clients, wlans]
+        operations: [ devices, clients, wlans ]
       - service: overlay-network
-        operations: [devices, users, keys]
+        operations: [ devices, users, keys ]
       - service: leo-modem
-        operations: [status, diagnostics]
+        operations: [ status, diagnostics ]
     trigger:
       on_demand: true
     outputs:
@@ -349,6 +361,21 @@ skills:
       5. **LEO Modem** (if configured): call {{leo-modem.status}} +
          {{leo-modem.diagnostics}}; summarise model, firmware, uptime.
       6. Present full inventory grouped by layer. End with totals.
+    required_services:
+      - isp.info
+      - isp.services
+      - protective_dns.profiles
+      - protective_dns.devices
+      - network.devices
+      - network.clients
+      - network.wlans
+      - overlay-network.devices
+      - overlay-network.users
+      - overlay-network.keys
+      - leo-modem.status
+      - leo-modem.diagnostics
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: morning-network-brief
     agent: network-operator
@@ -358,15 +385,15 @@ skills:
     graph: react-extract
     services_used:
       - service: isp
-        operations: [info, usage, outages]
+        operations: [ info, usage, outages ]
       - service: protective_dns
-        operations: [info]
+        operations: [ info ]
       - service: network
-        operations: [info]
+        operations: [ info ]
       - service: overlay-network
-        operations: [info]
+        operations: [ info ]
       - service: leo-modem
-        operations: [status]
+        operations: [ status ]
     trigger:
       schedule: "0 7 * * *"
     briefing:
@@ -411,6 +438,16 @@ skills:
            "notification_priority": 2,        // 3 if any warnings
            "notification_category": "digest"
          }
+    required_services:
+      - isp.info
+      - isp.usage
+      - isp.outages
+      - protective_dns.info
+      - network.info
+      - overlay-network.info
+      - leo-modem.status
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: weekly-network-digest
     agent: network-operator
@@ -419,15 +456,15 @@ skills:
     category: digest
     graph: critique-refine
     graph_config:
-      critique_criteria: [completeness, accuracy, trend-clarity]
+      critique_criteria: [ completeness, accuracy, trend-clarity ]
       max_critique_rounds: 2
     services_used:
       - service: isp
-        operations: [usage, outages]
+        operations: [ usage, outages ]
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
     trigger:
-      schedule: "0 7 * * 1"  # Mondays 07:00
+      schedule: "0 7 * * 1" # Mondays 07:00
     briefing:
       card_id: network-observatory-weekly
       refresh_interval: 7d
@@ -456,26 +493,34 @@ skills:
            "notification_category": "digest"
          }
       8. Return the per-line summary table for the briefing card.
+    required_services:
+      - isp.usage
+      - isp.outages
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Diagnosis ────────────────────────────────────────────────────
 
   - name: connectivity-triage
     agent: network-operator
     description: Layer-by-layer diagnosis when connectivity is degraded or down
-    tier: reasoning  # genuinely freeform diagnostic loop — root-cause inference benefits from frontier reasoning
+    tier: reasoning # genuinely freeform diagnostic loop — root-cause inference benefits from frontier reasoning
     category: triage
-    graph: react  # cannot pre-plan diagnostic trajectory; correct fit
+    graph: react # cannot pre-plan diagnostic trajectory; correct fit
     services_used:
       - service: leo-modem
-        operations: [status, alerts, obstruction, history]
+        operations: [ status, alerts, obstruction, history ]
       - service: isp
-        operations: [info, usage, outages, diagnostics_list]
+        operations: [ info, usage, outages, diagnostics_list ]
       - service: protective_dns
-        operations: [info, profiles, rules, network]
+        operations: [ info, profiles, rules, network ]
       - service: network
-        operations: [info, devices, clients, firewall, traffic_routes]
+        operations: [ info, devices, clients, firewall, traffic_routes ]
       - service: overlay-network
-        operations: [info, devices, device_routes, acl, dns]
+        operations: [ info, devices, device_routes, acl, dns ]
     inputs:
       - key: symptom
         type: string
@@ -536,6 +581,31 @@ skills:
            "notification_priority": 5,
            "notification_category": "alert"
          }
+    required_services:
+      - leo-modem.status
+      - leo-modem.alerts
+      - leo-modem.obstruction
+      - leo-modem.history
+      - isp.info
+      - isp.usage
+      - isp.outages
+      - isp.diagnostics_list
+      - protective_dns.info
+      - protective_dns.profiles
+      - protective_dns.rules
+      - protective_dns.network
+      - network.info
+      - network.devices
+      - network.clients
+      - network.firewall
+      - network.traffic_routes
+      - overlay-network.info
+      - overlay-network.devices
+      - overlay-network.device_routes
+      - overlay-network.acl
+      - overlay-network.dns
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: dns-security-audit
     agent: network-operator
@@ -545,11 +615,11 @@ skills:
     graph: react-extract
     services_used:
       - service: protective_dns
-        operations: [profiles, filters, rules, services, devices, access]
+        operations: [ profiles, filters, rules, services, devices, access ]
       - service: network
-        operations: [info, devices, clients, firewall, port_forwards, dpi]
+        operations: [ info, devices, clients, firewall, port_forwards, dpi ]
       - service: overlay-network
-        operations: [info, devices, acl, keys, audit_log]
+        operations: [ info, devices, acl, keys, audit_log ]
     trigger:
       on_demand: true
     outputs:
@@ -594,22 +664,42 @@ skills:
            "notification_priority": 4,
            "notification_category": "alert"
          }
+    required_services:
+      - protective_dns.profiles
+      - protective_dns.filters
+      - protective_dns.rules
+      - protective_dns.services
+      - protective_dns.devices
+      - protective_dns.access
+      - network.info
+      - network.devices
+      - network.clients
+      - network.firewall
+      - network.port_forwards
+      - network.dpi
+      - overlay-network.info
+      - overlay-network.devices
+      - overlay-network.acl
+      - overlay-network.keys
+      - overlay-network.audit_log
+    allow_request_service: true
+    allow_request_tool: false
 
   # ── Watchers ─────────────────────────────────────────────────────
 
   - name: new-device-alert
     agent: network-operator
     description: Daily check for new devices appearing on the LAN
-    tier: fast  # set diff against prior census, no reasoning
+    tier: fast # set diff against prior census, no reasoning
     category: triage
     graph: react-extract
     services_used:
       - service: network
-        operations: [clients]
+        operations: [ clients ]
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
     trigger:
-      schedule: "0 8 * * *"  # daily 08:00
+      schedule: "0 8 * * *" # daily 08:00
     prompt: |
       Detect devices that have appeared on the LAN since the last run.
 
@@ -636,6 +726,13 @@ skills:
            "notification_priority": 3,
            "notification_category": "task"
          }
+    required_services:
+      - network.clients
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
 workflows:
   - name: morning-network
@@ -658,17 +755,17 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: exfil-001
       category: exfiltration
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [community, verified, certified]
+      scope: [ community, verified, certified ]
       added: "2026-05-02"
