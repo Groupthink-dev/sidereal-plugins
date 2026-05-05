@@ -1,13 +1,11 @@
-pack: "1.7"
+pack: "1.12"
 name: stallari-core
-aliases: [sidereal-core]
+aliases: [ sidereal-core ]
 title: "Stallari Core"
 featured: false
-version: "3.9.1"
+version: "4.0.0"
 description: >-
-  Core platform operators and infrastructure health — PKM, comms, scheduling,
-  security auditing, fleet monitoring, notification delivery, registry management,
-  and the six operator agents that power every Stallari installation. Bundled with every install.
+  Core platform operators and infrastructure health — PKM, comms, scheduling, security auditing, fleet monitoring, notification delivery, registry management, and the six operator agents that power every Stallari installation. Bundled with every install.
 icon: /icons/stallari-core.svg
 author:
   name: Stallari
@@ -101,15 +99,15 @@ readme:
     - Notification operators **route only** — they do not generate content
 
 highlights:
-  - icon: "\U0001F916"
+  - icon: "🤖"
     text: "6 operator agents — PKM, comms, scheduling, security, fleet, and notifications"
-  - icon: "\U0001F9E9"
+  - icon: "🧩"
     text: "36 skills spanning vault ops, knowledge-base wiki-maintain quartet (enrich/query/lint/distil), corpus-lint hygiene, email triage, calendar, secops, fleet health, registry, and delivery"
-  - icon: "\U0001F4E6"
+  - icon: "📦"
     text: "Bundled — ships with every Stallari installation, zero configuration needed"
-  - icon: "\U0001F6E1\uFE0F"
+  - icon: "🛡️"
     text: "Least-privilege — read-only by default, write-gated where mutations exist"
-  - icon: "\U0001F50D"
+  - icon: "🔍"
     text: "Observable — dispatch analytics, delivery audits, and platform health probes"
 
 links:
@@ -125,20 +123,20 @@ min_stallari: "0.54"
 requires:
   services:
     - service: vault
-      operations: [read, search, create, append]
+      operations: [ read, search, create, append ]
 
 recommends:
   services:
     - service: calendar
-      operations: [read, search, freebusy]
+      operations: [ read, search, freebusy ]
     - service: email
-      operations: [read, search]
+      operations: [ read, search ]
     - service: tasks
-      operations: [read, search, create, complete]
+      operations: [ read, search, create, complete ]
 
 data:
-  reads: [vault, calendar, email, tasks]
-  writes: [vault, tasks]
+  reads: [ vault, calendar, email, tasks ]
+  writes: [ vault, tasks ]
   stores: nothing
   phones_home: false
 
@@ -249,12 +247,12 @@ skills:
     category: triage
     services_used:
       - service: vault
-        operations: [read, search, create, append]
+        operations: [ read, search, create, append ]
       - service: tasks
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
-      watch: ["+/ingest", "+/triage"]
+      watch: [ "+/ingest", "+/triage" ]
     graph: gate
     graph_config:
       classify_tier: fast
@@ -264,21 +262,37 @@ skills:
         pdf_import: react_pdf
         text_note: react_text
         operator_handoff: react_handoff
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+      - vault.append
+      - tasks.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/daily-digest.md
     agent: pkm-operator
     tier: standard
     category: digest
     services_used:
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
       - service: calendar
-        operations: [read]
+        operations: [ read ]
       - service: tasks
-        operations: [read]
+        operations: [ read ]
     graph: critique-refine
     graph_config:
-      critique_criteria: [completeness, accuracy, tone, actionability]
+      critique_criteria: [ completeness, accuracy, tone, actionability ]
       max_critique_rounds: 2
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+      - calendar.read
+      - tasks.read
+    allow_request_service: true
+    allow_request_tool: false
 
   - import: ./skills/weekly-digest.md
     agent: pkm-operator
@@ -286,38 +300,53 @@ skills:
     category: digest
     services_used:
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
       - service: calendar
-        operations: [read]
+        operations: [ read ]
       - service: tasks
-        operations: [read]
+        operations: [ read ]
     graph: critique-refine
     graph_config:
-      critique_criteria: [completeness, accuracy, tone, actionability]
+      critique_criteria: [ completeness, accuracy, tone, actionability ]
       max_critique_rounds: 2
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+      - calendar.read
+      - tasks.read
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/decompose-inbox.md
     agent: pkm-operator
     tier: standard
     category: transform
     services_used:
       - service: vault
-        operations: [read, create, append]
+        operations: [ read, create, append ]
       - service: tasks
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
     graph: react-verify
+    required_services:
+      - vault.read
+      - vault.create
+      - vault.append
+      - tasks.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/morning-sweep.md
     agent: pkm-operator
     tier: standard
     category: triage
     services_used:
       - service: vault
-        operations: [read, search]
+        operations: [ read, search ]
       - service: calendar
-        operations: [read]
+        operations: [ read ]
       - service: tasks
-        operations: [read]
+        operations: [ read ]
     trigger:
       on_demand: true
     graph: cascade
@@ -325,235 +354,304 @@ skills:
       confidence_threshold: 0.8
       classify_tier: fast
       escalation_tier: standard
+    required_services:
+      - vault.read
+      - vault.search
+      - calendar.read
+      - tasks.read
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/email-triage.md
     agent: comms-operator
     tier: standard
     category: triage
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
       - service: email
-        operations: [read, search]
+        operations: [ read, search ]
       - service: tasks
-        operations: [create]
+        operations: [ create ]
     graph: cascade
     graph_config:
       confidence_threshold: 0.85
       classify_tier: fast
       escalation_tier: reasoning
+    required_services:
+      - vault.read
+      - vault.create
+      - email.read
+      - email.search
+      - tasks.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/wiki-maintain-enrich.md
     agent: pkm-operator
     tier: standard
     category: transform
     services_used:
       - service: vault
-        operations: [read, search, lens_fts, append, create]
+        operations: [ read, search, lens_fts, append, create ]
     trigger:
-      watch: ["+/ingest", "+/triage", "+/handoff"]
+      watch: [ "+/ingest", "+/triage", "+/handoff" ]
     graph: react-extract
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.lens_fts
+      - vault.append
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/wiki-maintain-query.md
     agent: pkm-operator
     tier: standard
     category: report
     services_used:
       - service: vault
-        operations: [read, search, lens_fts, lens_recall, create, append]
+        operations: [ read, search, lens_fts, lens_recall, create, append ]
     trigger:
       on_demand: true
     graph: react-verify
     inputs:
-    - description: The question to answer from the knowledge base
-      key: question
-      label: Question
-      required: true
-      type: string
-    - description: Vault path or effort note to scope the search to. Omit for vault-wide.
-      key: context_path
-      label: Scope (optional)
-      required: false
-      type: string
+      - description: The question to answer from the knowledge base
+        key: question
+        label: Question
+        required: true
+        type: string
+      - description: Vault path or effort note to scope the search to. Omit for vault-wide.
+        key: context_path
+        label: Scope (optional)
+        required: false
+        type: string
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.lens_fts
+      - vault.lens_recall
+      - vault.create
+      - vault.append
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/wiki-maintain-lint.md
     agent: pkm-operator
     tier: standard
     category: report
     services_used:
       - service: vault
-        operations: [read, search, query_properties, lens_fts, create]
+        operations: [ read, search, query_properties, lens_fts, create ]
     briefing:
       card_id: stallari-core-wiki-lint
       refresh_interval: 7d
       priority: 6
       dismissal: per-version
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.query_properties
+      - vault.lens_fts
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/wiki-maintain-distil.md
     agent: pkm-operator
     tier: reasoning
     category: ingest
     services_used:
       - service: vault
-        operations: [read, search, files, lens_fts, lens_remember, create, append, property_set]
+        operations: [ read, search, files, lens_fts, lens_remember, create, append, property_set ]
     trigger:
       on_demand: true
     graph: plan-execute
     inputs:
-    - description: 'Vault path to the corpus to distil (recursive). Examples: atlas/source/articles, +/notes/legacy-import, spaces/Personal/Areas/Reading.
-        For non-vault corpora (~/Documents/Articles/, Evernote exports, downloaded paper collections), drop the files into +/ingest/
-        first and let process-inbox file them, then run distil with target_path pointing at wherever they landed.
-        '
-      key: target_path
-      label: Corpus folder
-      required: true
-      type: string
-    - default:
-      - person
-      - organisation
-      description: 'Default `[person, organisation]` (highest signal classes). Add `place`, `topic`, or `effort` opt-in per corpus
-        — `topic` stays opt-in always (every article has 5; topic cards become ontology, not entities). The dropped-by-type counts
-        in the batch report tell you what the corpus actually contains.
-        '
-      key: entity_types
-      label: Entity types to extract
-      required: false
-      type: enum_array
-      values:
-      - person
-      - organisation
-      - place
-      - topic
-      - effort
-    - default: 0.7
-      description: 'Candidates below this are dropped silently. 0.7 is a conservative default; lower if too few candidates surface;
-        higher if too many low-signal items reach the handoff.
-        '
-      key: confidence_threshold
-      label: Confidence threshold
-      max: 0.95
-      min: 0.5
-      required: false
-      type: float
-    - default: 20
-      description: 'Cap on candidates per handoff note — prevents review fatigue on large corpora. A 200-candidate corpus chunks
-        into ~10 batches of 20.
-        '
-      key: max_proposals_per_batch
-      label: Candidates per batch
-      max: 50
-      min: 5
-      required: false
-      type: int
-    - default: atlas/
-      description: 'Where to look for already-existing cards before proposing a new one. Defaults to atlas/ (covers atlas/people/,
-        atlas/people/public/, atlas/orgs/). Family-card paths under spaces/People/family/ are always checked regardless and default
-        to `merge` (never auto-create new family cards).
-        '
-      key: existing_card_search_root
-      label: Existing-card search root
-      required: false
-      type: string
+      - description: "Vault path to the corpus to distil (recursive). Examples: atlas/source/articles, +/notes/legacy-import, spaces/Personal/Areas/Reading. For non-vault corpora (~/Documents/Articles/, Evernote exports, downloaded paper collections), drop the files into +/ingest/ first and let process-inbox file them, then run distil with target_path pointing at wherever they landed. "
+        key: target_path
+        label: Corpus folder
+        required: true
+        type: string
+      - default:
+          - person
+          - organisation
+        description: "Default `[person, organisation]` (highest signal classes). Add `place`, `topic`, or `effort` opt-in per corpus — `topic` stays opt-in always (every article has 5; topic cards become ontology, not entities). The dropped-by-type counts in the batch report tell you what the corpus actually contains. "
+        key: entity_types
+        label: Entity types to extract
+        required: false
+        type: enum_array
+        values:
+          - person
+          - organisation
+          - place
+          - topic
+          - effort
+      - default: 0.7
+        description: "Candidates below this are dropped silently. 0.7 is a conservative default; lower if too few candidates surface; higher if too many low-signal items reach the handoff. "
+        key: confidence_threshold
+        label: Confidence threshold
+        max: 0.95
+        min: 0.5
+        required: false
+        type: float
+      - default: 20
+        description: "Cap on candidates per handoff note — prevents review fatigue on large corpora. A 200-candidate corpus chunks into ~10 batches of 20. "
+        key: max_proposals_per_batch
+        label: Candidates per batch
+        max: 50
+        min: 5
+        required: false
+        type: int
+      - default: atlas/
+        description: "Where to look for already-existing cards before proposing a new one. Defaults to atlas/ (covers atlas/people/, atlas/people/public/, atlas/orgs/). Family-card paths under spaces/People/family/ are always checked regardless and default to `merge` (never auto-create new family cards). "
+        key: existing_card_search_root
+        label: Existing-card search root
+        required: false
+        type: string
     briefing:
       card_id: stallari-core-wiki-distil
       refresh_interval: 7d
       priority: 7
       dismissal: per-version
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.files
+      - vault.lens_fts
+      - vault.lens_remember
+      - vault.create
+      - vault.append
+      - vault.property_set
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/corpus-lint.md
     agent: pkm-operator
     tier: standard
     category: report
     services_used:
       - service: vault
-        operations: [read, search, files, create, append, property_read, property_set, rename]
+        operations: [ read, search, files, create, append, property_read, property_set, rename ]
     trigger:
       on_demand: true
     graph: plan-execute
     inputs:
-    - description: 'Vault path to the corpus to lint (recursive). Examples: atlas/source/article, atlas/source/paper, +/notes/legacy-import.
-        Pre-flight rejects absolute paths, `..` traversal, and human-only roots (`+/ingest/`, `+/notes/`, `spaces/People/family/`,
-        `spaces/People/friends/`).
-        '
-      key: target_path
-      label: Corpus folder
-      required: true
-      type: string
-    - description: 'Drives the `kind: source/<subtype>` value the lint pass enforces. Inferred from the last path segment of `target_path`
-        (with trailing `s` stripped) when absent.
-        '
-      key: subtype
-      label: Source subtype
-      required: false
-      type: enum
-      values:
-      - article
-      - paper
-      - podcast
-      - video
-      - interview
-      - book
-      - presentation
-      - technical
-      - reference
-      - recipe
-      - film
-      - movie
-      - social
-      - statement
-      - debate
-      - misc
+      - description: "Vault path to the corpus to lint (recursive). Examples: atlas/source/article, atlas/source/paper, +/notes/legacy-import. Pre-flight rejects absolute paths, `..` traversal, and human-only roots (`+/ingest/`, `+/notes/`, `spaces/People/family/`, `spaces/People/friends/`). "
+        key: target_path
+        label: Corpus folder
+        required: true
+        type: string
+      - description: "Drives the `kind: source/<subtype>` value the lint pass enforces. Inferred from the last path segment of `target_path` (with trailing `s` stripped) when absent. "
+        key: subtype
+        label: Source subtype
+        required: false
+        type: enum
+        values:
+          - article
+          - paper
+          - podcast
+          - video
+          - interview
+          - book
+          - presentation
+          - technical
+          - reference
+          - recipe
+          - film
+          - movie
+          - social
+          - statement
+          - debate
+          - misc
     briefing:
       card_id: stallari-core-corpus-lint
       refresh_interval: 7d
       priority: 7
       dismissal: per-version
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.files
+      - vault.create
+      - vault.append
+      - vault.property_read
+      - vault.property_set
+      - vault.rename
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/calendar-sync.md
     agent: scheduling-operator
     tier: standard
     category: sync
     services_used:
       - service: calendar
-        operations: [read, search, freebusy]
+        operations: [ read, search, freebusy ]
       - service: vault
-        operations: [read]
+        operations: [ read ]
     graph: react-extract
+    required_services:
+      - calendar.read
+      - calendar.search
+      - calendar.freebusy
+      - vault.read
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/schedule-event.md
     agent: scheduling-operator
     tier: standard
     category: transform
     services_used:
       - service: calendar
-        operations: [read, freebusy]
+        operations: [ read, freebusy ]
       - service: tasks
-        operations: [create]
+        operations: [ create ]
     trigger:
       on_demand: true
     graph: react-extract
+    required_services:
+      - calendar.read
+      - calendar.freebusy
+      - tasks.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/process-calendar-handoffs.md
     agent: scheduling-operator
     tier: standard
     category: sync
     services_used:
       - service: calendar
-        operations: [read, freebusy]
+        operations: [ read, freebusy ]
       - service: vault
-        operations: [read, append]
+        operations: [ read, append ]
     trigger:
       on_demand: true
     graph: react-extract
+    required_services:
+      - calendar.read
+      - calendar.freebusy
+      - vault.read
+      - vault.append
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/darwin-state-audit.md
     agent: secops-operator
     tier: standard
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/tcc-drift-monitor.md
     agent: secops-operator
-    requires_capabilities: [shell]
+    requires_capabilities: [ shell ]
     tier: standard
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       schedule: "0 6 * * *"
     graph: cascade
@@ -561,13 +659,18 @@ skills:
       confidence_threshold: 0.9
       classify_tier: fast
       escalation_tier: standard
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/credential-expiry-watch.md
     agent: secops-operator
     tier: standard
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       schedule: "0 6 * * *"
     graph: cascade
@@ -575,14 +678,19 @@ skills:
       confidence_threshold: 0.9
       classify_tier: fast
       escalation_tier: standard
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/network-exposure-scan.md
     agent: secops-operator
-    requires_capabilities: [shell]
+    requires_capabilities: [ shell ]
     tier: standard
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       schedule: "0 6 * * *"
     graph: cascade
@@ -590,6 +698,11 @@ skills:
       confidence_threshold: 0.9
       classify_tier: fast
       escalation_tier: standard
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/security-correlation.md
     agent: secops-operator
     tier: reasoning
@@ -597,63 +710,93 @@ skills:
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/fleet-trust-audit.md
     agent: secops-operator
     tier: standard
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/platform-health.md
     agent: fleet-operator
     tier: standard
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/version-drift-check.md
     agent: fleet-operator
     tier: standard
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/dispatch-analytics.md
     agent: fleet-operator
     tier: standard
     category: report
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/mcp-lifecycle.md
     agent: fleet-operator
-    requires_capabilities: [shell]
+    requires_capabilities: [ shell ]
     tier: reasoning
     fallback_tier: standard
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       schedule: "0 */4 * * *"
       on_demand: true
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/capacity-forecast.md
     agent: fleet-operator
     tier: reasoning
@@ -661,10 +804,15 @@ skills:
     category: report
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/upgrade-coordinator.md
     agent: fleet-operator
     tier: reasoning
@@ -672,64 +820,96 @@ skills:
     category: sync
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: plan-execute
     graph_config:
       max_replan_attempts: 2
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/notification-channel-status.md
     agent: notifications-operator
     tier: standard
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/notification-delivery-audit.md
     agent: notifications-operator
     tier: standard
     category: report
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/delivery-report.md
     agent: notifications-operator
     tier: standard
     category: report
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     graph: react
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/registry-publish.md
     agent: fleet-operator
     tier: standard
     category: sync
     services_used:
       - service: vault
-        operations: [read]
+        operations: [ read ]
     graph: react
+    required_services:
+      - vault.read
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/registry-list.md
     agent: fleet-operator
     tier: standard
     category: report
     services_used:
       - service: vault
-        operations: [read]
+        operations: [ read ]
     graph: react
+    required_services:
+      - vault.read
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/registry-remove.md
     agent: fleet-operator
     tier: standard
     category: sync
     services_used:
       - service: vault
-        operations: [read]
+        operations: [ read ]
     graph: react
+    required_services:
+      - vault.read
+    allow_request_service: true
+    allow_request_tool: false
   - name: home-state-summary
     agent: home-operator
     description: Narrate current Home Assistant device state, anomalies, and recent automation fires
@@ -737,9 +917,9 @@ skills:
     category: report
     services_used:
       - service: home
-        operations: [read]
+        operations: [ read ]
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
@@ -758,6 +938,12 @@ skills:
       5. Read-only — never invoke services to change physical state. If you
          identify a desirable change (e.g. arm an alarm), surface it as a
          suggestion in the note for human action.
+    required_services:
+      - home.read
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: expense-triage
     agent: bizops-operator
@@ -766,7 +952,7 @@ skills:
     category: triage
     services_used:
       - service: vault
-        operations: [read, search, append]
+        operations: [ read, search, append ]
     trigger:
       on_demand: true
     graph: react
@@ -787,6 +973,12 @@ skills:
       5. Always cite the source note. Decline classification rather than
          guess when the entity-billed signal is ambiguous; flag the item
          with low confidence and continue.
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.append
+    allow_request_service: true
+    allow_request_tool: false
 
   - name: pr-review-summary
     agent: review-operator
@@ -795,7 +987,7 @@ skills:
     category: review
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
     trigger:
       on_demand: true
     graph: react
@@ -822,6 +1014,11 @@ skills:
          stating what was checked and is correct.
       5. If you find nothing wrong, say so explicitly with the list of what
          you checked. "Looks good" is not a review.
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - import: ./skills/lens-strengthen-metrics-review.md
     agent: memory-operator
@@ -829,15 +1026,27 @@ skills:
     category: report
     services_used:
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
     graph: react
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
   - import: ./skills/effort-digest.md
     agent: pkm-operator
     tier: standard
     category: digest
     services_used:
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - import: ./skills/vault-hygiene.md
     agent: pkm-operator
@@ -845,7 +1054,13 @@ skills:
     category: review
     services_used:
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - import: ./skills/enrich-persons.md
     agent: pkm-operator
@@ -853,7 +1068,14 @@ skills:
     category: transform
     services_used:
       - service: vault
-        operations: [read, search, create, property_set]
+        operations: [ read, search, create, property_set ]
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+      - vault.property_set
+    allow_request_service: true
+    allow_request_tool: false
 
   - import: ./skills/workload-reflect.md
     agent: pkm-operator
@@ -861,7 +1083,13 @@ skills:
     category: report
     services_used:
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - import: ./skills/domain-briefs.md
     agent: pkm-operator
@@ -869,7 +1097,13 @@ skills:
     category: digest
     services_used:
       - service: vault
-        operations: [read, search, create]
+        operations: [ read, search, create ]
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - import: ./skills/digest-invocation.md
     agent: pkm-operator
@@ -877,7 +1111,11 @@ skills:
     category: sync
     services_used:
       - service: vault
-        operations: [read]
+        operations: [ read ]
+    required_services:
+      - vault.read
+    allow_request_service: true
+    allow_request_tool: false
 
   - import: ./skills/enrich-person-email.md
     agent: comms-operator
@@ -885,9 +1123,16 @@ skills:
     category: transform
     services_used:
       - service: vault
-        operations: [read, search, property_set]
+        operations: [ read, search, property_set ]
       - service: email
-        operations: [search]
+        operations: [ search ]
+    required_services:
+      - vault.read
+      - vault.search
+      - vault.property_set
+      - email.search
+    allow_request_service: true
+    allow_request_tool: false
 
   - import: ./skills/notification-digest.md
     agent: notifications-operator
@@ -895,7 +1140,12 @@ skills:
     category: digest
     services_used:
       - service: vault
-        operations: [read, create]
+        operations: [ read, create ]
+    required_services:
+      - vault.read
+      - vault.create
+    allow_request_service: true
+    allow_request_tool: false
 
   - import: ./skills/notification-escalation.md
     agent: notifications-operator
@@ -903,7 +1153,11 @@ skills:
     category: notify
     services_used:
       - service: vault
-        operations: [read]
+        operations: [ read ]
+    required_services:
+      - vault.read
+    allow_request_service: true
+    allow_request_tool: false
 
 guardrails:
   version: "1.0.0"
@@ -912,52 +1166,52 @@ guardrails:
     - id: vault-001
       category: vault
       severity: critical
-      scope: [community, verified]
+      scope: [ community, verified ]
       added: "2026-04-18"
     - id: vault-002
       category: vault
       severity: high
-      scope: [community]
+      scope: [ community ]
       added: "2026-04-18"
     - id: exfil-001
       category: exfiltration
       severity: critical
-      scope: [community, verified]
+      scope: [ community, verified ]
       added: "2026-04-18"
     - id: exfil-002
       category: exfiltration
       severity: high
-      scope: [community]
+      scope: [ community ]
       added: "2026-04-18"
     - id: identity-001
       category: identity
       severity: critical
-      scope: [community, verified]
+      scope: [ community, verified ]
       added: "2026-04-18"
     - id: identity-002
       category: identity
       severity: high
-      scope: [community]
+      scope: [ community ]
       added: "2026-04-18"
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [community, verified]
+      scope: [ community, verified ]
       added: "2026-04-18"
     - id: data-002
       category: data-handling
       severity: high
-      scope: [community]
+      scope: [ community ]
       added: "2026-04-18"
     - id: prompt-001
       category: prompt-hygiene
       severity: critical
-      scope: [community, verified]
+      scope: [ community, verified ]
       added: "2026-04-18"
     - id: prompt-002
       category: prompt-hygiene
       severity: high
-      scope: [community]
+      scope: [ community ]
       added: "2026-04-18"
 
 herald:
@@ -966,15 +1220,12 @@ herald:
       title: Platform Security Guardrails
       since_harness: "0.66.2.0"
       summary: >-
-        Community and verified agents now operate under platform guardrails
-        covering vault integrity, data leakage, identity, credential scope,
-        and prompt injection defence.
+        Community and verified agents now operate under platform guardrails covering vault integrity, data leakage, identity, credential scope, and prompt injection defence.
     - id: herald-consent-model
       title: Agent Consent Model
       since_harness: "0.66.0.0"
       summary: >-
-        Community pack agents require explicit consent before first dispatch.
-        Manage consents in Settings > Privacy > Agent Access.
+        Community pack agents require explicit consent before first dispatch. Manage consents in Settings > Privacy > Agent Access.
 
 workflows:
   - name: morning-automation
@@ -984,9 +1235,9 @@ workflows:
       - skill: email-triage
         condition: always
       - skill: process-inbox
-        after: [email-triage]
+        after: [ email-triage ]
       - skill: daily-digest
-        after: [email-triage, process-inbox]
+        after: [ email-triage, process-inbox ]
 
 # ── Pack-level config ──────────────────────────────────────────────
 # Tunables for the wiki-maintain trio (DD-194, added v3.6.0).
@@ -997,8 +1248,7 @@ config:
       type: int
       label: Stale-card threshold (days)
       description: >
-        wiki-maintain-lint flags entity cards as stale when last_interaction
-        (or last inbound back-reference) is older than this many days.
+        wiki-maintain-lint flags entity cards as stale when last_interaction (or last inbound back-reference) is older than this many days.
       default: 90
       min: 7
       max: 730
@@ -1008,9 +1258,7 @@ config:
       type: int
       label: Dormant-effort threshold (days)
       description: >
-        wiki-maintain-lint flags efforts with status=on as dormant when their
-        body has not been modified within this many days. Recommends a
-        targeted wiki-maintain-query dispatch (does not auto-fire).
+        wiki-maintain-lint flags efforts with status=on as dormant when their body has not been modified within this many days. Recommends a targeted wiki-maintain-query dispatch (does not auto-fire).
       default: 30
       min: 7
       max: 365

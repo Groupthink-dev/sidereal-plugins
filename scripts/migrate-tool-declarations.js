@@ -102,18 +102,27 @@ function loadContractClassificationsESM() {
 // Conversion
 
 function classifyOperation(serviceVocab, contractOps, service, operation) {
+    // **Default rule:** every op in `services_used` → required_services.
+    // The skill author listed it because the skill uses it; absence breaks
+    // the skill. Architect promotes specific ops to optional_services
+    // during review based on reading the skill body.
+    //
+    // The script's contract-schema lookup is preserved purely for *drift
+    // detection* — emit a warning when a pack-side op isn't in the
+    // contract schema, but always classify as required.
     const contractId = serviceVocab.get(service);
-    if (!contractId) return { tier: "unknown_service" };
+    if (!contractId) {
+        return { tier: "required", warning: `unknown_service: ${service} (no entry in vocabularies/services.yaml)` };
+    }
     const ops = contractOps.get(contractId);
-    if (!ops) return { tier: "unknown_contract", contractId };
+    if (!ops) {
+        return { tier: "required", warning: `unknown_contract: ${contractId} (no schema/contracts/${contractId}.json)` };
+    }
     const cls = ops.get(operation);
-    if (!cls) return { tier: "unknown_operation", contractId };
-    // Contract classification → v1.12 placement
-    //   required    → required_services
-    //   recommended → required_services (treated as required by default)
-    //   optional    → optional_services
-    if (cls === "required" || cls === "recommended") return { tier: "required" };
-    return { tier: "optional" };
+    if (!cls) {
+        return { tier: "required", warning: `unknown_operation: ${service}.${operation} (not in ${contractId})` };
+    }
+    return { tier: "required" };
 }
 
 function convertSkill(skillNode, serviceVocab, contractOps, summary) {
@@ -146,25 +155,11 @@ function convertSkill(skillNode, serviceVocab, contractOps, summary) {
             if (!op) continue;
             const ref = `${service}.${op}`;
             const cls = classifyOperation(serviceVocab, contractOps, service, op);
-            switch (cls.tier) {
-                case "required":
-                    required.push(ref);
-                    break;
-                case "optional":
-                    optional.push(ref);
-                    break;
-                case "unknown_service":
-                    warnings.push(`unknown_service: ${service} (no entry in vocabularies/services.yaml)`);
-                    required.push(ref); // default to required when uncertain
-                    break;
-                case "unknown_contract":
-                    warnings.push(`unknown_contract: ${cls.contractId} (no schema/contracts/${cls.contractId}.json)`);
-                    required.push(ref);
-                    break;
-                case "unknown_operation":
-                    warnings.push(`unknown_operation: ${ref} (not in ${cls.contractId})`);
-                    required.push(ref);
-                    break;
+            if (cls.warning) warnings.push(cls.warning);
+            if (cls.tier === "optional") {
+                optional.push(ref);
+            } else {
+                required.push(ref);
             }
         }
     }
@@ -251,7 +246,18 @@ function main() {
             if (doc.get("pack") !== "1.12") {
                 doc.set("pack", "1.12");
             }
-            writeFileSync(path, doc.toString());
+            // Strict formatting flags to minimise cosmetic churn — preserve
+            // line width, default to plain strings (no auto-quote), don't
+            // expand unicode escape sequences.
+            const output = doc.toString({
+                lineWidth: 0,
+                minContentWidth: 0,
+                defaultStringType: "PLAIN",
+                defaultKeyType: "PLAIN",
+                doubleQuotedAsJSON: false,
+                singleQuote: false,
+            });
+            writeFileSync(path, output);
         }
     }
 
