@@ -1,8 +1,8 @@
-pack: "1.8"
+pack: "1.10"
 name: product-operations-starter
 title: "Product Operations Starter"
 featured: false
-version: "1.2.1"
+version: "2.0.0"
 description: >-
   Starter pack for running product operations with Stallari — release
   announcements, customer onboarding, subscription monitoring, MRR digest,

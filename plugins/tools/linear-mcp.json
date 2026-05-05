@@ -26,7 +26,7 @@
     "icon": "target",
     "product": "Linear",
     "blurb": "Connect to Linear for issue tracking, project management, sprint cycles, and team coordination.",
-    "help_text": "Linear's hosted MCP uses OAuth2. On first connection, you'll authorise Sidereal to access your Linear workspace via the browser. No API keys or app creation required.",
+    "help_text": "Linear's hosted MCP uses OAuth2. On first connection, you'll authorise Stallari to access your Linear workspace via the browser. No API keys or app creation required.",
     "help_url": "https://linear.app/docs/mcp",
     "oauth2": {
       "grant_type": "authorization_code",
@@ -102,7 +102,7 @@
       "url": "https://linear.app/changelog"
     }
   ],
-  "readme": "### What it does\n\nLinear MCP is an official vendor-hosted remote server that connects your AI agent to Linear's project management platform. Your agent can search and triage issues, create and update tasks, browse projects and cycles, and manage labels — all through Linear's native API.\n\nBecause it runs on Linear's infrastructure, there is no local process to install or maintain. The connection is established via OAuth2 on first use.\n\n### Remote MCP architecture\n\nUnlike most Blade MCPs, Linear runs as a remote server at `mcp.linear.app/mcp`. Sidereal connects directly — no local runtime, no package install, no Python or Node dependency. OAuth2 authentication is handled by Linear's hosted auth flow; you authorise once in the browser and the token is managed automatically.\n\n### Safety model\n\nLinear's MCP supports both read and write operations. Issue creation, updates, and completion are available when the OAuth scopes include `write` and `issues:create`. Read operations (search, list, inbox, team overview) require only the `read` scope.\n\n### Coverage\n\nThe service mapping covers the `tasks-v1` contract surface: issues as tasks, projects, labels, inbox, and CRUD operations. Linear's richer concepts — cycles, views, roadmaps, and team structures — are available through the full tool set but extend beyond the contract.",
+  "readme": "### What it does\n\nLinear MCP is an official vendor-hosted remote server that connects your AI agent to Linear's project management platform. Your agent can search and triage issues, create and update tasks, browse projects and cycles, and manage labels — all through Linear's native API.\n\nBecause it runs on Linear's infrastructure, there is no local process to install or maintain. The connection is established via OAuth2 on first use.\n\n### Remote MCP architecture\n\nUnlike most Blade MCPs, Linear runs as a remote server at `mcp.linear.app/mcp`. Stallari connects directly — no local runtime, no package install, no Python or Node dependency. OAuth2 authentication is handled by Linear's hosted auth flow; you authorise once in the browser and the token is managed automatically.\n\n### Safety model\n\nLinear's MCP supports both read and write operations. Issue creation, updates, and completion are available when the OAuth scopes include `write` and `issues:create`. Read operations (search, list, inbox, team overview) require only the `read` scope.\n\n### Coverage\n\nThe service mapping covers the `tasks-v1` contract surface: issues as tasks, projects, labels, inbox, and CRUD operations. Linear's richer concepts — cycles, views, roadmaps, and team structures — are available through the full tool set but extend beyond the contract.",
   "scenarios": [
     {
       "type": "workflow",

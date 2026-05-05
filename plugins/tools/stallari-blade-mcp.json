@@ -1,7 +1,7 @@
 {
   "name": "stallari-blade-mcp",
   "aliases": [
-    "sidereal-blade-mcp"
+    "stallari-blade-mcp"
   ],
   "title": "Stallari Vault",
   "description": "Obsidian vault operations via Swift MCP — read, write, search, properties, graph analysis, lens semantic tools",

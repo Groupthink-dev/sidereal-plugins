@@ -1,7 +1,7 @@
 {
   "name": "stallari-email-adapter",
   "aliases": [
-    "sidereal-email-adapter"
+    "stallari-email-adapter"
   ],
   "title": "Email Adapter",
   "description": "Domain adapter for email — canonical email_* tools with per-provider transforms (Fastmail, Gmail)",
