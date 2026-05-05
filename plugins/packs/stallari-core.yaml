@@ -3,7 +3,7 @@ name: stallari-core
 aliases: [stallari-core]
 title: "Stallari Core"
 featured: false
-version: "3.8.2"
+version: "3.9.0"
 description: >-
   Core platform operators and infrastructure health — PKM, comms, scheduling,
   security auditing, fleet monitoring, notification delivery, registry management,
