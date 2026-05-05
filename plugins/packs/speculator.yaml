@@ -1,8 +1,8 @@
-pack: "1.8"
+pack: "1.10"
 name: speculator
 title: "Speculator"
 featured: true
-version: "1.1.0"
+version: "2.0.0"
 tagline: "Betting exchanges, prediction markets, and brokerage — cross-market pricing in one conversation"
 description: >-
   Cross-market speculation and analysis — Betfair exchange odds,
