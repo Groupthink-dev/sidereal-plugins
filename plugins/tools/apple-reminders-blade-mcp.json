@@ -1,16 +1,16 @@
 {
-  "name": "reminders-blade-mcp",
+  "name": "apple-reminders-blade-mcp",
   "title": "Apple Reminders",
   "description": "Apple Reminders operations — lists, reminders, search, due dates, create, complete, update, delete",
   "tagline": "Native Apple Reminders access on macOS",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "groupthink-dev",
   "license": "MIT",
   "tier": "certified",
   "author_type": "first-party",
   "readiness": "production",
   "contract": "tasks-v1",
-  "repository": "https://github.com/groupthink-dev/reminders-blade-mcp",
+  "repository": "https://github.com/Groupthink-dev/apple-reminders-blade-mcp",
   "multi_instance": false,
   "notes": "macOS only. Requires Reminders permission (auto-prompted on first AppleScript access).",
   "install": {
@@ -85,7 +85,7 @@
   "links": [
     {
       "label": "Source Code",
-      "url": "https://github.com/groupthink-dev/reminders-blade-mcp"
+      "url": "https://github.com/Groupthink-dev/apple-reminders-blade-mcp"
     },
     {
       "label": "macOS Privacy Settings",
@@ -96,11 +96,11 @@
       "url": "https://support.apple.com/guide/reminders/welcome/mac"
     }
   ],
-  "readme": "### What it does\n\nApple Reminders gives your AI agent native access to the Reminders app on macOS. Browse lists, search for reminders, check due dates, and manage tasks — all through the system Reminders database via AppleScript.\n\nYour agent can see what’s overdue, find reminders by keyword, get list-level stats, and create or complete reminders without switching to the app.\n\n### macOS integration\n\nThis plugin talks directly to Apple Reminders through AppleScript — no API keys, no cloud setup. Just grant Reminders access when macOS prompts (System Settings > Privacy & Security > Reminders). Changes sync automatically via iCloud to all your Apple devices.\n\n### Safety model\n\nRead operations work immediately — lists, search, due dates, stats, individual reminder details.\n\nWrite operations (create, complete, update, delete) require `REMINDERS_WRITE_ENABLED=true` **and** `confirm: true` on each call. Double-gated by design, so your agent can browse freely but must be explicit about changes.\n\n### Tool coverage\n\n| Category | Tools | What you can do |\n|----------|-------|-----------------|\n| Read | 6 | Lists, items, search, due dates, stats, detail |\n| Write | 4 | Create, complete, update, delete (all gated) |",
+  "readme": "### What it does\n\nApple Reminders gives your AI agent native access to the Reminders app on macOS. Browse lists, search for reminders, check due dates, and manage tasks — all through the system Reminders database via AppleScript.\n\nYour agent can see what's overdue, find reminders by keyword, get list-level stats, and create or complete reminders without switching to the app.\n\n### macOS integration\n\nThis plugin talks directly to Apple Reminders through AppleScript — no API keys, no cloud setup. Just grant Reminders access when macOS prompts (System Settings > Privacy & Security > Reminders). Changes sync automatically via iCloud to all your Apple devices.\n\n### Safety model\n\nRead operations work immediately — lists, search, due dates, stats, individual reminder details.\n\nWrite operations (create, complete, update, delete) require `REMINDERS_WRITE_ENABLED=true` **and** `confirm: true` on each call. Double-gated by design, so your agent can browse freely but must be explicit about changes.\n\n### Tool coverage\n\n| Category | Tools | What you can do |\n|----------|-------|-----------------|\n| Read | 6 | Lists, items, search, due dates, stats, detail |\n| Write | 4 | Create, complete, update, delete (all gated) |",
   "scenarios": [
     {
       "type": "workflow",
-      "target": "reminders-blade-mcp",
+      "target": "apple-reminders-blade-mcp",
       "target_type": "plugin",
       "shared_services": [],
       "label": "Triage overdue reminders",
@@ -108,7 +108,7 @@
     },
     {
       "type": "workflow",
-      "target": "reminders-blade-mcp",
+      "target": "apple-reminders-blade-mcp",
       "target_type": "plugin",
       "shared_services": [],
       "label": "Capture tasks from a meeting",
@@ -116,7 +116,7 @@
     },
     {
       "type": "workflow",
-      "target": "reminders-blade-mcp",
+      "target": "apple-reminders-blade-mcp",
       "target_type": "plugin",
       "shared_services": [],
       "label": "Weekly reminder review",
@@ -128,6 +128,6 @@
     "recommended": "4/4",
     "optional": "1/1",
     "gated": "3/3",
-    "last_tested": "2026-04-07"
+    "last_tested": "2026-05-05"
   }
 }
