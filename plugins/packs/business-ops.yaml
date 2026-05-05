@@ -3,7 +3,6 @@ name: business-ops
 title: "Business Operations"
 featured: false
 version: "2.0.0"
-readiness: beta
 tagline: "Revenue, accounting, payroll, and compliance in one operator"
 description: >-
   Multi-service business operations automation — subscription revenue tracking,
