@@ -1,8 +1,8 @@
-pack: "1.8"
+pack: "1.10"
 name: saas-revenue-ops
 title: "SaaS Revenue Ops"
 featured: true
-version: "1.1.0"
+version: "2.0.0"
 tagline: "Subscriptions, orders, and delivery in one view — Paddle, Shopify, and Resend unified"
 description: >-
   End-to-end SaaS and e-commerce revenue operations — subscription billing,
