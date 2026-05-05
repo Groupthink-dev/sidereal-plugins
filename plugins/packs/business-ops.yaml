@@ -1,8 +1,9 @@
-pack: "1.8"
+pack: "1.10"
 name: business-ops
 title: "Business Operations"
 featured: false
-version: "1.1.1"
+version: "2.0.0"
+readiness: beta
 tagline: "Revenue, accounting, payroll, and compliance in one operator"
 description: >-
   Multi-service business operations automation — subscription revenue tracking,
