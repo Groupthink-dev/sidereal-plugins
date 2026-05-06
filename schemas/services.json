@@ -326,15 +326,6 @@
         "finance",
         "trading"
       ]
-    },
-    {
-      "contract": "betting-exchange-v1",
-      "description": "Betting exchanges (Betfair).",
-      "service": "betting-exchange",
-      "tags": [
-        "finance",
-        "trading"
-      ]
     }
   ]
 }
