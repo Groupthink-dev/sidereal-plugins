@@ -1,0 +1,62 @@
+{
+  "name": "apple-mail-blade-mcp",
+  "aliases": [
+    "mail-app-blade-mcp"
+  ],
+  "title": "Apple Mail",
+  "description": "On-disk Apple Mail reader — Envelope Index SQLite + .emlx bodies + attachments. Read-only; never opens the network. NLTagger entity extraction under the deterministic-extraction carve-out (DD-240).",
+  "tagline": "Tens of GB of personal correspondence, on-device, no network",
+  "version": "0.1.0",
+  "author": "groupthink-dev",
+  "license": "MIT",
+  "icon": "/icons/apple-mail-blade-mcp.svg",
+  "tier": "certified",
+  "author_type": "first-party",
+  "readiness": "production",
+  "contract": "mail-v1",
+  "repository": "https://github.com/Groupthink-dev/apple-mail-blade-mcp",
+  "multi_instance": false,
+  "install": {
+    "runtime": "native",
+    "binary": "apple-mail-blade"
+  },
+  "env": [],
+  "setup": {
+    "auth_model": "none",
+    "complexity": "moderate",
+    "icon": "envelope.fill",
+    "product": "Apple Mail",
+    "blurb": "Read on-disk Mail.app data — accounts, mailboxes, messages, threads, attachments, NLTagger entities. Tens of GB of personal correspondence the live IMAP/JMAP layer can't see (on-my-Mac mailboxes, removed-account archives, pre-migration history).",
+    "help_text": "Local-corpus class blade (DD-240). Library form factor — compiled into Stallari, not a separate subprocess. Requires Full Disk Access on the Stallari daemon binary so it can read ~/Library/Mail/V10/. Open System Settings → Privacy & Security → Full Disk Access and enable Stallari.app + the stallari-helper binary inside it.",
+    "fields": [],
+    "help": {
+      "fda_grant": {
+        "label": "Grant Full Disk Access",
+        "url": "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles",
+        "description": "Open System Settings → Privacy & Security → Full Disk Access. Add /Applications/Stallari.app and /Applications/Stallari.app/Contents/MacOS/stallari-helper, then toggle both on."
+      },
+      "decision_record": {
+        "label": "DD-241 — apple-mail-blade-mcp",
+        "url": "https://github.com/Groupthink-dev/apple-mail-blade-mcp",
+        "description": "Library form factor inside StallariKit (DD-240 invariant #8 — never advertised externally)."
+      }
+    },
+    "test": {
+      "endpoint": "file://~/Library/Mail/V10/MailData/Envelope%20Index",
+      "auth_style": "none"
+    },
+    "prerequisites": [
+      "macOS 14 (Sonoma) or later — V10 schema only in v0.1.0",
+      "Full Disk Access granted to the Stallari daemon binary (stallari-helper) — needed to read ~/Library/Mail/V10/",
+      "Mail.app must have been launched at least once (so Envelope Index exists)"
+    ]
+  },
+  "conformance": {
+    "required": "9/9",
+    "recommended": "0/0",
+    "optional": "0/0",
+    "last_tested": "2026-05-07"
+  },
+  "notes": "9 read-only tools (list_accounts, list_mailboxes, list_messages, search_messages, head, read_message, read_attachment, read_thread, extract_entities). Library form factor (DD-241 Phase A.5) — compiled into StallariKit via SPM dep on apple-mail-blade-mcp v0.1.0. **Never advertised on the daemon's :9847/mcp HTTP MCP surface per DD-240 invariant #8** — consumed only via the in-process Dispatcher path through AppleMailBladeWiring. testMailNotAdvertisedExternally regression guard locks this in stallari-harness. v0.1.0 hard caps: 25MB attachment, 100MB message, 32 multipart depth. NLTagger entity extraction (people/orgs/places/dates) under DD-240 invariant #3 deterministic-extraction carve-out — no LLM, no user-loaded CoreML.",
+  "hidden": false
+}
