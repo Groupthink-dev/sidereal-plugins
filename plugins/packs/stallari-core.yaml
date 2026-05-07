@@ -1,6 +1,5 @@
 pack: "1.12"
 name: stallari-core
-aliases: [ sidereal-core ]
 title: "Stallari Core"
 featured: false
 version: "4.0.0"
