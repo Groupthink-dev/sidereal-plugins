@@ -139,6 +139,10 @@
     {
       "code": "invalid-tunable-key",
       "description": "A tunable key does not match the snake_case pattern."
+    },
+    {
+      "code": "reserved-agent-name",
+      "description": "A pack declares an agent with a name reserved for the platform — the bundled stallari-core operator slugs (pkm-operator, comms-operator, scheduling-operator, secops-operator, fleet-operator, notifications-operator, home-operator, bizops-operator, review-operator, memory-operator) and the harness-only personas (digital-assistant, system-architect). Reference these via `skill.agent: <name>` to reuse the platform persona; redefining them is rejected. See docs/operators-v1.md."
     }
   ]
 }

@@ -1,0 +1,18 @@
+# expected-error: missing-required-field
+# Fixture: skill declares both import: and prompt: — mutually exclusive.
+pack: "1.11"
+name: bad-import-pack
+version: "1.0.0"
+description: Pack with a skill that declares both import and prompt — invalid.
+
+data:
+  reads: []
+  writes: []
+  stores: nothing
+  phones_home: false
+
+skills:
+  - name: bad-skill
+    import: ./skills/bad-skill.md
+    prompt: |
+      This should not be here alongside import:.

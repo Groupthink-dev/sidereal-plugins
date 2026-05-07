@@ -130,10 +130,50 @@
     },
     "skill": {
       "additionalProperties": true,
+      "oneOf": [
+        {
+          "description": "Inline skill — name and prompt are required; import must not be present.",
+          "not": {
+            "required": [
+              "import"
+            ]
+          },
+          "required": [
+            "name",
+            "prompt"
+          ]
+        },
+        {
+          "description": "Imported skill — import path required; name and description derived from SKILL.md frontmatter; prompt must not be present.",
+          "not": {
+            "required": [
+              "prompt"
+            ]
+          },
+          "required": [
+            "import"
+          ]
+        }
+      ],
       "properties": {
         "agent": {
           "description": "Agent name that executes this skill (key in agents dict).",
           "type": "string"
+        },
+        "allow_request_service": {
+          "default": true,
+          "description": "Whether the model may call the request_service(operation, justification) meta-tool to grow its surface mid-dispatch (v1.12, DD-244). Default true — author-friendly escape hatch for genuinely unanticipated needs; gates naturally on user-bound provider availability and authoriser approval. Set false for security-sensitive skills with strong static surface requirements.",
+          "type": "boolean"
+        },
+        "allow_request_tool": {
+          "default": false,
+          "description": "Whether the model may call the request_tool(name, justification) meta-tool to grow its surface mid-dispatch (v1.12, DD-244). Default false — direct concrete-tool grab is almost always a code smell signalling missed optional_tools declaration. Authors who genuinely need this opt in. Authoriser rules are stricter than for request_service: only previously-declared optional_tools or capability-covered tools approve.",
+          "type": "boolean"
+        },
+        "allow_request_track": {
+          "default": false,
+          "description": "DD-245 — Whether this skill may use mid-dispatch request_track_open / request_track_transition / request_track_link meta-tools (v1.13). Deny-by-default per the DD-244 Phase E pattern. Declared track_consumes / track_emits is the clean path; this escape hatch exists for skills with genuinely unanticipated track interactions. Authoriser rules apply identically to request_service / request_tool: declared workflow names approve, undeclared names require a per-dispatch elevation.",
+          "type": "boolean"
         },
         "briefing": {
           "additionalProperties": false,
@@ -183,6 +223,10 @@
             "sync",
             "report"
           ],
+          "type": "string"
+        },
+        "default_idempotency_key": {
+          "description": "DD-245 — Mustache-style template ({{ }} expressions over trigger / dispatch context) used as the fallback idempotency key for emitted tracks when a result-envelope entry omits an explicit key (v1.13). Single-skill resume relies on this — same rendered key on subsequent dispatches resolves to the same track for watermark continuation. When omitted, the engine falls back to sha256(skill_name || dispatch_id || verb || canonical(args)) per DD-245 Resolved §9.",
           "type": "string"
         },
         "depends_on": {
@@ -261,6 +305,35 @@
               "minimum": 1,
               "type": "integer"
             },
+            "node_model_preferences": {
+              "additionalProperties": false,
+              "description": "Per-graph-node model preferences (DD-236 Phase G, v2.10.1). Keys are graph node names (`classify`, `gate`, `react`, `escalate`, `critique`, `compact`); values declare a capability hint and/or a concrete model preference for that node. Resolver consults these alongside `classify_tier`/`escalation_tier`; the per-node entry wins on collision (more specific). Engine treats each node as a separate `LocalModelManager.acquire/release` window — multiple `complete` calls inside one node share the same residency, but the model can be evicted between consecutive nodes.",
+              "patternProperties": {
+                "^[a-z][a-z0-9_]*$": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "capability": {
+                      "description": "Capability hint for this node. Resolver maps to a concrete backend via the user's IntelligenceProfile capability defaults (DD-236 Phase H, v2.11.0). `large_context` was added in v2.11.0.",
+                      "enum": [
+                        "reasoning",
+                        "standard",
+                        "fast",
+                        "vision",
+                        "tool_use",
+                        "large_context"
+                      ],
+                      "type": "string"
+                    },
+                    "preference": {
+                      "description": "Concrete model preference. Sentinel `inherit_profile` (default when omitted) defers to capability + IntelligenceProfile; any other string is treated as an explicit model id.",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
             "routes": {
               "additionalProperties": {
                 "type": "string"
@@ -270,6 +343,11 @@
             }
           },
           "type": "object"
+        },
+        "import": {
+          "description": "Relative path to a SKILL.md file (relative to pack.yaml directory). Mutually exclusive with prompt:. When present, name:, description:, and prompt: are derived from the SKILL.md frontmatter and body. Pack-manifest fields override SKILL.md per-key. Path must be relative, must not contain '..' segments (path-traversal guard), and must end in .md. v1.11, DD-234.",
+          "pattern": "^(?!.*\\.\\.).*\\.md$",
+          "type": "string"
         },
         "inputs": {
           "description": "Skill-level user inputs, same shape as config.user_inputs (v1.2).",
@@ -282,6 +360,22 @@
           "description": "Skill identifier (kebab-case).",
           "pattern": "^[a-z][a-z0-9-]*$",
           "type": "string"
+        },
+        "optional_services": {
+          "description": "Service contract operations the skill MAY call depending on the conversation (v1.12, DD-244). Registered with the dispatcher's surface manager at dispatch start but NOT injected into turn 1 — saves tokens. Injected into next turn's surface on first call. Failed availability is silent (skill simply can't invoke that operation). See docs/services.md.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "optional_tools": {
+          "description": "Concrete blade tools the skill MAY call depending on the conversation (v1.12, DD-244). Registered but not injected into turn 1; injected on first call. See docs/tools.md.",
+          "items": {
+            "pattern": "^mcp__[a-z][a-z0-9-]*__[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": "array"
         },
         "outputs": {
           "description": "What this skill produces (v1.2).",
@@ -308,8 +402,24 @@
           "description": "Detailed LLM prompt. Can reference {{service.operation}} syntax.",
           "type": "string"
         },
+        "required_services": {
+          "description": "Service contract operations the skill ALWAYS calls (v1.12, DD-244). Format: <service>.<operation> (e.g. email.search, vault.read). The dispatcher's ServiceResolver maps each entry to a concrete tool against the host's bound providers at dispatch time and includes it in the LLM API call's tools parameter on turn 1. Failed availability (no provider bound, authoriser denial) refuses the dispatch with a structured error. Primary author-facing axis — pack authors should declare against contracts wherever possible. See docs/services.md.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "required_tools": {
+          "description": "Concrete blade tools the skill ALWAYS calls (v1.12, DD-244). Format: mcp__<blade>__<tool> for both subprocess and in-process blades — distribution form factor is implementation detail. Use only when no portable service contract applies (Apple Notes, Apple Mail.app, Apple Reminders, Apple Messages, operator-internal targets). Secondary axis — prefer required_services. Certified-tier packs MUST accompany any required_tools declaration with a tools_rationale block. See docs/tools.md.",
+          "items": {
+            "pattern": "^mcp__[a-z][a-z0-9-]*__[a-z][a-z0-9_]*$",
+            "type": "string"
+          },
+          "type": "array"
+        },
         "services_used": {
-          "description": "Services and operations this skill actually calls (v1.2).",
+          "description": "Services and operations this skill actually calls (v1.2). Audit-style declaration. Distinct from required_services / optional_services (v1.12, DD-244) which are enforcement-style — required_services controls the tool surface presented to the LLM.",
           "items": {
             "additionalProperties": false,
             "properties": {
@@ -327,6 +437,25 @@
               "service"
             ],
             "type": "object"
+          },
+          "type": "array"
+        },
+        "tools_rationale": {
+          "description": "Free-text justification for why the skill declares concrete required_tools rather than required_services (v1.12, DD-244). REQUIRED for Certified-tier packs that declare any required_tools; warned-but-allowed for Verified and Community tiers. Acceptable rationales: no portable contract exists, fundamentally first-party data, operator-internal target. Unacceptable: 'easier to type', 'I want to lock users to this provider'.",
+          "minLength": 20,
+          "type": "string"
+        },
+        "track_consumes": {
+          "description": "DD-245 — Workflows from which this skill is willing to take work (v1.13). When the runtime finds an open track of a matching workflow + scope, it dispatches the skill with NodeContext.track bound to the resolved track. For single-skill resume, default_idempotency_key drives the lookup; for multi-skill handoff, the dispatch caller supplies a track_id directly. Empty / omitted = skill is not a Track consumer.",
+          "items": {
+            "$ref": "#/$defs/trackConsumes"
+          },
+          "type": "array"
+        },
+        "track_emits": {
+          "description": "DD-245 — Workflows this skill may create new tracks against via the result-envelope tracks: array (v1.13). Authoring axis only — the actual emit shape (verb, title, owner, idempotency_key, watermark) lives in the result envelope at runtime. PackCompiler validates declared workflow names exist in the merged WorkflowRegistry; runtime authoriser (DD-188) gates verb invocations outside the skill's declared scope.",
+          "items": {
+            "$ref": "#/$defs/trackEmits"
           },
           "type": "array"
         },
@@ -357,9 +486,267 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "trackConsumes": {
+      "additionalProperties": false,
+      "properties": {
+        "scope": {
+          "description": "Scope filter (DD-219). Examples: self, self.fleet, effort:<wikilink>, org:<slug>.",
+          "type": "string"
+        },
+        "when": {
+          "description": "Optional predicate over track properties (state, owner, priority, watermark) restricting which tracks of the workflow this skill is willing to consume.",
+          "type": "string"
+        },
+        "workflow": {
+          "description": "Workflow name (first-party unprefixed, or pack-declared as <pack-name>.<workflow>).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workflow"
+      ],
+      "type": "object"
+    },
+    "trackEmits": {
+      "additionalProperties": false,
+      "properties": {
+        "when": {
+          "description": "Optional predicate over skill / dispatch state determining when the emit should fire (e.g. \"confidence < $tunable.confidence_flag\").",
+          "type": "string"
+        },
+        "workflow": {
+          "description": "Workflow name (first-party unprefixed, or pack-declared as <pack-name>.<workflow>).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "workflow"
+      ],
+      "type": "object"
+    },
+    "trackSaga": {
+      "additionalProperties": false,
+      "description": "DD-245 — Saga configuration on a parent workflow. Child step tracks adopt step_workflow; on_failure controls the engine's response to a step failure (compensate walks cursor → 0 invoking declared compensations; abort closes the parent without compensation; continue best-effort completes remaining steps).",
+      "properties": {
+        "on_failure": {
+          "enum": [
+            "compensate",
+            "abort",
+            "continue"
+          ],
+          "type": "string"
+        },
+        "step_workflow": {
+          "description": "Workflow used by child step tracks. Typically `standard` for simple step records.",
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/trackSagaStep"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "step_workflow",
+        "on_failure",
+        "steps"
+      ],
+      "type": "object"
+    },
+    "trackSagaStep": {
+      "additionalProperties": false,
+      "description": "DD-245 — A single saga step. id is the cursor key; action is a verb / contract-operation invoked when the cursor reaches this step; compensation is the inverse verb walked when on_failure=compensate. Tail steps (action without inverse) carry compensation: null with a compensation_rationale explanation.",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "compensation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "compensation_rationale": {
+          "description": "Required when compensation is null — explains why the step is uncompensable (typically tail steps with irreversible outbound side effects like email send).",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^[a-z][a-z0-9-]*$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "action"
+      ],
+      "type": "object"
+    },
+    "trackVerb": {
+      "additionalProperties": true,
+      "description": "DD-245 — Verb definition within a workflow. Verbs declare which from-states they apply to, the to-state they transition to, required arguments, audit-ledger fields, and permission requirement. The universal `transition` verb may instead carry a state_machine: object describing the full graph rather than a single from/to pair.",
+      "properties": {
+        "audit_fields": {
+          "description": "Argument names captured into the track audit entry beyond the always-stamped {at, actor, verb}.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "from": {
+          "description": "States from which this verb is applicable. Empty / omitted means any state.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "permissions": {
+          "description": "Permission key required to invoke this verb (e.g. transition, comment, write). Resolved through DD-188 authoriser against the caller's identity + the track's permissions block.",
+          "type": "string"
+        },
+        "requires": {
+          "description": "Argument names that the caller MUST supply (e.g. [reason] for block; [actor_arg] for assign).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "state_machine": {
+          "description": "Full transition map for verbs (typically `transition`) that drive between many states. Keys are from-states, values are arrays of allowed to-states.",
+          "type": "object"
+        },
+        "to": {
+          "description": "Target state after the verb fires. Same-state transitions (cursor-only advancement) are valid (e.g. saga step-success holds state=active while cursor walks).",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "trackWorkflow": {
+      "additionalProperties": true,
+      "description": "DD-245 — Tracks workflow definition. State machine + verb set + watermark schema + permission defaults + optional saga config. First-party workflows live in stallari-harness/Sources/StallariKit/Tracks/Workflows/*.yaml; pack-declared workflows ride in this slot in pack.yaml and are namespaced as <pack-name>.<name> at compile time.",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "idempotency": {
+          "additionalProperties": false,
+          "properties": {
+            "required": {
+              "default": false,
+              "description": "If true, callers MUST supply an explicit idempotency_key — engine refuses to fall back to derived sha256. Used for security-sensitive workflows where collision via predictable derivation would be unsafe (DD-245 Resolved §9).",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "initial": {
+          "description": "State assigned at track open. Must appear in states[].",
+          "type": "string"
+        },
+        "name": {
+          "description": "Workflow identifier (kebab-case; dotted names allowed for sub-class naming like saga.crm-close-won).",
+          "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
+          "type": "string"
+        },
+        "permissions": {
+          "additionalProperties": false,
+          "description": "Default permission sets baked into newly-opened tracks of this workflow. Per-track permissions in the YAML body override these defaults. Subjects use DD-219 scope-uri shape.",
+          "properties": {
+            "default_read": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "default_transition": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "default_write": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "required_capabilities": {
+          "description": "Capabilities required to author a verb on this workflow (DD-138 capability vocab).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "required_permissions": {
+          "description": "Permissions required to transition tracks in this workflow (DD-188).",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "saga": {
+          "$ref": "#/$defs/trackSaga"
+        },
+        "states": {
+          "description": "All states a track in this workflow may occupy. Universal states (open, assigned, active, blocked, review, done, abandoned) are conventional but not enforced — workflows may declare any state set.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "terminal": {
+          "description": "States in which a track is considered closed. No further verbs apply to a terminal track unless explicitly permitted by a reopen-shaped verb.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "verbs": {
+          "additionalProperties": {
+            "$ref": "#/$defs/trackVerb"
+          },
+          "description": "Verb registry — keys are verb names. The universal verb set (open, assign, transition, comment, block, unblock, escalate, close, reopen, link, archive, surface-extend) is closed at the engine level; pack-declared workflows extend it with domain verbs but cannot redefine universals.",
+          "type": "object"
+        },
+        "watermark": {
+          "additionalProperties": false,
+          "properties": {
+            "comparator": {
+              "description": "For schema=opaque or composite, name of a workflow-supplied comparator function. Required when monotonic advancement must be enforced.",
+              "type": "string"
+            },
+            "schema": {
+              "description": "Watermark kind. none = no watermark; offset = {value, total} integer pair; since = ISO-8601 timestamp; opaque = provider-defined cursor string; composite = workflow-defined shape (declare in shape:).",
+              "enum": [
+                "none",
+                "offset",
+                "since",
+                "opaque",
+                "composite"
+              ],
+              "type": "string"
+            },
+            "shape": {
+              "description": "Workflow-defined watermark shape (only for schema=composite). Engine treats as opaque blob; comparator must be declared via comparator:.",
+              "type": "object"
+            }
+          },
+          "type": "object"
+        }
+      },
       "required": [
         "name",
-        "prompt"
+        "states",
+        "initial",
+        "verbs"
       ],
       "type": "object"
     },
@@ -395,6 +782,18 @@
           "default": false,
           "description": "When true, GUI surfaces hide this tunable behind an Advanced disclosure. Use for tunables most users should not touch.",
           "type": "boolean"
+        },
+        "capability": {
+          "description": "Capability hint for `type: model_preference` (DD-236 Phase F, v2.10.0; `large_context` added Phase H v2.11.0). Drives the GUI candidate list filter so authors can ask for a class of model (\"give me a reasoning-class model\") rather than name a SKU. Ignored on every other tunable type.",
+          "enum": [
+            "reasoning",
+            "standard",
+            "fast",
+            "vision",
+            "tool_use",
+            "large_context"
+          ],
+          "type": "string"
         },
         "default": {
           "description": "Default value used when no override is present, when override fails validation, or when override exceeds tunable_size_budget."
@@ -432,7 +831,7 @@
           "type": "string"
         },
         "type": {
-          "description": "Closed type vocabulary. int/float take min/max; string takes pattern/max_length; enum/enum_array take values; string_array/enum_array take max_items; effort_ref_array is Bases-backed (vault wikilinks); cidr_array is IP-family-aware; duration is ISO-8601; bool is true/false.",
+          "description": "Closed type vocabulary. int/float take min/max; string takes pattern/max_length; enum/enum_array take values; string_array/enum_array take max_items; effort_ref_array is Bases-backed (vault wikilinks); cidr_array is IP-family-aware; duration is ISO-8601; bool is true/false. model_preference (DD-236 Phase F, v2.10.0): string-shaped; default accepts the sentinel \"inherit_profile\" or any concrete model id; sibling capability hint (reasoning|standard|fast|vision|tool_use) drives the GUI candidate list. Resolver consults it during dispatch as an override above the IntelligenceProfile preference list.",
           "enum": [
             "int",
             "float",
@@ -443,7 +842,8 @@
             "effort_ref_array",
             "cidr_array",
             "duration",
-            "bool"
+            "bool",
+            "model_preference"
           ],
           "type": "string"
         },
@@ -587,7 +987,7 @@
   "$id": "https://stallari.app/schemas/stallari-pack.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": true,
-  "description": "Schema for pack manifests (stallari-plugin.yaml with pack: field). Public Pack Spec v1.0/v1.1/v1.2/v1.3/v1.4/v1.5/v1.6/v1.7/v1.8/v1.9/v1.10 (DD92, DD99, DD104, DD113, DD119, DD126, DD145/DD146, DD152, DD163, DD184, DD-214). v1.8 (DD-214): briefing: skill block, tier-named graph_config fields, full graph enum (gate/critique-refine/plan-execute), pack-scoped guardrail-ID semantics, runtime notification_* result-envelope fields routed by harness to stallari/{pack}/{category} via supervised ntfy add-on (DD-191).",
+  "description": "Schema for pack manifests (stallari-plugin.yaml with pack: field). Public Pack Spec v1.0/v1.1/v1.2/v1.3/v1.4/v1.5/v1.6/v1.7/v1.8/v1.9/v1.10/v1.11/v1.12/v1.13 (DD92, DD99, DD104, DD113, DD119, DD126, DD145/DD146, DD152, DD163, DD184, DD-214, DD-215, DD-234, DD-244, DD-245). v1.8 (DD-214): briefing: skill block, tier-named graph_config fields, full graph enum (gate/critique-refine/plan-execute), pack-scoped guardrail-ID semantics. v1.10 (DD-184): tunables. v1.11 (DD-234): skills[].import — SKILL.md import primitive; inline prompt: no longer required when import: present. v1.12 (DD-244): per-skill required_services / optional_services / required_tools / optional_tools / allow_request_service / allow_request_tool / tools_rationale fields — deny-by-default skill-declared tool surface replacing the previous full-firehose. Service contracts primary author axis; concrete tools secondary for non-portable cases (Apple-app blades). Late-ALPHA cutover: immediate at v1.12 release, no backward-compat window. v1.9 (DD-215 Phase C): notifications: manifest block declaring per-pack publish categories + cross-pack subscribe claims; ntfy topics flat-name + tags (NOT slash-paths — original DD-214 documentation pre-dated the ntfy-regex correction at NotificationTopicRouter 1cc3cda). v1.13 (DD-245): per-skill track_consumes / track_emits / default_idempotency_key / allow_request_track fields — Tracks substrate integration. Pack-level track_workflows: declares state-machine workflows namespaced as <pack-name>.<workflow.name> at compile time. The existing workflows: field (multi-skill DAGs, DD-200 territory) is unchanged and retires at DD-245 Phase E when SagaEngine subsumes it.",
   "properties": {
     "access": {
       "default": "public",
@@ -602,7 +1002,26 @@
       "additionalProperties": {
         "$ref": "#/$defs/agent"
       },
-      "description": "Named agent definitions (dict of name → agent config).",
+      "description": "Named agent definitions (dict of name → agent config). Pack authors MAY reference platform operators by bare name (`skill.agent: comms-operator`) without declaring them here — bundled-fallback resolution handles the dispatch (DD-146 §A). Pack authors MUST NOT redefine reserved platform operator names (DD-222 — see docs/operators-v1.md for the canonical reusable palette and harness-only personas).",
+      "propertyNames": {
+        "description": "Reserved platform operator names (DD-222). Reference these via skill.agent: <name> to reuse the platform persona; redefining them is rejected.",
+        "not": {
+          "enum": [
+            "pkm-operator",
+            "comms-operator",
+            "scheduling-operator",
+            "secops-operator",
+            "fleet-operator",
+            "notifications-operator",
+            "home-operator",
+            "bizops-operator",
+            "review-operator",
+            "memory-operator",
+            "digital-assistant",
+            "system-architect"
+          ]
+        }
+      },
       "type": "object"
     },
     "author": {
@@ -880,6 +1299,72 @@
       "description": "Pack name (title-case, human-readable).",
       "type": "string"
     },
+    "notifications": {
+      "additionalProperties": false,
+      "description": "Pack-level notification claims (DD-215 Phase C, pack v1.9; amended 2.6.1). Declares the categories the pack publishes (audit + envelope validation; the runtime auto-tags every emission with pack/agent/category/severity/scope tags via NotificationTopicRouter) and any cross-pack subscription claims the pack needs (drives subscriber-side tag filters). Today all publishers share a single mesh-wide topic (`stallari` by default) and identity lives in tags — the harness owns enforcement at the publish capability boundary. Phase F (sealed/certified marketplace packs) opt into per-pack ntfy users + per-pack topics for defence-in-depth; first-party packs share a single `fleet-agent` user. Reserved tag keys: pack, agent, category, severity, scope, org — see docs/notification-tags-v1.md.",
+      "properties": {
+        "publishes": {
+          "description": "Categories this pack publishes. The publish topic is always derived as stallari_fleet_<pack-id> (one topic per pack); the category becomes the `category` tag on each post. The set here is the union of all categories the pack's skills will emit via the runtime `notification_category` envelope field — declaring them up-front lets the harness validate skill output and lets operators audit cross-pack data flow before install.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "category": {
+                "description": "Tag value applied to every post in this category. Lowercase + hyphen only. Common values: alert, digest, task, system, status, incident, metric — pack-scoped, not enforced.",
+                "pattern": "^[a-z][a-z0-9-]*$",
+                "type": "string"
+              },
+              "priority": {
+                "description": "Default ntfy priority (1=min, 5=max). Skills override per-call via the runtime `notification_priority` envelope field. Defaults to 3 if omitted at both manifest and runtime.",
+                "maximum": 5,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "retention": {
+                "description": "Default server-side retention (Go time.Duration syntax: 12h, 24h, 7d, 4w). Falls through to ntfy server config if omitted.",
+                "pattern": "^\\d+(s|m|h|d|w)$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "category"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "subscribes": {
+          "description": "Explicit cross-pack read claims. Each entry mints a read-only ACL grant on the named topic for this pack's ntfy user. By default agent operators see no traffic outside their own pack's topic; this array is the only way to opt into reading another pack's emissions. The `reason` field is mandatory and surfaced to operators in the Add-ons UI for visibility into cross-pack data flow.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "reason": {
+                "description": "Why this pack needs to read another pack's topic. Surfaced to operators in the Add-ons UI when they review the install.",
+                "type": "string"
+              },
+              "tags": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Optional client-side tag filter — receiver narrows incoming messages to only those matching all declared tag key=value pairs. Does not affect the ACL grant (read-only on the whole topic) — purely a subscriber-side filter for routing efficiency.",
+                "type": "object"
+              },
+              "topic": {
+                "description": "Flat ntfy topic name to subscribe to. Pattern enforces ntfy's wire-format constraint only. Today the runtime publishes everything to a single mesh-wide topic (`stallari` by default — see harness NotificationTopicRouter); cross-pack scoping is carried in the `pack:` tag, not in distinct topics. Future Phase F (per-pack bearers for sealed/certified marketplace packs) may introduce per-pack topics like `stallari_pack_<id>` — those will validate under the same wire-format pattern. Use `tags` below to filter on pack/agent/category/severity/scope.",
+                "pattern": "^[-_A-Za-z0-9]{1,64}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "topic",
+              "reason"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
     "organization": {
       "description": "Owning organisation slug. Required when access is private (v1.3, DD104).",
       "pattern": "^[a-z0-9][a-z0-9-]*$",
@@ -898,7 +1383,10 @@
         "1.7",
         "1.8",
         "1.9",
-        "1.10"
+        "1.10",
+        "1.11",
+        "1.12",
+        "1.13"
       ],
       "type": "string"
     },
@@ -970,6 +1458,16 @@
       "$ref": "#/$defs/requirements",
       "description": "Hard requirements — missing services prevent pack execution."
     },
+    "routing_floor": {
+      "default": "opportunistic",
+      "description": "Pack-level local-routing floor (DD-236 Phase F, v2.10.0). Bounds how aggressively the user's LocalRoutingPolicy may divert this pack's dispatches to local. opportunistic (default): user policy wins outright. preferred: user policy honoured unless local is unreachable; cloud fallback always permitted. strict: user MUST keep cloud reachable for this pack — refused dispatch on cloud-unavailable when policy is `strict` (the user's strict mode does not block this pack). Reserved for skills where falling back to a weaker model would compromise correctness (failed-payment alerts, security incidents).",
+      "enum": [
+        "opportunistic",
+        "preferred",
+        "strict"
+      ],
+      "type": "string"
+    },
     "sharing": {
       "default": "none",
       "description": "Sharing scope within orgs. 'family' allows family org members to use without separate purchase. 'team' for team orgs. 'org' for any org type (v1.8, DD152).",
@@ -1000,6 +1498,13 @@
       ],
       "type": "string"
     },
+    "track_workflows": {
+      "description": "DD-245 — Pack-declared Tracks workflow definitions (state machines for durable issue-shaped records). Namespaced as <pack-name>.<workflow.name> at PackCompiler time and merged into the harness WorkflowRegistry. First-party workflows (standard, review, hitl, corpus-lint, devfu, saga-compensation-failure) ship in stallari-harness/Sources/StallariKit/Tracks/Workflows/ and remain unprefixed. Distinct from `workflows:` above, which is the DD-200 multi-skill DAG concept.",
+      "items": {
+        "$ref": "#/$defs/trackWorkflow"
+      },
+      "type": "array"
+    },
     "version": {
       "description": "Pack semantic version (major.minor.patch).",
       "pattern": "^\\d+\\.\\d+\\.\\d+$",
@@ -1015,7 +1520,7 @@
       "type": "string"
     },
     "workflows": {
-      "description": "Multi-skill execution sequences (DAGs).",
+      "description": "Multi-skill execution sequences (DAGs). DD-200 territory; retires at DD-245 Phase E when SagaEngine subsumes it.",
       "items": {
         "$ref": "#/$defs/workflow"
       },

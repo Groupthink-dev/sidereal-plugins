@@ -1,0 +1,56 @@
+# DD-245 — Reference fixture exercising every v1.13 skill-level Tracks field.
+# track_consumes / track_emits / default_idempotency_key / allow_request_track.
+# Uses only the universal first-party `review` workflow (no track_workflows
+# block needed; that's exercised by v113-track-workflow.yaml).
+pack: "1.13"
+name: v113-track-consumer
+version: "1.0.0"
+description: v1.13 fixture — skill-level Tracks integration.
+
+author:
+  name: Stallari
+
+data:
+  reads: [vault]
+  writes: [vault]
+  stores: nothing
+  phones_home: false
+
+skills:
+  - name: triage-with-track-emit
+    description: Single-skill case — emits a review track on low confidence; resumes its own watermarked work via default_idempotency_key.
+    required_services:
+      - vault.search
+      - vault.read
+    optional_services:
+      - vault.append
+    track_consumes:
+      - workflow: review
+        scope: self.fleet
+        when: "owner == 'pkm-operator'"
+    track_emits:
+      - workflow: review
+        when: "confidence < $tunable.confidence_flag"
+    default_idempotency_key: "triage-with-track-emit:{{item.path}}"
+    allow_request_track: false
+    tunables:
+      - key: confidence_flag
+        type: float
+        min: 0
+        max: 1
+        default: 0.6
+        description: Below this confidence, emit a review track.
+    prompt: |
+      Triage the inbox item. Emit a review track if confidence < {{tunable.confidence_flag}}.
+
+  - name: hitl-consumer
+    description: Multi-skill case — consumes review tracks emitted by other skills; uses request_track meta-tools for ad-hoc transitions.
+    required_services:
+      - vault.read
+      - vault.append
+    track_consumes:
+      - workflow: review
+        scope: self.fleet
+    allow_request_track: true
+    prompt: |
+      Pick up the bound track and walk it through human triage.

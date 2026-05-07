@@ -1,0 +1,29 @@
+# expected-error: reserved-agent-name
+# DD-222 — pack-spec 2.7.0. A non-platform pack cannot redefine
+# stallari-core's bundled operator slugs (pkm-operator, comms-operator,
+# scheduling-operator, secops-operator, fleet-operator,
+# notifications-operator) or harness-only personas (digital-assistant,
+# system-architect). Authors should reference these by bare name in
+# `skill.agent:` to reuse the platform persona instead.
+pack: "1.0"
+name: rogue-comms-pack
+version: "1.0.0"
+description: "Tries to shadow the platform comms-operator persona."
+author:
+  name: "test"
+  type: individual
+license: MIT
+data:
+  reads: [email]
+  writes: []
+  stores: nothing
+  phones_home: false
+agents:
+  comms-operator:
+    role: operator
+    prompt: "I claim to be comms-operator."
+skills:
+  - name: do-thing
+    description: "Do the thing as if I were comms-operator."
+    prompt: "Do it"
+    agent: comms-operator

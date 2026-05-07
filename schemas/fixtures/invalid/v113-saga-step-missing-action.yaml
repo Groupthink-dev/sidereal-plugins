@@ -1,0 +1,34 @@
+# expected-error: missing-required-field
+# DD-245 — Saga step lacks the required `action` field.
+pack: "1.13"
+name: v113-saga-step-missing-action
+version: "1.0.0"
+description: Track-workflow saga step missing required action.
+author:
+  name: Test
+data:
+  reads: []
+  writes: []
+  stores: nothing
+  phones_home: false
+skills:
+  - name: noop
+    description: noop
+    prompt: ok
+track_workflows:
+  - name: saga.broken
+    states: [pending, active, closed]
+    initial: pending
+    terminal: [closed]
+    verbs:
+      start:
+        from: [pending]
+        to: active
+        permissions: transition
+    saga:
+      step_workflow: standard
+      on_failure: compensate
+      steps:
+        - id: step-without-action
+          # action: <missing>
+          compensation: noop.undo

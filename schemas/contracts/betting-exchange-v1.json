@@ -1,0 +1,130 @@
+{
+  "$id": "https://stallari.app/schemas/contracts/betting-exchange-v1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Betting exchange service contract v1 — 22 operations across discovery, pricing, account, orders, and system management. Designed for two-sided exchange markets (back/lay). Operation names chosen for future alignment with securities-exchange-v1.",
+  "operations": [
+    {
+      "classification": "required",
+      "description": "List sport/event categories with market counts",
+      "name": "event_types"
+    },
+    {
+      "classification": "required",
+      "description": "List events (matches, races) with filters",
+      "name": "events"
+    },
+    {
+      "classification": "required",
+      "description": "Market metadata: names, runners, event info, start times",
+      "name": "market_catalogue"
+    },
+    {
+      "classification": "required",
+      "description": "Live market data: prices, volumes, status, in-play flag",
+      "name": "market_book"
+    },
+    {
+      "classification": "required",
+      "description": "Account balance, exposure, and commission info",
+      "name": "account_funds"
+    },
+    {
+      "classification": "required",
+      "description": "List active/unmatched orders",
+      "name": "current_orders"
+    },
+    {
+      "classification": "required",
+      "description": "Session status, auth method, write gate, rate limits",
+      "name": "login_status"
+    },
+    {
+      "classification": "required",
+      "description": "Refresh session token to prevent expiry",
+      "name": "keepalive"
+    },
+    {
+      "classification": "recommended",
+      "description": "List competitions (leagues, tournaments) within a sport",
+      "name": "competitions"
+    },
+    {
+      "classification": "recommended",
+      "description": "Detailed price/volume data for a single selection",
+      "name": "runner_book"
+    },
+    {
+      "classification": "recommended",
+      "description": "Browse sport/event/market hierarchy tree",
+      "name": "navigation"
+    },
+    {
+      "classification": "recommended",
+      "description": "Account info: name, country, currency, timezone",
+      "name": "account_details"
+    },
+    {
+      "classification": "recommended",
+      "description": "Transaction history (bets, deposits, withdrawals)",
+      "name": "account_statement"
+    },
+    {
+      "classification": "recommended",
+      "description": "Settled/voided orders with profit and settlement dates",
+      "name": "cleared_orders"
+    },
+    {
+      "classification": "recommended",
+      "description": "Per-selection profit/loss in a market",
+      "name": "market_pnl"
+    },
+    {
+      "classification": "optional",
+      "description": "List venues (racing tracks) with market counts",
+      "name": "venues"
+    },
+    {
+      "classification": "optional",
+      "description": "Exchange rates for currency conversion",
+      "name": "currency_rates"
+    },
+    {
+      "classification": "gated",
+      "description": "Place bets (real money). Requires write gate + confirm gate",
+      "name": "place_orders"
+    },
+    {
+      "classification": "gated",
+      "description": "Cancel unmatched/partially matched bets",
+      "name": "cancel_orders"
+    },
+    {
+      "classification": "gated",
+      "description": "Update persistence type on unmatched bets",
+      "name": "update_orders"
+    },
+    {
+      "classification": "gated",
+      "description": "Atomically cancel and re-place at new price",
+      "name": "replace_orders"
+    },
+    {
+      "classification": "gated",
+      "description": "Dead-man switch: auto-cancel bets on disconnect",
+      "name": "heartbeat"
+    }
+  ],
+  "properties": {
+    "name": {
+      "const": "betting-exchange-v1"
+    },
+    "service": {
+      "const": "betting-exchange"
+    },
+    "version": {
+      "const": 1
+    }
+  },
+  "title": "betting-exchange-v1",
+  "type": "object"
+}

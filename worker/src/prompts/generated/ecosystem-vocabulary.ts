@@ -19,19 +19,19 @@ These are the built-in operator agents. Packs assign skills to agents. When a us
 Reference these when the user's needs overlap. Suggest forking an open pack rather than building from scratch. Mention sealed/paid packs as alternatives when relevant.
 
 **Bundled (included with Stallari):**
-- **stallari-core** v3.8.2 [calendar, email, home, tasks, vault]: Core platform operators and infrastructure health — PKM, comms, scheduling, security auditing, flee… (36 skills, 10 agents, free)
+- **stallari-core** v4.0.0 [calendar, email, home, tasks, vault]: Core platform operators and infrastructure health — PKM, comms, scheduling, security auditing, flee… (45 skills, 10 agents, free)
 
 **Open (forkable):**
-- **business-ops** v1.1.1 [accounting, billing, vault]: Multi-service business operations automation — subscription revenue tracking, double-entry accounti… (16 skills, 1 agents, free)
-- **Declarative Infrastructure** v0.3.0 [documentation, overlay-network, virtualisation]: Provision and manage GPU cloud compute instances declaratively. Stands up stallari-gpu-worker nodes… (8 skills, 4 agents, free)
-- **gaming-lounge** v1.1.0 [gaming, vault]: Cross-platform gaming presence — friends online, achievement progress, game libraries, weekly play … (6 skills, 1 agents, free)
-- **home-maintenance** v1.2.1 [tasks, vault]: Property maintenance logger — drop a photo, voice memo, or text note into an ingest folder to class… (5 skills, 2 agents, free)
-- **meeting-intelligence** v1.0.0 [calendar, notifications, vault]: Privacy-first meeting processing — on-device transcription via mlx-whisper, attendee extraction mat… (4 skills, 1 agents, free)
-- **network-observatory** v1.1.0 [isp, leo-modem, network, overlay-network, protective_dns, vault]: Cross-layer network monitoring and diagnosis — ISP accounts, DNS filtering, local infrastructure, o… (7 skills, 1 agents, free)
-- **product-operations-starter** v1.2.1 [billing, transactional-email, vault]: Starter pack for running product operations with Stallari — release announcements, customer onboard… (6 skills, 2 agents, free)
-- **saas-revenue-ops** v1.1.0 [billing, ecommerce, transactional-email, vault]: End-to-end SaaS and e-commerce revenue operations — subscription billing, storefront orders, and tr… (7 skills, 1 agents, free)
-- **speculator** v1.1.0 [betting-exchange, brokerage, prediction-market, vault]: Cross-market speculation and analysis — Betfair exchange odds, Polymarket prediction prices, and In… (7 skills, 1 agents, free)
-- **stallari-hearth** v1.2.0 [home, vault]: Smart home intelligence for Stallari — site status monitoring, device inventory tracking, daily hom… (5 skills, 1 agents, free)
+- **business-ops** v3.0.0 [accounting, billing, vault]: Multi-service business operations automation — subscription revenue tracking, double-entry accounti… (16 skills, 1 agents, free)
+- **Declarative Infrastructure** v0.4.0 [documentation, overlay-network, virtualisation]: Provision and manage GPU cloud compute instances declaratively. Stands up stallari-gpu-worker nodes… (8 skills, 4 agents, free)
+- **gaming-lounge** v3.0.0 [gaming, vault]: Cross-platform gaming presence — friends online, achievement progress, game libraries, weekly play … (6 skills, 1 agents, free)
+- **home-maintenance** v3.0.0 [tasks, vault]: Property maintenance logger — drop a photo, voice memo, or text note into an ingest folder to class… (5 skills, 2 agents, free)
+- **meeting-intelligence** v2.0.0 [calendar, notifications, vault]: Privacy-first meeting processing — on-device transcription via mlx-whisper, attendee extraction mat… (4 skills, 1 agents, free)
+- **network-observatory** v3.0.0 [isp, leo-modem, network, overlay-network, protective_dns, vault]: Cross-layer network monitoring and diagnosis — ISP accounts, DNS filtering, local infrastructure, o… (7 skills, 1 agents, free)
+- **product-operations-starter** v3.0.0 [billing, transactional-email, vault]: Starter pack for running product operations with Stallari — release announcements, customer onboard… (6 skills, 2 agents, free)
+- **saas-revenue-ops** v3.0.0 [billing, ecommerce, transactional-email, vault]: End-to-end SaaS and e-commerce revenue operations — subscription billing, storefront orders, and tr… (7 skills, 1 agents, free)
+- **speculator** v3.0.0 [brokerage, prediction-market, vault]: Cross-market speculation and analysis — Polymarket prediction prices and Interactive Brokers portfo… (7 skills, 1 agents, free)
+- **stallari-hearth** v3.0.0 [home, vault]: Smart home intelligence for Stallari — site status monitoring, device inventory tracking, daily hom… (5 skills, 1 agents, free)
 `;
 
 export const AGENT_NAMES = ["digital-assistant", "pkm-operator", "comms-operator", "scheduling-operator", "secops-operator", "fleet-operator", "home-operator", "bizops-operator"] as const;

@@ -1,0 +1,27 @@
+# Fixture: skill with import: path instead of inline prompt:.
+# Validates that pack-spec v1.11 accepts import: as an alternative to prompt:.
+# The import: path is relative to pack.yaml and must end in .md.
+pack: "1.11"
+name: import-skill-pack
+version: "1.0.0"
+description: Pack demonstrating SKILL.md import primitive.
+
+author:
+  name: Stallari
+
+data:
+  reads: []
+  writes: []
+  stores: nothing
+  phones_home: false
+
+skills:
+  - import: ./skills/my-skill.md
+  - import: ./skills/another-skill.md
+    agent: pkm-operator
+    trigger:
+      schedule: "0 7 * * *"
+  - name: inline-coexists
+    description: Inline skill alongside import skills — mixed packs are valid.
+    prompt: |
+      Respond with 'ok'.

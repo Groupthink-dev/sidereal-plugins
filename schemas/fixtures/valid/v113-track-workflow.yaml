@@ -1,0 +1,117 @@
+# DD-245 — Reference fixture exercising pack-level track_workflows.
+# Two workflows declared: a trivial single-step `notify` workflow and a
+# multi-step `saga.publish` saga. Both will be namespaced as
+# `v113-track-workflow.<name>` at PackCompiler time.
+pack: "1.13"
+name: v113-track-workflow
+version: "1.0.0"
+description: v1.13 fixture — pack-declared Tracks workflows.
+
+author:
+  name: Stallari
+
+data:
+  reads: []
+  writes: [notifications]
+  stores: nothing
+  phones_home: false
+
+skills:
+  - name: emit-and-walk
+    description: Skill that consumes the pack-declared workflows.
+    required_services:
+      - notifications.send
+    track_consumes:
+      - workflow: v113-track-workflow.notify
+    track_emits:
+      - workflow: v113-track-workflow.saga.publish
+    prompt: |
+      Walk the bound track to completion.
+
+track_workflows:
+  - name: notify
+    description: Trivial single-step notification workflow.
+    states: [open, sent, failed]
+    initial: open
+    terminal: [sent, failed]
+    verbs:
+      open:
+        to: open
+        permissions: transition
+      send:
+        from: [open]
+        to: sent
+        permissions: transition
+      fail:
+        from: [open]
+        to: failed
+        requires: [error]
+        audit_fields: [error]
+        permissions: transition
+    watermark:
+      schema: none
+    permissions:
+      default_read: [self, fleet]
+      default_write: [self]
+      default_transition: [self]
+
+  - name: saga.publish
+    description: Two-step publish saga with full compensation.
+    states: [pending, active, compensating, closed-published, closed-rolled-back, compensation-stuck]
+    initial: pending
+    terminal: [closed-published, closed-rolled-back, compensation-stuck]
+    verbs:
+      start:
+        from: [pending]
+        to: active
+        permissions: transition
+      step-success:
+        from: [active]
+        to: active
+        requires: [step_id]
+        audit_fields: [step_id]
+        permissions: transition
+      step-failure:
+        from: [active]
+        to: compensating
+        requires: [step_id, error]
+        audit_fields: [step_id, error]
+        permissions: transition
+      compensation-success:
+        from: [compensating]
+        to: compensating
+        requires: [step_id]
+        audit_fields: [step_id]
+        permissions: transition
+      rolled-back:
+        from: [compensating]
+        to: closed-rolled-back
+        permissions: transition
+      compensation-failure:
+        from: [compensating]
+        to: compensation-stuck
+        requires: [step_id, error]
+        audit_fields: [step_id, error]
+        permissions: transition
+      finalise:
+        from: [active]
+        to: closed-published
+        permissions: transition
+    watermark:
+      schema: none
+    permissions:
+      default_read: [self, fleet]
+      default_write: [self]
+      default_transition: [self]
+    idempotency:
+      required: true
+    saga:
+      step_workflow: standard
+      on_failure: compensate
+      steps:
+        - id: stage
+          action: storage.upload
+          compensation: storage.delete
+        - id: publish
+          action: index.upsert
+          compensation: index.delete

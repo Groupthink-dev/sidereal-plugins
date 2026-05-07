@@ -1,0 +1,26 @@
+# DD-222 — Reusing a platform operator by bare reference. A pack adds a
+# skill to the existing comms-operator persona without redefining it. The
+# harness's bundled-fallback resolution (DD-146 §A) routes the skill to
+# stallari-core's certified comms-operator at dispatch time.
+pack: "1.0"
+name: telstra-bills
+version: "1.0.0"
+description: "Adds Telstra-specific skills to the platform comms-operator."
+
+author:
+  name: ExampleCommunityAuthor
+  type: individual
+
+data:
+  reads: [email]
+  writes: []
+  stores: nothing
+  phones_home: false
+
+skills:
+  - name: telstra-bill-summary
+    agent: comms-operator
+    description: "Summarise recent Telstra bills from inbox."
+    prompt: |
+      Find recent Telstra bills and summarise the period, amount, and
+      anomalies vs. the prior month.
