@@ -114,9 +114,38 @@ function validatePack(parsed) {
     for (let i = 0; i < parsed.skills.length; i++) {
       const skill = parsed.skills[i];
       if (!skill || typeof skill !== "object") { errors.push(`skills[${i}] must be an object`); continue; }
-      if (!skill.name || typeof skill.name !== "string") errors.push(`skills[${i}].name is required`);
-      else { if (names.has(skill.name)) errors.push(`Duplicate skill name: "${skill.name}"`); names.add(skill.name); }
-      if (!skill.prompt || typeof skill.prompt !== "string") errors.push(`skills[${i}].prompt is required`);
+      // DD-234 (pack format v1.11+): skills may use the `import:` primitive
+      // instead of inline `name`/`description`/`prompt`. The skill body lives
+      // at a relative SKILL.md path; name/description/prompt are derived from
+      // its frontmatter+body at load time. The validator skips the inline
+      // shape checks for these and asserts the import path is well-formed.
+      if (skill.import !== undefined) {
+        if (typeof skill.import !== "string" || !skill.import) {
+          errors.push(`skills[${i}].import must be a non-empty string`);
+        } else {
+          if (!skill.import.endsWith(".md")) {
+            errors.push(`skills[${i}].import "${skill.import}" must end in .md`);
+          }
+          if (skill.import.includes("..")) {
+            errors.push(`skills[${i}].import "${skill.import}" must not contain '..' segments (path-traversal guard)`);
+          }
+          if (skill.import.startsWith("/")) {
+            errors.push(`skills[${i}].import "${skill.import}" must be a relative path (no leading '/')`);
+          }
+          if (names.has(skill.import)) {
+            errors.push(`Duplicate skill import path: "${skill.import}"`);
+          } else {
+            names.add(skill.import);
+          }
+        }
+        // import:-form skills bypass inline name/prompt checks. Other
+        // per-skill checks below (services_used, trigger, inputs, outputs,
+        // category) still apply uniformly.
+      } else {
+        if (!skill.name || typeof skill.name !== "string") errors.push(`skills[${i}].name is required`);
+        else { if (names.has(skill.name)) errors.push(`Duplicate skill name: "${skill.name}"`); names.add(skill.name); }
+        if (!skill.prompt || typeof skill.prompt !== "string") errors.push(`skills[${i}].prompt is required`);
+      }
       // category (v1.2)
       if (skill.category !== undefined) {
         if (!VALID_SKILL_CATEGORIES.includes(String(skill.category))) {
