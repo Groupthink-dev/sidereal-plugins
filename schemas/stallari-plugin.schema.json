@@ -435,6 +435,18 @@
           "description": "Command to invoke the plugin.",
           "type": "string"
         },
+        "network_transport": {
+          "default": [],
+          "description": "Declarative documentation of network transports the plugin's MCP server exposes when run as a standalone process outside the Stallari harness. Empty (default) means stdio-only — the harness always spawns the plugin via stdio per DD-242, and the env-scrub at spawn (DD-242 Phase A) actively strips MCP_TRANSPORT/HOST/PORT regardless of this field. Declaring [\"http\"] means the plugin's binary also offers an HTTP/Streamable-HTTP mode for non-Stallari consumers (e.g. Cloudflare Workers, external MCP clients); the harness still spawns stdio. This field does not change runtime behaviour — it self-documents the binary's capability for marketplace listings, audits, and tier C of DD-242 (community marketplace co-sign gate). Not applicable when runtime = remote (which is HTTP by definition).",
+          "items": {
+            "enum": [
+              "http"
+            ],
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
         "package": {
           "description": "Package name for local runtimes (uv/npm).",
           "type": "string"
