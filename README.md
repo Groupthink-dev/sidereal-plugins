@@ -1,6 +1,9 @@
 <p align="center">
   <a href="https://marketplace.stallari.app">
-    <img src="assets/stallari-icon.png" width="128" alt="Stallari">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="assets/stallari-logo-dark.png">
+      <img src="assets/stallari-logo-light.png" alt="Stallari" width="320">
+    </picture>
   </a>
 </p>
 
