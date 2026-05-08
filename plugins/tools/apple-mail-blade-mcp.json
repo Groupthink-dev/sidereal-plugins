@@ -29,18 +29,18 @@
     "blurb": "Read on-disk Mail.app data — accounts, mailboxes, messages, threads, attachments, NLTagger entities. Tens of GB of personal correspondence the live IMAP/JMAP layer can't see (on-my-Mac mailboxes, removed-account archives, pre-migration history).",
     "help_text": "Local-corpus class blade (DD-240). Library form factor — compiled into Stallari, not a separate subprocess. Requires Full Disk Access on the Stallari daemon binary so it can read ~/Library/Mail/V10/. Open System Settings → Privacy & Security → Full Disk Access and enable Stallari.app + the stallari-helper binary inside it.",
     "fields": [],
-    "help": {
-      "fda_grant": {
+    "help": [
+      {
         "label": "Grant Full Disk Access",
         "url": "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles",
         "description": "Open System Settings → Privacy & Security → Full Disk Access. Add /Applications/Stallari.app and /Applications/Stallari.app/Contents/MacOS/stallari-helper, then toggle both on."
       },
-      "decision_record": {
+      {
         "label": "DD-241 — apple-mail-blade-mcp",
         "url": "https://github.com/Groupthink-dev/apple-mail-blade-mcp",
         "description": "Library form factor inside StallariKit (DD-240 invariant #8 — never advertised externally)."
       }
-    },
+    ],
     "test": {
       "endpoint": "file://~/Library/Mail/V10/MailData/Envelope%20Index",
       "auth_style": "none"
