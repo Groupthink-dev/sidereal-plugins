@@ -52,6 +52,13 @@ const SKIPPED_CODES = new Set([
   // The "pack-spec fixture corpus — valid" suite covers AJV-level validation.
   "invalid-tunable-key",
   "unknown-tunable-type",
+  // Reserved-platform-operator-slug enforcement (DD-222, pack-spec 2.7.0+)
+  // lives in the harness PackCompiler and the pack-spec AJV schema, not in
+  // this marketplace validator — non-platform packs cannot redefine
+  // pkm-operator / comms-operator / scheduling-operator / secops-operator /
+  // fleet-operator / notifications-operator / digital-assistant /
+  // system-architect.
+  "reserved-agent-name",
 ]);
 
 // Fixtures from pack-spec that exercise pack-spec features but do not satisfy
