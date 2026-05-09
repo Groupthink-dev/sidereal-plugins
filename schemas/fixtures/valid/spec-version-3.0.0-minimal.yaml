@@ -1,0 +1,36 @@
+# Smallest pack that validates against pack-spec 3.0.0-alpha.1: required-only.
+# DD-261 Phase A — six new required root fields (spec_version, slug, title,
+# trust_tier, source, runtime) plus the legacy required block (pack, name,
+# description, data, skills). All optional fields omitted.
+spec_version: "3.0.0"
+pack: "1.13"
+slug: minimal-pack
+name: minimal-pack
+title: "Minimal Pack"
+version: "1.0.0"
+description: Minimal valid pack used as schema regression for v3.0.0-alpha.1.
+
+trust_tier: first-party
+
+source:
+  type: vault
+  vault_path: packs/minimal-pack/
+
+runtime:
+  distribution: none
+  publish_targets: []
+
+author:
+  name: Stallari
+
+data:
+  reads: []
+  writes: []
+  stores: nothing
+  phones_home: false
+
+skills:
+  - name: noop
+    description: A skill that does nothing.
+    prompt: |
+      Respond with 'ok'.

@@ -1,0 +1,67 @@
+# DD-260 Phase A — Canonical workflow graph fixture. Demonstrates the unified
+# `workflows:` field with v3-shaped nodes (id, skill, depends_on). Mirrors the
+# stallari-core morning-automation pattern: 3-node sequential + fan-in graph,
+# triggered on cron schedule. Phase A schema covers sequential + fan-in
+# (depends_on) only; parallel / conditional / error-handler shapes are
+# additive in 3.x minor.
+spec_version: "3.0.0"
+pack: "1.13"
+slug: morning-pack
+name: morning-pack
+title: "Morning Pack"
+version: "1.0.0"
+description: Morning automation — 3-node graph with cron trigger and fan-in.
+
+trust_tier: first-party
+
+source:
+  type: vault
+  vault_path: packs/morning-pack/
+
+runtime:
+  distribution: none
+  publish_targets: []
+
+author:
+  name: Stallari
+
+data:
+  reads:
+    - email
+    - vault
+  writes:
+    - vault
+  stores: local
+  phones_home: false
+
+skills:
+  - name: email-triage
+    description: Triage overnight email.
+    prompt: |
+      Triage email.
+  - name: process-inbox
+    description: Process the vault inbox.
+    prompt: |
+      Process inbox.
+  - name: daily-digest
+    description: Generate daily digest.
+    prompt: |
+      Generate digest.
+
+workflows:
+  - name: morning-automation
+    description: Full morning automation pass — DD-260 Phase A graph shape.
+    triggers:
+      - schedule: "0 7 * * *"
+    nodes:
+      - id: email-triage
+        skill: email-triage
+      - id: process-inbox
+        skill: process-inbox
+        depends_on:
+          - email-triage
+      - id: daily-digest
+        skill: daily-digest
+        depends_on:
+          - email-triage
+          - process-inbox

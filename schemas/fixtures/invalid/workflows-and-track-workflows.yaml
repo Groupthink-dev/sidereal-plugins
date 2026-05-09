@@ -1,0 +1,53 @@
+# expected-error: workflows-and-track-workflows
+# DD-260 Phase A — pack declares BOTH workflows: (canonical v3) AND
+# track_workflows: (retired). Schema rejects per the top-level not.required
+# constraint on track_workflows; canonical mapping treats this as the
+# specific workflows-and-track-workflows error code.
+spec_version: "3.0.0"
+pack: "1.13"
+slug: dual-workflow-fixture
+name: dual-workflow-fixture
+title: "Dual Workflow Fixture"
+version: "1.0.0"
+description: Pack declaring both workflows and track_workflows — must be rejected.
+
+trust_tier: first-party
+
+source:
+  type: vault
+  vault_path: packs/dual-workflow-fixture/
+
+runtime:
+  distribution: none
+  publish_targets: []
+
+author:
+  name: Stallari
+
+data:
+  reads: []
+  writes: []
+  stores: nothing
+  phones_home: false
+
+skills:
+  - name: noop
+    description: noop
+    prompt: |
+      Respond with 'ok'.
+
+workflows:
+  - name: forward
+    nodes:
+      - id: noop
+        skill: noop
+
+track_workflows:
+  - name: legacy
+    states: [open, done]
+    initial: open
+    terminal: [done]
+    verbs:
+      open:
+        to: open
+        permissions: transition

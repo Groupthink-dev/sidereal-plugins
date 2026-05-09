@@ -59,6 +59,16 @@ const SKIPPED_CODES = new Set([
   // fleet-operator / notifications-operator / digital-assistant /
   // system-architect.
   "reserved-agent-name",
+  // DD-261 Phase D — v3.0.0 cut error codes. The strict v3 submission gate
+  // lives in stallari-registry-infra's validate.ts (the API submission
+  // boundary); this plugins-side hand-rolled validator runs at catalog
+  // build time over content already trusted to come from the in-tree
+  // first-party packs. v3 contract enforcement is layered at the registry
+  // boundary, not here. The harness PackCompiler is the runtime gate.
+  "missing-spec-version",
+  "track-workflows-retired",
+  "workflows-and-track-workflows",
+  "classify-model-removed",
 ]);
 
 // Fixtures from pack-spec that exercise pack-spec features but do not satisfy

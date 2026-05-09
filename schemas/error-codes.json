@@ -143,6 +143,26 @@
     {
       "code": "reserved-agent-name",
       "description": "A pack declares an agent with a name reserved for the platform — the bundled stallari-core operator slugs (pkm-operator, comms-operator, scheduling-operator, secops-operator, fleet-operator, notifications-operator, home-operator, bizops-operator, review-operator, memory-operator) and the harness-only personas (digital-assistant, system-architect). Reference these via `skill.agent: <name>` to reuse the platform persona; redefining them is rejected. See docs/operators-v1.md."
+    },
+    {
+      "code": "missing-spec-version",
+      "description": "The top-level spec_version: field is absent. Required at v3.0.0 (DD-172 P0). See docs/spec-version.md and docs/migration-v2-to-v3.md."
+    },
+    {
+      "code": "track-workflows-retired",
+      "description": "The pack declares track_workflows: which is retired in v3.0.0 (DD-260 Phase A). Migrate to the unified workflows: field with node-shaped graphs — see docs/migration-v2-to-v3.md."
+    },
+    {
+      "code": "workflows-and-track-workflows",
+      "description": "The pack declares both workflows: and track_workflows:. The latter is retired in v3.0.0 (DD-260 Phase A); remove it. Pre-cut packs that mid-migrate carry both fields are explicitly rejected by the schema."
+    },
+    {
+      "code": "classify-model-removed",
+      "description": "The skill graph_config declares classify_model: or escalation_model: which are hard-removed in v3.0.0 (DD-261 B.1). Use classify_tier: / escalation_tier: instead — DD-138/DD-236 capabilities supersede model pinning."
+    },
+    {
+      "code": "network-transport-on-plugin",
+      "description": "The plugin manifest declares install.network_transport which is hard-removed in v3.0.0 (DD-242 lean-pull, DD-261 audit-confirmed). The harness always spawns blade MCPs via stdio per DD-242 Phase A; the field had zero runtime consumers and is reintroduced when DD-242 Phase D marketplace gate ships with a real consumer."
     }
   ]
 }

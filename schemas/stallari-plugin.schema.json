@@ -119,8 +119,38 @@
   "$id": "https://stallari.app/schemas/stallari-plugin.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
+  "allOf": [
+    {
+      "$comment": "DD-266 Phase C.2: adapter_framework: only valid alongside contract:. A raw blade-mcp without contract: cannot declare an adapter framework version.",
+      "if": {
+        "required": [
+          "adapter_framework"
+        ]
+      },
+      "then": {
+        "not": {
+          "properties": {
+            "contract": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "contract"
+          ]
+        },
+        "required": [
+          "contract"
+        ]
+      }
+    }
+  ],
   "description": "Schema for stallari-plugin.yaml — the manifest format for Stallari platform plugins. The legacy filename sidereal-plugin.yaml is also accepted during the Sidereal→Stallari rebrand transition; both resolve to this schema.",
   "properties": {
+    "adapter_framework": {
+      "description": "SemVer range that pins the stallari-adapter-framework version this adapter targets (DD-266 Phase C.2). Allowed only when `contract:` is set — only adapter shims, not raw blade-mcps. Examples: \"1.0.0\", \">=1.0.0,<2.0.0\". Harness emits a warning when constraint can't be satisfied (warn-only at 3.0.x; promotes to load-refusal at a future major bump per DD-266).",
+      "pattern": "^([><=!~^]*\\d+\\.\\d+\\.\\d+(\\s*,\\s*[><=!~^]*\\d+\\.\\d+\\.\\d+)*|\\d+\\.\\d+\\.\\d+)$",
+      "type": "string"
+    },
     "author": {
       "description": "Plugin author identifier.",
       "type": "string"
@@ -434,18 +464,6 @@
         "command": {
           "description": "Command to invoke the plugin.",
           "type": "string"
-        },
-        "network_transport": {
-          "default": [],
-          "description": "Declarative documentation of network transports the plugin's MCP server exposes when run as a standalone process outside the Stallari harness. Empty (default) means stdio-only — the harness always spawns the plugin via stdio per DD-242, and the env-scrub at spawn (DD-242 Phase A) actively strips MCP_TRANSPORT/HOST/PORT regardless of this field. Declaring [\"http\"] means the plugin's binary also offers an HTTP/Streamable-HTTP mode for non-Stallari consumers (e.g. Cloudflare Workers, external MCP clients); the harness still spawns stdio. This field does not change runtime behaviour — it self-documents the binary's capability for marketplace listings, audits, and tier C of DD-242 (community marketplace co-sign gate). Not applicable when runtime = remote (which is HTTP by definition).",
-          "items": {
-            "enum": [
-              "http"
-            ],
-            "type": "string"
-          },
-          "type": "array",
-          "uniqueItems": true
         },
         "package": {
           "description": "Package name for local runtimes (uv/npm).",

@@ -258,10 +258,6 @@
           "additionalProperties": false,
           "description": "Graph-specific configuration (v1.6, DD126). Used with cascade/gate graphs for multi-tier routing. Tier-named fields (v1.8) preferred over model-pinned fields — model-pinned couples the pack to a specific provider SKU and prevents local-LLM dispatch (DD214).",
           "properties": {
-            "classify_model": {
-              "description": "DEPRECATED in v1.8 — use classify_tier instead. Model identifier for the classify tier (e.g. claude-haiku-4-5-20251001). Pinning a model SKU prevents local-LLM dispatch and couples the pack to a specific provider; tier-based routing is portable.",
-              "type": "string"
-            },
             "classify_tier": {
               "description": "Tier name for the classify stage (v1.8, DD214). Preferred over classify_model — the router resolves tier → model per provider, so packs stay portable across cloud and local backends.",
               "enum": [
@@ -284,10 +280,6 @@
                 "type": "string"
               },
               "type": "array"
-            },
-            "escalation_model": {
-              "description": "DEPRECATED in v1.8 — use escalation_tier instead. Model identifier for escalation when the react tier exhausts its budget.",
-              "type": "string"
             },
             "escalation_tier": {
               "description": "Tier name for escalation when the primary stage exhausts its budget (v1.8, DD214). Preferred over escalation_model.",
@@ -526,230 +518,6 @@
       ],
       "type": "object"
     },
-    "trackSaga": {
-      "additionalProperties": false,
-      "description": "DD-245 — Saga configuration on a parent workflow. Child step tracks adopt step_workflow; on_failure controls the engine's response to a step failure (compensate walks cursor → 0 invoking declared compensations; abort closes the parent without compensation; continue best-effort completes remaining steps).",
-      "properties": {
-        "on_failure": {
-          "enum": [
-            "compensate",
-            "abort",
-            "continue"
-          ],
-          "type": "string"
-        },
-        "step_workflow": {
-          "description": "Workflow used by child step tracks. Typically `standard` for simple step records.",
-          "type": "string"
-        },
-        "steps": {
-          "items": {
-            "$ref": "#/$defs/trackSagaStep"
-          },
-          "minItems": 1,
-          "type": "array"
-        }
-      },
-      "required": [
-        "step_workflow",
-        "on_failure",
-        "steps"
-      ],
-      "type": "object"
-    },
-    "trackSagaStep": {
-      "additionalProperties": false,
-      "description": "DD-245 — A single saga step. id is the cursor key; action is a verb / contract-operation invoked when the cursor reaches this step; compensation is the inverse verb walked when on_failure=compensate. Tail steps (action without inverse) carry compensation: null with a compensation_rationale explanation.",
-      "properties": {
-        "action": {
-          "type": "string"
-        },
-        "compensation": {
-          "type": [
-            "string",
-            "null"
-          ]
-        },
-        "compensation_rationale": {
-          "description": "Required when compensation is null — explains why the step is uncompensable (typically tail steps with irreversible outbound side effects like email send).",
-          "type": "string"
-        },
-        "id": {
-          "pattern": "^[a-z][a-z0-9-]*$",
-          "type": "string"
-        }
-      },
-      "required": [
-        "id",
-        "action"
-      ],
-      "type": "object"
-    },
-    "trackVerb": {
-      "additionalProperties": true,
-      "description": "DD-245 — Verb definition within a workflow. Verbs declare which from-states they apply to, the to-state they transition to, required arguments, audit-ledger fields, and permission requirement. The universal `transition` verb may instead carry a state_machine: object describing the full graph rather than a single from/to pair.",
-      "properties": {
-        "audit_fields": {
-          "description": "Argument names captured into the track audit entry beyond the always-stamped {at, actor, verb}.",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "from": {
-          "description": "States from which this verb is applicable. Empty / omitted means any state.",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "permissions": {
-          "description": "Permission key required to invoke this verb (e.g. transition, comment, write). Resolved through DD-188 authoriser against the caller's identity + the track's permissions block.",
-          "type": "string"
-        },
-        "requires": {
-          "description": "Argument names that the caller MUST supply (e.g. [reason] for block; [actor_arg] for assign).",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "state_machine": {
-          "description": "Full transition map for verbs (typically `transition`) that drive between many states. Keys are from-states, values are arrays of allowed to-states.",
-          "type": "object"
-        },
-        "to": {
-          "description": "Target state after the verb fires. Same-state transitions (cursor-only advancement) are valid (e.g. saga step-success holds state=active while cursor walks).",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "trackWorkflow": {
-      "additionalProperties": true,
-      "description": "DD-245 — Tracks workflow definition. State machine + verb set + watermark schema + permission defaults + optional saga config. First-party workflows live in stallari-harness/Sources/StallariKit/Tracks/Workflows/*.yaml; pack-declared workflows ride in this slot in pack.yaml and are namespaced as <pack-name>.<name> at compile time.",
-      "properties": {
-        "description": {
-          "type": "string"
-        },
-        "idempotency": {
-          "additionalProperties": false,
-          "properties": {
-            "required": {
-              "default": false,
-              "description": "If true, callers MUST supply an explicit idempotency_key — engine refuses to fall back to derived sha256. Used for security-sensitive workflows where collision via predictable derivation would be unsafe (DD-245 Resolved §9).",
-              "type": "boolean"
-            }
-          },
-          "type": "object"
-        },
-        "initial": {
-          "description": "State assigned at track open. Must appear in states[].",
-          "type": "string"
-        },
-        "name": {
-          "description": "Workflow identifier (kebab-case; dotted names allowed for sub-class naming like saga.crm-close-won).",
-          "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
-          "type": "string"
-        },
-        "permissions": {
-          "additionalProperties": false,
-          "description": "Default permission sets baked into newly-opened tracks of this workflow. Per-track permissions in the YAML body override these defaults. Subjects use DD-219 scope-uri shape.",
-          "properties": {
-            "default_read": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            "default_transition": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            "default_write": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            }
-          },
-          "type": "object"
-        },
-        "required_capabilities": {
-          "description": "Capabilities required to author a verb on this workflow (DD-138 capability vocab).",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "required_permissions": {
-          "description": "Permissions required to transition tracks in this workflow (DD-188).",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "saga": {
-          "$ref": "#/$defs/trackSaga"
-        },
-        "states": {
-          "description": "All states a track in this workflow may occupy. Universal states (open, assigned, active, blocked, review, done, abandoned) are conventional but not enforced — workflows may declare any state set.",
-          "items": {
-            "type": "string"
-          },
-          "minItems": 1,
-          "type": "array"
-        },
-        "terminal": {
-          "description": "States in which a track is considered closed. No further verbs apply to a terminal track unless explicitly permitted by a reopen-shaped verb.",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "verbs": {
-          "additionalProperties": {
-            "$ref": "#/$defs/trackVerb"
-          },
-          "description": "Verb registry — keys are verb names. The universal verb set (open, assign, transition, comment, block, unblock, escalate, close, reopen, link, archive, surface-extend) is closed at the engine level; pack-declared workflows extend it with domain verbs but cannot redefine universals.",
-          "type": "object"
-        },
-        "watermark": {
-          "additionalProperties": false,
-          "properties": {
-            "comparator": {
-              "description": "For schema=opaque or composite, name of a workflow-supplied comparator function. Required when monotonic advancement must be enforced.",
-              "type": "string"
-            },
-            "schema": {
-              "description": "Watermark kind. none = no watermark; offset = {value, total} integer pair; since = ISO-8601 timestamp; opaque = provider-defined cursor string; composite = workflow-defined shape (declare in shape:).",
-              "enum": [
-                "none",
-                "offset",
-                "since",
-                "opaque",
-                "composite"
-              ],
-              "type": "string"
-            },
-            "shape": {
-              "description": "Workflow-defined watermark shape (only for schema=composite). Engine treats as opaque blob; comparator must be declared via comparator:.",
-              "type": "object"
-            }
-          },
-          "type": "object"
-        }
-      },
-      "required": [
-        "name",
-        "states",
-        "initial",
-        "verbs"
-      ],
-      "type": "object"
-    },
     "trigger": {
       "additionalProperties": false,
       "properties": {
@@ -933,61 +701,107 @@
     },
     "workflow": {
       "additionalProperties": false,
+      "description": "DD-260 Phase A — Canonical declarative graph-composition contract. Replaces the v2.x `steps:`-shaped workflow and the v1.13 `track_workflows:` field (both retired in v3.0.0). The graph runs Track-backed by default (DD-245 substrate); SagaEngine semantics engage when `saga.compensation:` is declared. Phase A schema covers sequential + fan-in (`depends_on`) only; parallel (`wait:`), conditional (`if:`), error handlers (`on_error:`), sub-workflow invocation, and iteration (`for_each:`) shapes are additive in 3.x minor as DD-260 Phase B–F land in the harness.",
       "properties": {
         "description": {
           "type": "string"
         },
         "name": {
-          "description": "Workflow identifier.",
+          "description": "Workflow identifier (kebab-case; dotted names allowed for sub-class naming, e.g. `saga.publish`). Namespaced as `<pack-slug>.<workflow.name>` at PackCompiler time.",
+          "pattern": "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)*$",
           "type": "string"
         },
-        "schedule": {
-          "description": "Optional cron expression for the entire workflow.",
-          "type": "string"
-        },
-        "steps": {
+        "nodes": {
+          "description": "DD-260 Phase A — Graph nodes. Each node executes one skill; `depends_on:` declares the DAG topology. PackCompiler validates statically: no cycles, no dangling refs, no unreachable nodes, every `skill:` reference exists in the pack's `skills:` array.",
           "items": {
-            "$ref": "#/$defs/workflowStep"
+            "$ref": "#/$defs/workflowNode"
           },
           "minItems": 1,
+          "type": "array"
+        },
+        "saga": {
+          "$ref": "#/$defs/workflowSaga"
+        },
+        "triggers": {
+          "description": "DD-260 Phase A — Workflow-level triggers. Empty / omitted = manual invocation only (CLI / Forge / Astrolabe deeplink).",
+          "items": {
+            "$ref": "#/$defs/workflowTrigger"
+          },
           "type": "array"
         }
       },
       "required": [
         "name",
-        "steps"
+        "nodes"
       ],
       "type": "object"
     },
-    "workflowStep": {
+    "workflowNode": {
       "additionalProperties": false,
       "properties": {
-        "after": {
-          "description": "Skills that must complete before this step.",
+        "depends_on": {
+          "description": "DD-260 Phase A — Node IDs that must complete successfully before this node executes (fan-in). Default `wait: all` semantics: every named dependency must reach a terminal-success state. Empty / omitted = root node (executes when the workflow starts). `wait: any`, conditional `if:`, and error-handler `on_error:` shapes are additive in 3.x minor.",
           "items": {
+            "pattern": "^[a-z][a-z0-9-]*$",
             "type": "string"
           },
-          "type": "array"
+          "type": "array",
+          "uniqueItems": true
         },
-        "condition": {
-          "description": "Execution condition (e.g. \"always\").",
+        "id": {
+          "description": "DD-260 Phase A — Stable node identifier within the workflow. Used by `depends_on:` references and by the runtime to scope node outputs (e.g. `<id>.outputs.<field>`). Must be unique within the workflow.",
+          "pattern": "^[a-z][a-z0-9-]*$",
           "type": "string"
         },
         "skill": {
-          "description": "Skill name to execute (must exist in skills array).",
+          "description": "DD-260 Phase A — Name of the skill to execute. Must reference an entry in this pack's `skills:` array (PackCompiler validates).",
+          "pattern": "^[a-z][a-z0-9-]*$",
           "type": "string"
         }
       },
       "required": [
+        "id",
         "skill"
       ],
+      "type": "object"
+    },
+    "workflowSaga": {
+      "additionalProperties": false,
+      "description": "DD-260 Phase A — Saga compensation declaration. Optional. Engages SagaEngine semantics when present.",
+      "properties": {
+        "compensation": {
+          "additionalProperties": {
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "type": "string"
+          },
+          "description": "DD-260 Phase A — Map from node ID → compensation skill name. On saga abort the SagaEngine walks back through the executed nodes in reverse and dispatches each declared compensation skill. Compensation skills are registered with the runtime authoriser identically to forward-dispatch skills (DD-188); no privilege escalation. Phase A schema supports the map shape only — Phase D (DD-260 in the harness) wires the SagaEngine.",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "workflowTrigger": {
+      "additionalProperties": false,
+      "description": "DD-260 Phase A — One workflow trigger entry. Phase A schema supports `schedule:` only; `webhook:`, `track_open:`, and `manual:` triggers are additive in 3.x minor.",
+      "properties": {
+        "schedule": {
+          "description": "DD-260 Phase A — Cron expression triggering the workflow at the configured cadence.",
+          "type": "string"
+        }
+      },
       "type": "object"
     }
   },
   "$id": "https://stallari.app/schemas/stallari-pack.schema.json",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": true,
-  "description": "Schema for pack manifests (stallari-plugin.yaml with pack: field). Public Pack Spec v1.0/v1.1/v1.2/v1.3/v1.4/v1.5/v1.6/v1.7/v1.8/v1.9/v1.10/v1.11/v1.12/v1.13 (DD92, DD99, DD104, DD113, DD119, DD126, DD145/DD146, DD152, DD163, DD184, DD-214, DD-215, DD-234, DD-244, DD-245). v1.8 (DD-214): briefing: skill block, tier-named graph_config fields, full graph enum (gate/critique-refine/plan-execute), pack-scoped guardrail-ID semantics. v1.10 (DD-184): tunables. v1.11 (DD-234): skills[].import — SKILL.md import primitive; inline prompt: no longer required when import: present. v1.12 (DD-244): per-skill required_services / optional_services / required_tools / optional_tools / allow_request_service / allow_request_tool / tools_rationale fields — deny-by-default skill-declared tool surface replacing the previous full-firehose. Service contracts primary author axis; concrete tools secondary for non-portable cases (Apple-app blades). Late-ALPHA cutover: immediate at v1.12 release, no backward-compat window. v1.9 (DD-215 Phase C): notifications: manifest block declaring per-pack publish categories + cross-pack subscribe claims; ntfy topics flat-name + tags (NOT slash-paths — original DD-214 documentation pre-dated the ntfy-regex correction at NotificationTopicRouter 1cc3cda). v1.13 (DD-245): per-skill track_consumes / track_emits / default_idempotency_key / allow_request_track fields — Tracks substrate integration. Pack-level track_workflows: declares state-machine workflows namespaced as <pack-name>.<workflow.name> at compile time. The existing workflows: field (multi-skill DAGs, DD-200 territory) is unchanged and retires at DD-245 Phase E when SagaEngine subsumes it.",
+  "description": "Schema for pack manifests (stallari-plugin.yaml with pack: field). Public Pack Spec v3.0.0-alpha.1 — first breaking-version cut of the spec-repo (DD-261 coordinator, DD-172 P0 namespace+signing, DD-253 P0 signature carrier, DD-260 Phase A workflow unification). v3.0.0 introduces six new required fields at the pack root: `spec_version: \"3.0.0\"` (hard fail-fast indicator), `slug` (stable kebab-case namespace identifier), `title` (display name), `trust_tier` (first-party | community-signed | user-self), `source` (provenance: vault | git | local), `runtime` (distribution: fabric | none + signing key + publish_targets). Retires `track_workflows:` field — the canonical declarative graph-composition contract is now the unified `workflows:` field with node-shaped nodes (DD-260 Phase A: sequential + fan-in only at this stage; parallel/conditional/error-handler shapes additive in 3.x minor). Removes `classify_model` and `escalation_model` (DD-261 B.1 — schema-only, zero pack consumers; DD-138/DD-236 capabilities supersede). Keeps `tier:` field (75-file usage; DD-261 audit revised B.1) and `virtualmachine-v1` contract (active sealed-pack consumer). Per DD-172 Q3 the `pack:` field does NOT bump (`pack: \"1.13\"` stays valid); `spec_version` is the new fail-fast contract. v2.x history retained at this header for migration reference: v1.0–v1.13 (DD92, DD99, DD104, DD113, DD119, DD126, DD145/DD146, DD152, DD163, DD184, DD-214, DD-215, DD-234, DD-244, DD-245).",
+  "not": {
+    "description": "DD-260 Phase A — `track_workflows:` retired in v3.0.0. The unified `workflows:` field is the canonical declarative graph-composition contract. Migration: rename `track_workflows:` → `workflows:`, restructure entries to node-shaped graphs (per DD-260 Phase A; see docs/migration-v2-to-v3.md).",
+    "required": [
+      "track_workflows"
+    ]
+  },
   "properties": {
     "access": {
       "default": "public",
@@ -1296,7 +1110,7 @@
       "type": "string"
     },
     "name": {
-      "description": "Pack name (title-case, human-readable).",
+      "description": "Pack name (title-case, human-readable). Legacy field — v3.0.0 introduces `slug:` (stable kebab-case identifier) and `title:` (display name) as the canonical machine + UI fields. `name` is kept for back-compat during the v2.x → v3.x migration window; future 3.x minor may deprecate it (DD-261 deprecation policy).",
       "type": "string"
     },
     "notifications": {
@@ -1390,6 +1204,20 @@
       ],
       "type": "string"
     },
+    "permissions": {
+      "additionalProperties": false,
+      "description": "DD-172 P0 — Capability declarations for runtime authoriser gating. Optional at v3.0.0-alpha.1; expected mandatory for `trust_tier: user-self` once DD-138 capability surface stabilises (Phase B harness work).",
+      "properties": {
+        "capability_declarations": {
+          "description": "DD-172 P0 — SurfaceManifest equivalent for `user-self` trust tier (and additive on first-party / community-signed). Capabilities the pack declares it requires; the runtime authoriser (DD-188) gates dispatch against the user's per-pack grant matrix. Reuses DD-138 capability vocabulary.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
     "pricing": {
       "default": null,
       "description": "Pricing configuration (v1.1). Null = free.",
@@ -1468,6 +1296,43 @@
       ],
       "type": "string"
     },
+    "runtime": {
+      "additionalProperties": false,
+      "description": "DD-172 P0 — Runtime distribution declaration. The publishing peer signs a manifest with the configured key and gossips content-addressed blobs over fabric to peers within the declared `publish_targets`.",
+      "properties": {
+        "distribution": {
+          "description": "DD-172 P0 — Runtime distribution channel. `fabric` = pack runtime artefact distributes via stallari-fabric content-addressed blobs to fleet/family/team/org peers per `publish_targets`. `none` = local-only, no peer distribution.",
+          "enum": [
+            "fabric",
+            "none"
+          ],
+          "type": "string"
+        },
+        "publish_targets": {
+          "description": "DD-172 P0 — Distribution scopes. Free tier supports `fleet` and `family-fleet`. Pro tier additionally supports `team`, `org`, `world` (DD-254). Empty array = no peer distribution (equivalent to `distribution: none` for the publish step). Order does not matter.",
+          "items": {
+            "enum": [
+              "fleet",
+              "family-fleet",
+              "team",
+              "org",
+              "world"
+            ],
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        "signing_key_id": {
+          "description": "DD-172 P0 — Handle into DD-186 CredentialStore for the ed25519 signing key used to sign published manifests. For `trust_tier: user-self`, this is the install identity's user-self key (provisioned at install time). For `trust_tier: first-party`, this references a Stallari catalog key. For `trust_tier: community-signed`, this references the publisher's marketplace-bound key.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "distribution"
+      ],
+      "type": "object"
+    },
     "sharing": {
       "default": "none",
       "description": "Sharing scope within orgs. 'family' allows family org members to use without separate purchase. 'team' for team orgs. 'org' for any org type (v1.8, DD152).",
@@ -1479,6 +1344,11 @@
       ],
       "type": "string"
     },
+    "signatures": {
+      "additionalProperties": true,
+      "description": "DD-253 P0 — Signature carrier for pack tarballs. Optional at the manifest level; the canonical carrier is a sidecar `pack.yaml.sig` file (or `signatures/sig.ed25519` inside the tarball) which the harness's `PackSignatureVerifier` consumes at import time to classify the pack into one of seven trust classifications (self-signed, peer-signed, catalog-signed, third-party-signed, unsigned, tampered, and the bypass case for catalog-direct delivery). When present in-manifest, the runtime cross-validates the embedded signature against the sidecar; mismatch = `tampered`.",
+      "type": "object"
+    },
     "skills": {
       "description": "Ordered skill list. At least one required.",
       "items": {
@@ -1486,6 +1356,49 @@
       },
       "minItems": 1,
       "type": "array"
+    },
+    "slug": {
+      "description": "DD-172 P0 — Stable kebab-case identifier for this pack. Used by trace records, fabric routing, capability grants, override targets, and slug-reserved-name enforcement. Stable for life — renaming is a multi-step Settings flow that re-issues the user-self signing key and emits a deprecation alias. Reserved exact slugs: `default`, `system`, `admin`, `root`, `test`, `example`. Reserved prefixes (cannot be user-chosen): `stallari-`, `apple-`, and any first-party pack slug (validator-enforced live blacklist). For `user-`, `family-`, `team-`, `org-` namespacing rules see DD-172.",
+      "pattern": "^[a-z][a-z0-9-]{0,31}$",
+      "type": "string"
+    },
+    "source": {
+      "additionalProperties": false,
+      "description": "DD-172 P0 — Pack source-of-truth declaration. Vault-canonical packs hot-reload via `PackFileWatcher`; git-canonical packs sync via daemon poll/webhook; local-only packs never leave the device.",
+      "properties": {
+        "git_ref": {
+          "description": "Required iff `type: git`. Git ref (branch, tag, or commit sha) to track. Default `main` if omitted at runtime; harness logs a warning when omitted in manifest.",
+          "type": "string"
+        },
+        "git_remote": {
+          "description": "Required iff `type: git`. Git remote URL (https or ssh). Authentication via per-pack credential row in DD-186 CredentialStore — daemon never reads `~/.ssh/`.",
+          "format": "uri",
+          "type": "string"
+        },
+        "type": {
+          "description": "DD-172 P0 — Pack provenance. `vault` = canonical source lives in the Obsidian vault under `packs/<slug>/` (default for user packs). `git` = canonical source is a personal git remote; daemon clones to a working copy under harness data. `local` = local-only, never distributed via fabric or git.",
+          "enum": [
+            "vault",
+            "git",
+            "local"
+          ],
+          "type": "string"
+        },
+        "vault_path": {
+          "description": "Required iff `type: vault`. Vault-relative path to the pack root, e.g. `packs/user-piers/`. Must end with `/` and the slug segment must match the manifest's `slug` field.",
+          "pattern": "^packs/[a-z][a-z0-9-]{0,31}/$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "spec_version": {
+      "const": "3.0.0",
+      "description": "DD-172 P0 — Hard fail-fast indicator that the author targets pack-spec v3.0.0. Required at v3.0.0; `spec_version` is distinct from the pre-existing `pack:` field which describes the manifest YAML shape (still `1.0`–`1.13`). Harness loaders that don't know v3.0.0 reject with a clear migration error pointing at docs/migration-v2-to-v3.md. Authors writing for v3 schema MUST declare `spec_version: \"3.0.0\"` explicitly.",
+      "type": "string"
     },
     "tier": {
       "default": "community",
@@ -1498,12 +1411,20 @@
       ],
       "type": "string"
     },
-    "track_workflows": {
-      "description": "DD-245 — Pack-declared Tracks workflow definitions (state machines for durable issue-shaped records). Namespaced as <pack-name>.<workflow.name> at PackCompiler time and merged into the harness WorkflowRegistry. First-party workflows (standard, review, hitl, corpus-lint, devfu, saga-compensation-failure) ship in stallari-harness/Sources/StallariKit/Tracks/Workflows/ and remain unprefixed. Distinct from `workflows:` above, which is the DD-200 multi-skill DAG concept.",
-      "items": {
-        "$ref": "#/$defs/trackWorkflow"
-      },
-      "type": "array"
+    "title": {
+      "description": "DD-172 P0 — User-facing display name (e.g. \"Piers Skills\"). Editable freely without migration cost; UI surfaces always render `title` while `slug` appears only in technical contexts (Settings → Authoring, manifest YAML, trace records). Default suggested at create time derives from the install-identity display name (`\"<DisplayName> Skills\"`).",
+      "maxLength": 80,
+      "minLength": 1,
+      "type": "string"
+    },
+    "trust_tier": {
+      "description": "DD-172 P0 — Trust tier driving the runtime authoriser (DD-188) capability gate. `first-party` is for in-tree Stallari packs; `community-signed` is for marketplace-signed third-party packs (DD-253 import path); `user-self` is for Forge- or Obsidian-authored packs signed with the install identity's user-self ed25519 key (DD-186 CredentialStore). The harness's PackCompiler validates the signing chain on load; a manifest declaring a tier its signature can't substantiate is rejected.",
+      "enum": [
+        "first-party",
+        "community-signed",
+        "user-self"
+      ],
+      "type": "string"
     },
     "version": {
       "description": "Pack semantic version (major.minor.patch).",
@@ -1529,8 +1450,14 @@
   },
   "required": [
     "pack",
+    "spec_version",
     "name",
+    "slug",
+    "title",
     "description",
+    "trust_tier",
+    "source",
+    "runtime",
     "data",
     "skills"
   ],

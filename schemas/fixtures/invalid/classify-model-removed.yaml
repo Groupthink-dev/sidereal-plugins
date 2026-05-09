@@ -1,0 +1,39 @@
+# expected-error: classify-model-removed
+# DD-261 B.1 — skill graph_config declares classify_model:, hard-removed in
+# v3.0.0. Schema rejects via graph_config.additionalProperties: false.
+spec_version: "3.0.0"
+pack: "1.13"
+slug: classify-model-fixture
+name: classify-model-fixture
+title: "Classify Model Fixture"
+version: "1.0.0"
+description: Pack declaring removed classify_model — must be rejected.
+
+trust_tier: first-party
+
+source:
+  type: vault
+  vault_path: packs/classify-model-fixture/
+
+runtime:
+  distribution: none
+  publish_targets: []
+
+author:
+  name: Stallari
+
+data:
+  reads: []
+  writes: []
+  stores: nothing
+  phones_home: false
+
+skills:
+  - name: classifier
+    description: A skill using legacy classify_model.
+    graph: cascade
+    graph_config:
+      classify_tier: fast
+      classify_model: claude-haiku-4-5-20251001
+    prompt: |
+      Classify input.

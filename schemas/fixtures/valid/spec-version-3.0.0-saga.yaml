@@ -1,0 +1,63 @@
+# DD-260 Phase A — Saga compensation fixture. Demonstrates the optional
+# `saga.compensation:` map on a workflow. Phase A schema accepts the shape;
+# Phase D (DD-260 in the harness) wires the SagaEngine.
+spec_version: "3.0.0"
+pack: "1.13"
+slug: publish-pack
+name: publish-pack
+title: "Publish Pack"
+version: "1.0.0"
+description: Two-step publish saga with full compensation.
+
+trust_tier: first-party
+
+source:
+  type: vault
+  vault_path: packs/publish-pack/
+
+runtime:
+  distribution: none
+  publish_targets: []
+
+author:
+  name: Stallari
+
+data:
+  reads: []
+  writes:
+    - storage
+  stores: remote
+  phones_home: true
+
+skills:
+  - name: stage
+    description: Stage payload for publish.
+    prompt: |
+      Stage payload.
+  - name: publish
+    description: Publish staged payload.
+    prompt: |
+      Publish.
+  - name: undo-stage
+    description: Compensation — remove staged payload.
+    prompt: |
+      Remove staged payload.
+  - name: undo-publish
+    description: Compensation — unpublish.
+    prompt: |
+      Unpublish.
+
+workflows:
+  - name: publish
+    description: Two-step publish with full compensation.
+    nodes:
+      - id: stage
+        skill: stage
+      - id: publish
+        skill: publish
+        depends_on:
+          - stage
+    saga:
+      compensation:
+        stage: undo-stage
+        publish: undo-publish

@@ -1,0 +1,50 @@
+# DD-172 P0 + DD-261 — User-self pack with full v3.0.0 substrate: vault-canonical
+# source, fabric distribution targeting fleet, capability_declarations,
+# embedded signature carrier (DD-253). Demonstrates the full happy-path shape
+# for a Forge-built or Obsidian-authored user pack.
+spec_version: "3.0.0"
+pack: "1.13"
+slug: user-piers
+name: user-piers
+title: "Piers Skills"
+version: "0.1.0"
+description: User-authored pack — Forge-built or Obsidian-authored, fabric-distributed across fleet.
+
+trust_tier: user-self
+
+source:
+  type: vault
+  vault_path: packs/user-piers/
+
+runtime:
+  distribution: fabric
+  signing_key_id: cred:user-self/ed25519/piers
+  publish_targets:
+    - fleet
+    - family-fleet
+
+permissions:
+  capability_declarations:
+    - vault.read
+    - vault.write
+
+signatures:
+  algorithm: ed25519
+  signing_key_id: cred:user-self/ed25519/piers
+
+author:
+  name: Piers
+
+data:
+  reads:
+    - vault
+  writes:
+    - vault
+  stores: local
+  phones_home: false
+
+skills:
+  - name: morning-summary
+    description: Personal morning summary skill.
+    prompt: |
+      Summarise overnight activity into a 3-line digest.

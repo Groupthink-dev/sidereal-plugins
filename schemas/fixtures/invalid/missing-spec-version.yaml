@@ -1,0 +1,33 @@
+# expected-error: missing-spec-version
+# DD-261 — pack omits spec_version: which is required at v3.0.0.
+pack: "1.13"
+slug: missing-spec-version-fixture
+name: missing-spec-version-fixture
+title: "Missing spec_version Fixture"
+version: "1.0.0"
+description: Pack missing spec_version — must be rejected.
+
+trust_tier: first-party
+
+source:
+  type: vault
+  vault_path: packs/missing-spec-version-fixture/
+
+runtime:
+  distribution: none
+  publish_targets: []
+
+author:
+  name: Stallari
+
+data:
+  reads: []
+  writes: []
+  stores: nothing
+  phones_home: false
+
+skills:
+  - name: noop
+    description: noop
+    prompt: |
+      Respond with 'ok'.
