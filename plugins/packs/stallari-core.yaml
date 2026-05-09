@@ -1,4 +1,13 @@
 pack: "1.12"
+spec_version: "3.0.0"
+slug: stallari-core
+trust_tier: first-party
+source:
+  type: vault
+  vault_path: packs/stallari-core/
+runtime:
+  distribution: none
+  publish_targets: []
 name: stallari-core
 title: "Stallari Core"
 featured: false
@@ -1229,14 +1238,17 @@ herald:
 workflows:
   - name: morning-automation
     description: Full morning automation pass
-    schedule: "0 7 * * *"
-    steps:
-      - skill: email-triage
-        condition: always
-      - skill: process-inbox
-        after: [ email-triage ]
-      - skill: daily-digest
-        after: [ email-triage, process-inbox ]
+    triggers:
+      - schedule: "0 7 * * *"
+    nodes:
+      - id: email-triage
+        skill: email-triage
+      - id: process-inbox
+        skill: process-inbox
+        depends_on: [ email-triage ]
+      - id: daily-digest
+        skill: daily-digest
+        depends_on: [ email-triage, process-inbox ]
 
 # ── Pack-level config ──────────────────────────────────────────────
 # Tunables for the wiki-maintain trio (DD-194, added v3.6.0).

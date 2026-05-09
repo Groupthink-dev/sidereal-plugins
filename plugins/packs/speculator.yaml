@@ -1,4 +1,13 @@
 pack: "1.12"
+spec_version: "3.0.0"
+slug: speculator
+trust_tier: first-party
+source:
+  type: vault
+  vault_path: packs/speculator/
+runtime:
+  distribution: none
+  publish_targets: []
 name: speculator
 title: "Speculator"
 featured: true

@@ -1,4 +1,13 @@
 pack: "1.12"
+spec_version: "3.0.0"
+slug: network-observatory
+trust_tier: first-party
+source:
+  type: vault
+  vault_path: packs/network-observatory/
+runtime:
+  distribution: none
+  publish_targets: []
 name: network-observatory
 title: "Network Observatory"
 featured: true

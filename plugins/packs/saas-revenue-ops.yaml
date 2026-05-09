@@ -1,4 +1,13 @@
 pack: "1.12"
+spec_version: "3.0.0"
+slug: saas-revenue-ops
+trust_tier: first-party
+source:
+  type: vault
+  vault_path: packs/saas-revenue-ops/
+runtime:
+  distribution: none
+  publish_targets: []
 name: saas-revenue-ops
 title: "SaaS Revenue Ops"
 featured: true

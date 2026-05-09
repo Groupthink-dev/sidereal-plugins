@@ -1,4 +1,13 @@
 pack: "1.12"
+spec_version: "3.0.0"
+slug: business-ops
+trust_tier: first-party
+source:
+  type: vault
+  vault_path: packs/business-ops/
+runtime:
+  distribution: none
+  publish_targets: []
 name: business-ops
 title: "Business Operations"
 featured: false

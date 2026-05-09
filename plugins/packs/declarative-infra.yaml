@@ -1,4 +1,13 @@
 pack: "1.12"
+spec_version: "3.0.0"
+slug: declarative-infra
+trust_tier: first-party
+source:
+  type: vault
+  vault_path: packs/declarative-infra/
+runtime:
+  distribution: none
+  publish_targets: []
 name: Declarative Infrastructure
 description: >
   Provision and manage GPU cloud compute instances declaratively. Stands up stallari-gpu-worker nodes (11C distribution — Ubuntu 24.04 + CUDA 12.8.1) on Vultr with Tailscale mesh authentication: embedded one-shot pre-auth key for unattended standup, or QR-code interactive flow when present. Includes fleet health monitoring, cost trend rollup, image upgrade planning, post-provision verification, safe teardown, and cloud-init generation with security refinement.
