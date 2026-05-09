@@ -218,6 +218,9 @@ function pluginToCatalogEntry(raw) {
     contract: raw.contract || null,
     not_supported: Array.isArray(raw.not_supported) && raw.not_supported.length > 0 ? raw.not_supported : null,
     runtime: raw.install?.runtime || raw.runtime || null,
+    // DD-265: surface library-form-factor metadata so the harness marketplace
+    // tile can render the Bundled badge + Manage deep-link without a second fetch.
+    bundled_in: raw.install?.bundled_in || null,
     license: raw.license || null,
     conformance: raw.conformance || null,
     inference: raw.inference || null,

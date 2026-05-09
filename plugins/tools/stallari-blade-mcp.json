@@ -15,8 +15,8 @@
   "contract": "vault-v1",
   "repository": "https://github.com/groupthink-dev/stallari-vault",
   "install": {
-    "runtime": "native",
-    "binary": "stallari-blade"
+    "runtime": "library",
+    "bundled_in": "stallari-harness"
   },
   "env": [],
   "setup": {
@@ -33,6 +33,6 @@
     "optional": "7/7",
     "last_tested": "2026-03-25"
   },
-  "notes": "Vault tools from stallari-blade (29 tools) + lens tools from stallari-lens (11 tools). Both map to the vault service via the vault-v1 contract.",
-  "hidden": true
+  "notes": "Vault tools from stallari-blade (29 tools) + lens tools from stallari-lens (11 tools). Both map to the vault service via the vault-v1 contract. Library form factor (DD-265) — compiled into the Stallari daemon via SPM dep on stallari-vault; no separate install path. Vault is always-on so no consent_tile_link is set; marketplace renders a passive Bundled tile.",
+  "hidden": false
 }

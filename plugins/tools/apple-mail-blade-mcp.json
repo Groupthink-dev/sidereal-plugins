@@ -17,8 +17,8 @@
   "repository": "https://github.com/Groupthink-dev/apple-mail-blade-mcp",
   "multi_instance": false,
   "install": {
-    "runtime": "native",
-    "binary": "apple-mail-blade"
+    "runtime": "library",
+    "bundled_in": "stallari-harness"
   },
   "env": [],
   "setup": {
@@ -26,6 +26,7 @@
     "complexity": "moderate",
     "icon": "envelope.fill",
     "product": "Apple Mail",
+    "consent_tile_link": "stallari://settings/general/local-corpus/mail",
     "blurb": "Read on-disk Mail.app data — accounts, mailboxes, messages, threads, attachments, NLTagger entities. Tens of GB of personal correspondence the live IMAP/JMAP layer can't see (on-my-Mac mailboxes, removed-account archives, pre-migration history).",
     "help_text": "Local-corpus class blade (DD-240). Library form factor — compiled into Stallari, not a separate subprocess. Requires Full Disk Access on the Stallari daemon binary so it can read ~/Library/Mail/V10/. Open System Settings → Privacy & Security → Full Disk Access and enable Stallari.app + the stallari-helper binary inside it.",
     "fields": [],

@@ -6,20 +6,44 @@
   "type": "object",
   "required": ["name", "type", "description", "version", "author", "tier"],
   "additionalProperties": true,
-  "if": {
-    "properties": { "type": { "const": "plugin" } }
-  },
-  "then": {
-    "required": ["name", "type", "description", "version", "author", "tier", "license", "contract", "repository", "install"]
-  },
-  "else": {
-    "if": {
-      "properties": { "type": { "const": "pack" } }
+  "allOf": [
+    {
+      "if": {
+        "properties": { "type": { "const": "plugin" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["name", "type", "description", "version", "author", "tier", "license", "contract", "repository", "install"]
+      }
     },
-    "then": {
-      "required": ["name", "type", "description", "version", "author", "tier"]
+    {
+      "if": {
+        "properties": { "type": { "const": "pack" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["name", "type", "description", "version", "author", "tier"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "install": {
+            "properties": { "runtime": { "const": "library" } },
+            "required": ["runtime"]
+          }
+        },
+        "required": ["install"]
+      },
+      "then": {
+        "properties": {
+          "author_type": { "const": "first-party" }
+        },
+        "required": ["author_type"],
+        "description": "DD-265 belt-and-braces: library form factor requires an SPM dependency in stallari-harness/Package.swift — only first-party builds can produce library blades."
+      }
     }
-  },
+  ],
   "properties": {
     "name": {
       "type": "string",
@@ -63,14 +87,70 @@
       "properties": {
         "runtime": {
           "type": "string",
-          "enum": ["uv", "npm", "npx", "docker", "remote", "native"]
+          "enum": ["uv", "npm", "npx", "docker", "remote", "native", "library"],
+          "description": "Runtime kind. 'library' (DD-265) means the plugin is compiled into the Stallari daemon binary via SPM — never fetched, never installed; the consumer is the daemon process itself."
         },
         "package": { "type": "string" },
         "binary": { "type": "string" },
-        "url": { "type": "string", "format": "uri" }
+        "url": { "type": "string", "format": "uri" },
+        "bundled_in": {
+          "type": "string",
+          "description": "DD-265: name of the Stallari binary that compiles this library blade in (e.g. 'stallari-harness'). Set only when runtime == 'library'."
+        }
       },
-      "description": "Installation specification. Required for plugins."
+      "description": "Installation specification. Required for plugins.",
+      "allOf": [
+        {
+          "if": {
+            "properties": { "runtime": { "const": "library" } },
+            "required": ["runtime"]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                { "required": ["binary"] },
+                { "required": ["package"] }
+              ]
+            },
+            "description": "DD-265: library-runtime entries MUST NOT carry binary or package — the consumer is the daemon binary itself, not a separately-fetched artefact."
+          }
+        }
+      ]
     },
+    "setup": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "consent_tile_link": {
+          "type": "string",
+          "format": "uri",
+          "description": "DD-265: deep-link (e.g. 'stallari://settings/general/local-corpus/mail') opened by the marketplace Manage button when runtime == 'library'. Optional — absence means render a passive Bundled tile with no Manage button (vault form factor)."
+        }
+      }
+    },
+    "author_type": {
+      "type": "string",
+      "enum": ["first-party", "verified", "community", "unverified"],
+      "description": "Authorship class. DD-265: required for runtime == 'library' (must be 'first-party' — only first-party builds can edit Package.swift)."
+    },
+    "hidden": {
+      "type": "boolean",
+      "description": "When true, the entry is excluded from the marketplace catalog build."
+    },
+    "aliases": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Alternative names for this entry."
+    },
+    "title": { "type": "string" },
+    "tagline": { "type": "string" },
+    "icon": { "type": "string" },
+    "readiness": {
+      "type": "string",
+      "enum": ["alpha", "beta", "production", "preview"]
+    },
+    "multi_instance": { "type": "boolean" },
+    "env": { "type": "array" },
     "services": {
       "type": "array",
       "items": { "type": "string" },
