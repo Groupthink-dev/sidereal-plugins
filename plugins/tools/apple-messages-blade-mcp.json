@@ -1,17 +1,17 @@
 {
-  "name": "messages-blade-mcp",
+  "name": "apple-messages-blade-mcp",
   "title": "Apple Messages",
   "description": "Apple Messages (iMessage) operations — conversations, search, contacts, attachments, send",
   "tagline": "Read, search, and send via iMessage on macOS",
   "version": "0.1.1",
   "author": "groupthink-dev",
   "license": "MIT",
-  "icon": "/icons/messages-blade-mcp.svg",
+  "icon": "/icons/apple-messages-blade-mcp.svg",
   "tier": "certified",
   "author_type": "first-party",
   "readiness": "production",
   "contract": "messages-v1",
-  "repository": "https://github.com/groupthink-dev/messages-blade-mcp",
+  "repository": "https://github.com/Groupthink-dev/apple-messages-blade-mcp",
   "multi_instance": false,
   "notes": "macOS only. Requires Full Disk Access for reading message history. TCC Automation permission for sending.",
   "install": {
@@ -94,7 +94,7 @@
   "links": [
     {
       "label": "Source Code",
-      "url": "https://github.com/groupthink-dev/messages-blade-mcp"
+      "url": "https://github.com/Groupthink-dev/apple-messages-blade-mcp"
     },
     {
       "label": "Full Disk Access Guide",
@@ -109,7 +109,7 @@
   "scenarios": [
     {
       "type": "workflow",
-      "target": "messages-blade-mcp",
+      "target": "apple-messages-blade-mcp",
       "target_type": "plugin",
       "shared_services": [
         "messages"
@@ -119,7 +119,7 @@
     },
     {
       "type": "workflow",
-      "target": "messages-blade-mcp",
+      "target": "apple-messages-blade-mcp",
       "target_type": "plugin",
       "shared_services": [
         "messages"
