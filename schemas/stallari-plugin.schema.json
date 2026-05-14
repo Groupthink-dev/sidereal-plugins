@@ -147,7 +147,9 @@
   "description": "Schema for stallari-plugin.yaml — the manifest format for Stallari platform plugins. The legacy filename sidereal-plugin.yaml is also accepted during the Sidereal→Stallari rebrand transition; both resolve to this schema.",
   "properties": {
     "adapter_framework": {
-      "description": "SemVer range that pins the stallari-adapter-framework version this adapter targets (DD-266 Phase C.2). Allowed only when `contract:` is set — only adapter shims, not raw blade-mcps. Examples: \"1.0.0\", \">=1.0.0,<2.0.0\". Harness emits a warning when constraint can't be satisfied (warn-only at 3.0.x; promotes to load-refusal at a future major bump per DD-266).",
+      "$comment": "DEPRECATED in pack-spec 3.1 (DD-281). Use `requires.adapter_contracts` instead. This field references the framework package version rather than the contract version, leaking internal packaging into blade manifests. Warn-only retained for 3.0.x backwards-compat; load-refusal promotion planned in DD-266 is cancelled — field will be removed at pack-spec 4.0.0.",
+      "deprecated": true,
+      "description": "DEPRECATED (pack-spec 3.1, DD-281): use `requires.adapter_contracts` instead. SemVer range pinning the stallari-adapter-framework version this adapter targets (DD-266 Phase C.2). Allowed only when `contract:` is set — only adapter shims, not raw blade-mcps. Examples: \"1.0.0\", \">=1.0.0,<2.0.0\". Harness emits a warning when constraint can't be satisfied (warn-only; suppressed when `requires.adapter_contracts` is present).",
       "pattern": "^([><=!~^]*\\d+\\.\\d+\\.\\d+(\\s*,\\s*[><=!~^]*\\d+\\.\\d+\\.\\d+)*|\\d+\\.\\d+\\.\\d+)$",
       "type": "string"
     },
@@ -530,6 +532,17 @@
       "additionalProperties": false,
       "description": "Dependency requirements.",
       "properties": {
+        "adapter_contracts": {
+          "$comment": "DD-281: contract-versioned adapter requirements. Each entry is `<contract-name> <constraint> <major.minor[.patch]>` (e.g. `email >= 1.1`). Names a domain contract (`email`, `calendar`, `tasks`, `billing`, `payments`, ...) and the minimum contract version the blade requires — never a framework or package version. Harness resolves against bundled adapter contract registry at install time; fails with a plain-language `update Stallari to install this pack` message when unsatisfied. Replaces top-level `adapter_framework:`.",
+          "description": "Domain adapter contracts this blade requires. Each entry combines a contract name with a SemVer constraint (e.g. `email >= 1.1`). Hard-validated at install time. Pack-spec 3.1+ — replaces top-level `adapter_framework:`.",
+          "items": {
+            "pattern": "^[a-z][a-z0-9_-]*\\s+[><=!~^]+\\s*\\d+\\.\\d+(\\.\\d+)?$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
         "stallari": {
           "description": "Minimum Stallari version (e.g. >=0.3.0).",
           "pattern": "^[><=!~^]+\\d+\\.\\d+\\.\\d+",

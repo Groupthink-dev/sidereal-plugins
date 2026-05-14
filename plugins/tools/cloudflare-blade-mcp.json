@@ -1,7 +1,7 @@
 {
   "name": "cloudflare-blade-mcp",
   "title": "Cloudflare Edge Platform",
-  "description": "Manage your Cloudflare stack — DNS, Workers, Pages, R2, KV, D1, Tunnels, and cache purge. 53 tools with token-efficient output and safety gates on all writes.",
+  "description": "Manage your Cloudflare stack — DNS, Workers, Pages, R2, KV, D1, Tunnels, Vectorize, AI Search, AI Gateway, Workers AI, and cache purge. 78 tools with token-efficient output and safety gates on all writes.",
   "tagline": "Full-stack Cloudflare management from DNS to deploy",
   "version": "0.3.0",
   "author": "groupthink-dev",
@@ -16,7 +16,7 @@
     "kv-v1",
     "functions-v1"
   ],
-  "contract_notes": "edge-platform-v1/v2 was retired in pack-spec 2.0.0 (DD-181). Cloudflare blade now declares the four decomposed contracts directly. D1, Tunnels, Pages, and Cache are not covered by a v1 contract yet — exposed as native tools.",
+  "contract_notes": "edge-platform-v1/v2 was retired in pack-spec 2.0.0 (DD-181). Cloudflare blade declares the four decomposed contracts directly. D1, Tunnels, Pages, Vectorize, AI Search, AI Gateway, Workers AI, and Cache are exposed as native tools.",
   "homepage": "https://github.com/groupthink-dev/cloudflare-blade-mcp",
   "repository": "https://github.com/groupthink-dev/cloudflare-blade-mcp",
   "highlights": [
@@ -26,7 +26,7 @@
     },
     {
       "icon": "⚙️",
-      "text": "Workers — scripts, deployments, versions, secrets, cron schedules"
+      "text": "Workers — scripts, deployments, settings, bindings, versions, secrets, cron schedules"
     },
     {
       "icon": "📄",
@@ -38,11 +38,19 @@
     },
     {
       "icon": "🔑",
-      "text": "KV — namespaces, key-value CRUD, bulk operations"
+      "text": "KV — namespace provisioning, key-value CRUD, bulk operations"
     },
     {
       "icon": "🗃️",
-      "text": "D1 — databases, tables, queries, schema inspection, export"
+      "text": "D1 — database provisioning, tables, queries, schema inspection, export"
+    },
+    {
+      "icon": "🧭",
+      "text": "Vectorize — index lifecycle and metadata-index management"
+    },
+    {
+      "icon": "✨",
+      "text": "AI — AI Search, AI Gateway observability, and Workers AI inference"
     }
   ],
   "links": [
@@ -63,11 +71,15 @@
       "url": "https://developers.cloudflare.com/workers/"
     },
     {
-      "label": "Pages Documentation",
-      "url": "https://developers.cloudflare.com/pages/"
+      "label": "Vectorize Documentation",
+      "url": "https://developers.cloudflare.com/vectorize/"
+    },
+    {
+      "label": "Workers AI Documentation",
+      "url": "https://developers.cloudflare.com/workers-ai/"
     }
   ],
-  "readme": "### What it does\n\nCloudflare Edge Platform gives your AI agent full operational control over your Cloudflare infrastructure — DNS records, Workers, Pages, R2, KV, D1, Tunnels, and cache — through 53 purpose-built tools.\n\nYour agent can check DNS propagation, roll back a broken Pages deploy, rotate a Workers secret, query a D1 database, and purge cache in a single conversation. No context switching between dashboards.\n\n### Token efficiency\n\nEvery Cloudflare API response is large and noisy. Raw responses waste context window on pagination metadata, empty fields, and internal IDs your agent will never use.\n\nEach tool includes a **concise formatter** that extracts only the fields that matter. A typical `list_zones` call returns ~200 tokens instead of ~800. Across a session with dozens of API calls, this saves thousands of tokens and keeps your agent focused.\n\n### Safety model\n\nAll 53 tools follow a read-free, write-gated pattern:\n\n- **Reads** work immediately — list zones, get records, inspect deployments\n- **Writes** require `confirm: true` — create records, put secrets, purge cache\n- **Destructive operations** are double-gated — delete records, remove secrets, drop buckets\n\nThis means your agent can explore your infrastructure freely but must be explicit about changes. Accidental deletions are structurally prevented.\n\n### Domain coverage\n\n| Domain | Tools | What you can do |\n|--------|-------|-----------------|\n| DNS | 10 | Zones, records, bulk create/update, BIND export |\n| Workers | 10 | Scripts, deployments, versions, secrets, cron triggers |\n| Pages | 7 | Projects, builds, rollback, custom domains, build cache |\n| R2 | 4 | Buckets with location hints, jurisdiction, storage class |\n| KV | 7 | Namespaces, key CRUD, bulk put/delete |\n| D1 | 7 | Databases, tables, SQL query/execute, schema, export |\n| Tunnels | 7 | Create, configure, connections, ingress routing |\n| Cache | 1 | Purge by URL, tag, host, prefix, or everything |",
+  "readme": "### What it does\n\nCloudflare Edge Platform gives your AI agent operational control over Cloudflare infrastructure — DNS records, Workers, Pages, R2, KV, D1, Tunnels, Vectorize, AI Search, AI Gateway, Workers AI, and cache — through 78 purpose-built tools.\n\nYour agent can check DNS propagation, provision KV/D1 storage, wire Worker bindings, inspect Vectorize indexes, query AI Search, review AI Gateway logs, run Workers AI diagnostics, roll back a broken Pages deploy, rotate a Workers secret, query a D1 database, and purge cache in a single conversation. No context switching between dashboards.\n\n### Token efficiency\n\nCloudflare API responses are large and noisy. Raw responses waste context window on pagination metadata, empty fields, and internal IDs your agent will never use.\n\nEach tool includes a **concise formatter** that extracts only the fields that matter. A typical `list_zones` call returns ~200 tokens instead of ~800. Across a session with dozens of API calls, this saves thousands of tokens and keeps your agent focused.\n\n### Safety model\n\nThe plugin follows a read-free, write-gated pattern:\n\n- **Reads** work immediately — list zones, get records, inspect deployments, review AI Gateway logs\n- **Writes** require `confirm: true` — create records, put secrets, provision KV/D1/Vectorize resources, run Workers AI inference\n- **Destructive operations** are double-gated where practical — delete namespaces/databases/indexes require explicit confirmation and exact-name checks\n\nThis means your agent can explore your infrastructure freely but must be explicit about changes. Accidental deletions are structurally prevented.\n\n### Domain coverage\n\n| Domain | Tools | What you can do |\n|--------|-------|-----------------|\n| DNS | 10 | Zones, records, bulk create/update, BIND export |\n| Workers | 13 | Scripts, settings, bindings, deployments, versions, secrets, cron triggers |\n| Pages | 7 | Projects, builds, rollback, custom domains, build cache |\n| R2 | 4 | Buckets with location hints, jurisdiction, storage class |\n| KV | 9 | Namespace provisioning, key CRUD, bulk put/delete |\n| D1 | 9 | Database provisioning, tables, SQL query/execute, schema, export |\n| Tunnels | 7 | Create, configure, connections, ingress routing |\n| Vectorize | 8 | Index lifecycle, operational info, metadata indexes |\n| AI | 10 | AI Search queries, AI Gateway CRUD/logs, Workers AI model search/run |\n| Cache | 1 | Purge by URL, tag, host, prefix, or everything |",
   "install": {
     "runtime": "node",
     "package": "cloudflare-blade-mcp",
@@ -76,12 +88,12 @@
   "env": [
     {
       "name": "CLOUDFLARE_API_TOKEN",
-      "description": "Cloudflare API token with Zone DNS Edit, Workers Scripts/KV/D1/Tunnel/R2 Edit, Pages Read, Cache Purge permissions",
+      "description": "Cloudflare API token with permissions for the Cloudflare services you enable: DNS, Workers, KV, D1, Tunnels, Pages, R2, Vectorize, AI Gateway, AI Search, Workers AI, and Cache Purge",
       "secret": true
     },
     {
       "name": "CLOUDFLARE_ACCOUNT_ID",
-      "description": "Cloudflare Account ID — required for KV, D1, Tunnel, Workers, Pages, and R2 tools",
+      "description": "Cloudflare Account ID — required for account-level tools including KV, D1, Tunnels, Workers, Pages, R2, Vectorize, and AI",
       "secret": false
     },
     {
@@ -102,8 +114,8 @@
     "complexity": "moderate",
     "icon": "cloud.fill",
     "product": "Cloudflare Platform",
-    "blurb": "Manage DNS, Workers, Pages, R2, KV, D1, Tunnels, and Cache. 53 tools with token-efficient output.",
-    "help_text": "Create a custom API token at dash.cloudflare.com/profile/api-tokens. Grant Zone > DNS > Edit, Account > Workers Scripts/KV/D1/Tunnel/R2 > Edit, and Zone > Cache Purge > Purge permissions. Tokens can be scoped to specific zones if you only need DNS.",
+    "blurb": "Manage DNS, Workers, Pages, R2, KV, D1, Tunnels, Vectorize, AI, and Cache. 78 tools with token-efficient output.",
+    "help_text": "Create a custom API token at dash.cloudflare.com/profile/api-tokens. Grant only the service permissions you plan to use: Zone DNS Edit, Account Workers Scripts/KV/D1/Tunnel/R2/Vectorize/AI permissions, Pages access, and Zone Cache Purge. Tokens can be scoped to specific zones if you only need DNS.",
     "help_url": "https://developers.cloudflare.com/fundamentals/api/get-started/create-token/",
     "fields": [
       {
@@ -112,7 +124,7 @@
         "secret": true,
         "placeholder": "Create at dash.cloudflare.com/profile/api-tokens",
         "required": true,
-        "help": "Custom token with Zone DNS Edit and Account-level KV/D1/Tunnel Edit permissions"
+        "help": "Custom token with the Cloudflare service permissions you plan to use"
       },
       {
         "key": "CLOUDFLARE_ACCOUNT_ID",
@@ -120,7 +132,7 @@
         "secret": false,
         "placeholder": "32-character hex from dashboard overview",
         "required": true,
-        "help": "Found on any zone's overview page in the Cloudflare dashboard, or via the API"
+        "help": "Found on the account overview page in the Cloudflare dashboard"
       }
     ],
     "test": {
@@ -171,6 +183,30 @@
       "target": "cloudflare-blade-mcp",
       "target_type": "plugin",
       "shared_services": [
+        "functions",
+        "kv",
+        "d1",
+        "vectorize"
+      ],
+      "label": "Provision storage and bindings for a Worker",
+      "body": "Create the required KV namespace, D1 database, and Vectorize index, then upsert Worker bindings so the script can access them."
+    },
+    {
+      "type": "workflow",
+      "target": "cloudflare-blade-mcp",
+      "target_type": "plugin",
+      "shared_services": [
+        "ai",
+        "functions"
+      ],
+      "label": "Debug an AI-backed Worker flow",
+      "body": "Query AI Search, inspect AI Gateway logs for errors or latency, list Workers AI models, and run a small inference smoke test."
+    },
+    {
+      "type": "workflow",
+      "target": "cloudflare-blade-mcp",
+      "target_type": "plugin",
+      "shared_services": [
         "dns",
         "d1",
         "kv"
@@ -204,7 +240,28 @@
       "optional": "1/3",
       "gated": "1/3"
     },
-    "last_tested": "2026-04-28",
-    "notes": "object-storage-v1 conformance is intentionally low — Cloudflare blade only exposes R2 bucket lifecycle (4 tools); object-level operations are not yet implemented. dns-authoritative-v1 nameserver_set/zone_create/zone_delete intentionally gated out (Cloudflare zone provisioning lives in dashboard). Numbers measured against pack-spec 2.0.0."
+    "last_tested": "2026-05-14",
+    "notes": "Contract conformance remains scoped to dns-authoritative-v1, object-storage-v1, kv-v1, and functions-v1. Newly added D1 provisioning, Vectorize, AI Search, AI Gateway, Workers AI, Tunnels, Pages, and Cache operations are native tools outside the current v1 service contracts. Source validated at Git commit 78941d68db1c0fd2942d455c9fa9bf16ccebefd4; Nix source narHash sha256-jehNVTQhwxWBJYKNxDMD/Ay0w+YcNaYTKHgmtuYjHw0=."
+  },
+  "certification": {
+    "status": "certified",
+    "validated_commit": "78941d68db1c0fd2942d455c9fa9bf16ccebefd4",
+    "validated_version": "0.3.0",
+    "validated_date": "2026-05-14",
+    "validator": "system-architect",
+    "platform_tested": [
+      "darwin-arm64"
+    ],
+    "security_review": "pass",
+    "stability": "stable",
+    "security_notes": "First-party network API blade. Uses Cloudflare scoped API token from environment; destructive operations require confirm gates and exact-name checks where practical. Nix source narHash: sha256-jehNVTQhwxWBJYKNxDMD/Ay0w+YcNaYTKHgmtuYjHw0=.",
+    "checklist": {
+      "installs_cleanly": true,
+      "tools_enumerate": true,
+      "tools_callable": true,
+      "no_data_exfil": true,
+      "auth_reviewed": true,
+      "license_compatible": true
+    }
   }
 }
