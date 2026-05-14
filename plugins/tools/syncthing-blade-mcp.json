@@ -1,0 +1,181 @@
+{
+  "name": "syncthing-blade-mcp",
+  "type": "plugin",
+  "title": "Syncthing",
+  "description": "Syncthing replication management MCP — multi-instance, token-efficient output, safe disk-space reclamation. Read and control access to Syncthing's REST API with a focus on replication awareness: knowing which folders are fully replicated across devices so you can confidently reclaim local disk space.",
+  "tagline": "Mesh file sync with replication-aware disk reclamation",
+  "version": "0.4.0",
+  "author": "groupthink-dev",
+  "license": "MIT",
+  "icon": "/icons/syncthing-blade-mcp.svg",
+  "tier": "certified",
+  "author_type": "first-party",
+  "readiness": "beta",
+  "contract": "sync-v1",
+  "not_supported": [
+    "folder_get",
+    "device_get",
+    "folder_add",
+    "folder_remove",
+    "device_add",
+    "device_remove"
+  ],
+  "repository": "https://github.com/piersdd/syncthing-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "syncthing-blade-mcp"
+  },
+  "env": [
+    {
+      "name": "SYNCTHING_API_KEY",
+      "description": "Syncthing REST API key (single-instance mode). Find in Actions → Settings → API Key in the Syncthing web GUI.",
+      "secret": true
+    },
+    {
+      "name": "SYNCTHING_URL",
+      "description": "Syncthing base URL (default: http://localhost:8384). Used in single-instance mode.",
+      "default": "http://localhost:8384"
+    },
+    {
+      "name": "SYNCTHING_INSTANCES",
+      "description": "JSON object for multi-instance mode (overrides API_KEY/URL). Shape: {\"name\":{\"url\":\"...\",\"apiKey\":\"...\"}}.",
+      "secret": true
+    }
+  ],
+  "setup": {
+    "auth_model": "api_key",
+    "complexity": "simple",
+    "icon": "externaldrive.connected.to.line.below",
+    "product": "Syncthing API Key",
+    "help_text": "Find your API key in the Syncthing web GUI: Actions → Settings → API Key. For multi-instance mode, provide a JSON object mapping instance names to {url, apiKey} pairs.",
+    "help_url": "https://docs.syncthing.net/users/config.html#config-option-gui.apikey",
+    "fields": [
+      {
+        "key": "SYNCTHING_API_KEY",
+        "label": "API Key",
+        "secret": true,
+        "placeholder": "From Syncthing GUI → Actions → Settings → API Key"
+      },
+      {
+        "key": "SYNCTHING_URL",
+        "label": "Server URL",
+        "secret": false,
+        "placeholder": "http://localhost:8384"
+      },
+      {
+        "key": "SYNCTHING_INSTANCES",
+        "label": "Multi-Instance Config",
+        "secret": true,
+        "placeholder": "{\"viking\":{\"url\":\"http://localhost:8384\",\"apiKey\":\"...\"}}"
+      }
+    ],
+    "test": {
+      "endpoint": "http://localhost:8384/rest/system/ping",
+      "auth_style": "header"
+    },
+    "prerequisites": [
+      "A running Syncthing instance (v2.x) with REST API enabled"
+    ],
+    "help": [
+      {
+        "label": "Syncthing Documentation",
+        "url": "https://docs.syncthing.net/"
+      },
+      {
+        "label": "REST API Reference",
+        "url": "https://docs.syncthing.net/dev/rest.html"
+      },
+      {
+        "label": "Source Code",
+        "url": "https://github.com/piersdd/syncthing-blade-mcp"
+      }
+    ],
+    "blurb": "Syncthing replication management MCP — multi-instance, token-efficient output, safe disk-space reclamation."
+  },
+  "highlights": [
+    {
+      "icon": "🔄",
+      "text": "Folder sync — list, status, completion, replication across the mesh"
+    },
+    {
+      "icon": "♻️",
+      "text": "Reclaim disk space — safe-to-remove flags from replication analysis"
+    },
+    {
+      "icon": "🧭",
+      "text": "Multi-instance — manage multiple Syncthing nodes from one server"
+    },
+    {
+      "icon": "⚡",
+      "text": "Token-efficient — concise JSON by default, full detail on demand"
+    },
+    {
+      "icon": "🛡️",
+      "text": "Mesh-local — talks to Syncthing's REST API, no cloud egress"
+    },
+    {
+      "icon": "🧰",
+      "text": "Device pairing — accept/reject pending devices, manage ignore patterns"
+    }
+  ],
+  "links": [
+    {
+      "label": "Source Code",
+      "url": "https://github.com/piersdd/syncthing-blade-mcp"
+    },
+    {
+      "label": "Syncthing Documentation",
+      "url": "https://docs.syncthing.net/"
+    },
+    {
+      "label": "REST API Reference",
+      "url": "https://docs.syncthing.net/dev/rest.html"
+    },
+    {
+      "label": "Syncthing Home",
+      "url": "https://syncthing.net/"
+    }
+  ],
+  "readme": "### What it does\n\nSyncthing Blade MCP gives your AI agent read and control access to one or more Syncthing nodes. Your agent can audit replication health across the mesh, identify which folders are fully replicated (and therefore safe to reclaim locally), inspect sync errors, pause and resume folders, scan on demand, and manage device pairing.\n\nIdeal for fleet operators running Syncthing across a personal Mac fleet, NAS appliances, or a mix — where you want to know which copies are durable, which folders are stuck, and which devices are misbehaving without logging into each web GUI.\n\n### Multi-instance from one server\n\nSet `SYNCTHING_INSTANCES` to a JSON object and the blade connects to every node simultaneously. Every tool accepts an optional `instance` parameter; when only one instance is configured, the parameter can be omitted. Drop in a `tn-sb`, `viking`, `voyager` triple and ask the agent to compare folder coverage across all three in one call.\n\n### Token efficiency\n\nSyncthing's REST API returns large, deeply-nested objects (folder configs with per-device addresses, history, ignore patterns; system status with platform / version / connection counts). Each tool's concise formatter extracts the fields that matter — folder id, label, state, completion %, error count — keeping context windows lean. Pass `concise=false` to any tool when you need the full payload.\n\n### Safety model\n\n- **Reads** work immediately — folder listings, replication reports, device stats, system errors.\n- **Mutations** are scoped to non-destructive operations — pause/resume folders, trigger rescans, accept/reject pending pairs, edit ignore patterns.\n- **Override and revert** (send-only / receive-only conflict resolution) are present but operate on the folder's existing replication mode — they do not delete files outside of that mode's contract.\n- **No folder or device creation** — the contract's `folder_add` / `device_add` / `folder_remove` / `device_remove` operations are deliberately not exposed in this blade; pairing is bootstrapped through Syncthing's own pending-device flow.",
+  "scenarios": [
+    {
+      "type": "workflow",
+      "target": "syncthing-blade-mcp",
+      "target_type": "plugin",
+      "shared_services": [
+        "sync"
+      ],
+      "label": "Audit replication coverage across the fleet",
+      "body": "Pull a replication report from every configured instance, identify folders fully replicated to two or more peers, and surface the reclaimable bytes per host so the operator can decide which local copies are safe to drop."
+    },
+    {
+      "type": "workflow",
+      "target": "syncthing-blade-mcp",
+      "target_type": "plugin",
+      "shared_services": [
+        "sync"
+      ],
+      "label": "Reclaim disk space on a host",
+      "body": "Confirm a target folder is fully replicated on at least one healthy peer, pause the folder on the local host to halt deletion propagation, then guide the operator through removing the on-disk copy without breaking the mesh."
+    },
+    {
+      "type": "workflow",
+      "target": "syncthing-blade-mcp",
+      "target_type": "plugin",
+      "shared_services": [
+        "sync"
+      ],
+      "label": "Diagnose a stuck sync",
+      "body": "Read folder errors and recent system errors, list the files this folder still needs from peers, check per-device completion, and inspect recent file-change events to pinpoint where the sync is blocked."
+    }
+  ],
+  "conformance": {
+    "sync-v1": {
+      "required": "3/3",
+      "recommended": "2/4",
+      "optional": "2/2",
+      "gated": "0/4",
+      "last_tested": "2026-05-14"
+    }
+  }
+}
