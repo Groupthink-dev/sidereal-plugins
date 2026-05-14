@@ -25,6 +25,20 @@
     "icon": "doc.text.magnifyingglass",
     "product": "Obsidian Vault",
     "help_text": "No credentials required. Stallari Blade connects directly to your local Obsidian vault via the filesystem. Ensure the vault path is configured in Stallari settings.",
+    "help": [
+      {
+        "label": "Stallari Vault Setup",
+        "url": "https://stallari.app/docs/vault"
+      },
+      {
+        "label": "Source Code",
+        "url": "https://github.com/groupthink-dev/stallari-vault"
+      }
+    ],
+    "test": {
+      "skip": true,
+      "skip_reason": "Bundled library form factor (DD-265) — runs in-process inside the Stallari daemon; no credentials and no separate endpoint to probe."
+    },
     "blurb": "Obsidian vault operations via Swift MCP — read, write, search, properties, graph analysis, lens semantic tools"
   },
   "conformance": {
