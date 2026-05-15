@@ -551,6 +551,16 @@
       },
       "type": "object"
     },
+    "risk_class": {
+      "description": "DD-280 — Optional coarse risk-class declaration for this plugin's tool surface. Used as a declared override when runtime MCP annotations are absent; per-tool MCP annotations can still narrow individual tools.",
+      "enum": [
+        "read_only",
+        "reversible_write",
+        "external_side_effect",
+        "high_risk"
+      ],
+      "type": "string"
+    },
     "services": {
       "additionalProperties": {
         "additionalProperties": {

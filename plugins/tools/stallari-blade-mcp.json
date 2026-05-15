@@ -13,6 +13,7 @@
   "author_type": "first-party",
   "readiness": "production",
   "contract": "vault-v1",
+  "risk_class": "reversible_write",
   "repository": "https://github.com/groupthink-dev/stallari-vault",
   "install": {
     "runtime": "library",

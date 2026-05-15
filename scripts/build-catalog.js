@@ -216,6 +216,7 @@ function pluginToCatalogEntry(raw) {
     author_type,
     readiness,
     contract: raw.contract || null,
+    risk_class: raw.risk_class || null,
     not_supported: Array.isArray(raw.not_supported) && raw.not_supported.length > 0 ? raw.not_supported : null,
     runtime: raw.install?.runtime || raw.runtime || null,
     // DD-265: surface library-form-factor metadata so the harness marketplace

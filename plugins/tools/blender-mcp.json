@@ -10,6 +10,7 @@
   "author_type": "community",
   "readiness": "beta",
   "contract": null,
+  "risk_class": "external_side_effect",
   "tagline": "AI-driven 3D modelling inside Blender",
   "repository": "https://github.com/ahujasid/blender-mcp",
   "highlights": [

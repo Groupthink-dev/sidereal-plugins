@@ -9,6 +9,7 @@
   "author_type": "community",
   "readiness": "beta",
   "contract": null,
+  "risk_class": "high_risk",
   "tagline": "Polymarket and Kalshi prediction data in one place",
   "repository": "https://github.com/shaanmajid/prediction-mcp",
   "homepage": "https://github.com/shaanmajid/prediction-mcp",

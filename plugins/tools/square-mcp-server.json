@@ -10,7 +10,8 @@
   "tier": "community",
   "author_type": "third-party",
   "readiness": "beta",
-  "contract": null,
+  "contract": "payments-v1",
+  "risk_class": "high_risk",
   "repository": "https://github.com/square/square-mcp-server",
   "install": {
     "runtime": "npx",

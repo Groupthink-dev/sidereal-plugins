@@ -11,6 +11,7 @@
   "author_type": "community",
   "readiness": "beta",
   "contract": "messages-v1",
+  "risk_class": "external_side_effect",
   "homepage": "https://api.slack.com/docs/mcp",
   "install": {
     "runtime": "remote",

@@ -10,6 +10,7 @@
   "author_type": "community",
   "readiness": "beta",
   "contract": null,
+  "risk_class": "read_only",
   "tagline": "Search, discover, and transcribe YouTube content",
   "repository": "https://github.com/ZubeidHendricks/youtube-mcp-server",
   "highlights": [

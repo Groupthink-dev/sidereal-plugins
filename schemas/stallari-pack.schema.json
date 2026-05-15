@@ -362,10 +362,9 @@
           "type": "array"
         },
         "optional_tools": {
-          "description": "Concrete blade tools the skill MAY call depending on the conversation (v1.12, DD-244). Registered but not injected into turn 1; injected on first call. See docs/tools.md.",
+          "description": "Concrete blade tools the skill MAY call depending on the conversation (v1.12, DD-244). String form uses mcp__<blade>__<tool>; object form additionally permits DD-280 risk_class declared overrides. Registered but not injected into turn 1; injected on first call. See docs/tools.md.",
           "items": {
-            "pattern": "^mcp__[a-z][a-z0-9-]*__[a-z][a-z0-9_]*$",
-            "type": "string"
+            "$ref": "#/$defs/toolDeclaration"
           },
           "type": "array"
         },
@@ -403,10 +402,9 @@
           "type": "array"
         },
         "required_tools": {
-          "description": "Concrete blade tools the skill ALWAYS calls (v1.12, DD-244). Format: mcp__<blade>__<tool> for both subprocess and in-process blades — distribution form factor is implementation detail. Use only when no portable service contract applies (Apple Notes, Apple Mail.app, Apple Reminders, Apple Messages, operator-internal targets). Secondary axis — prefer required_services. Certified-tier packs MUST accompany any required_tools declaration with a tools_rationale block. See docs/tools.md.",
+          "description": "Concrete blade tools the skill ALWAYS calls (v1.12, DD-244). String form uses mcp__<blade>__<tool>; object form additionally permits DD-280 risk_class declared overrides. Use only when no portable service contract applies (Apple Notes, Apple Mail.app, Apple Reminders, Apple Messages, operator-internal targets). Secondary axis — prefer required_services. Certified-tier packs MUST accompany any required_tools declaration with a tools_rationale block. See docs/tools.md.",
           "items": {
-            "pattern": "^mcp__[a-z][a-z0-9-]*__[a-z][a-z0-9_]*$",
-            "type": "string"
+            "$ref": "#/$defs/toolDeclaration"
           },
           "type": "array"
         },
@@ -479,6 +477,39 @@
         }
       },
       "type": "object"
+    },
+    "toolDeclaration": {
+      "description": "Concrete tool declaration. String form is the legacy v1.12 shape; object form is additive and carries DD-280 metadata.",
+      "oneOf": [
+        {
+          "pattern": "^mcp__[a-z][a-z0-9-]*__[a-z][a-z0-9_]*$",
+          "type": "string"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "description": "Concrete blade tool name.",
+              "pattern": "^mcp__[a-z][a-z0-9-]*__[a-z][a-z0-9_]*$",
+              "type": "string"
+            },
+            "risk_class": {
+              "description": "DD-280 — Optional declared risk-class override for this concrete tool. Runtime consumers fall back to MCP annotations, then heuristic derivation when omitted.",
+              "enum": [
+                "read_only",
+                "reversible_write",
+                "external_side_effect",
+                "high_risk"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        }
+      ]
     },
     "trackConsumes": {
       "additionalProperties": false,

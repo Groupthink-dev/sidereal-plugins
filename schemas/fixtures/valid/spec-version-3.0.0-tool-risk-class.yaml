@@ -1,0 +1,39 @@
+# DD-280: concrete tool declarations may carry an optional risk_class override.
+spec_version: "3.0.0"
+pack: "1.13"
+slug: tool-risk-class-pack
+name: tool-risk-class-pack
+title: "Tool Risk Class Pack"
+version: "1.0.0"
+description: Valid pack proving object-form required_tools accepts risk_class.
+
+trust_tier: first-party
+
+source:
+  type: vault
+  vault_path: packs/tool-risk-class-pack/
+
+runtime:
+  distribution: none
+  publish_targets: []
+
+author:
+  name: Stallari
+
+data:
+  reads: []
+  writes: []
+  stores: nothing
+  phones_home: false
+
+skills:
+  - name: risky-tool
+    description: A skill with a declared high-risk concrete tool.
+    required_tools:
+      - name: mcp__square-mcp-server__make_request
+        risk_class: high_risk
+    tools_rationale: |
+      This fixture intentionally binds to the Square meta-tool because it has
+      no portable operation-level schema in the pack manifest.
+    prompt: |
+      Respond with 'ok'.

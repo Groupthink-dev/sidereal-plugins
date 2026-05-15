@@ -10,6 +10,8 @@
   "tier": "community",
   "author_type": "community",
   "readiness": "beta",
+  "contract": "leo-modem-v1",
+  "risk_class": "high_risk",
   "homepage": "https://github.com/ry-ops/starlink-enterprise-mcp-server",
   "repository": "https://github.com/ry-ops/starlink-enterprise-mcp-server",
   "multi_instance": false,

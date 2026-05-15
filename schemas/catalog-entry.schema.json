@@ -77,6 +77,11 @@
       "pattern": "^[a-z]+-v\\d+$",
       "description": "Domain contract identifier. Required for plugins."
     },
+    "risk_class": {
+      "type": ["string", "null"],
+      "enum": ["read_only", "reversible_write", "external_side_effect", "high_risk", null],
+      "description": "DD-280 coarse risk class for this plugin's tool surface."
+    },
     "repository": {
       "type": "string",
       "format": "uri"

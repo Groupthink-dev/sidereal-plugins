@@ -42,6 +42,12 @@
     "experimental",
     "stub"
   ],
+  "RISK_CLASSES": [
+    "read_only",
+    "reversible_write",
+    "external_side_effect",
+    "high_risk"
+  ],
   "TIERS": [
     "certified",
     "verified",
