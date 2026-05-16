@@ -7,6 +7,7 @@ export const DECLARED_SERVICES: string[] = [
   "billing",
   "brokerage",
   "calendar",
+  "context_packet",
   "dns",
   "documentation",
   "ecommerce",

@@ -397,27 +397,46 @@ skills:
     agent: pkm-operator
     tier: standard
     category: transform
+    # DD-287 Phase E.2 — declarative packet requirement. Replaces direct
+    # lens search/recall invocations with packet-evidence consumption.
+    # Memory write-backs route through the vault.write proposal envelope
+    # per WriteBackPolicy rather than the lens remember surface. Legacy
+    # lens surface gated behind
+    # STALLARI_BYPASS_CONTEXT_PACKET[_WIKI_MAINTAIN_ENRICH].
+    requires_context_packet:
+      level: operational
+      work_object_type: wiki_note_enrichment
     services_used:
       - service: vault
-        operations: [ read, search, lens_fts, append, create ]
+        operations: [ read, write, append, create ]
+      - service: context_packet
+        operations: [ consume ]
     trigger:
       watch: [ "+/ingest", "+/triage", "+/handoff" ]
     graph: react-extract
     required_services:
       - vault.read
-      - vault.search
-      - vault.lens_fts
+      - vault.write
       - vault.append
       - vault.create
+      - context_packet.consume
     allow_request_service: true
     allow_request_tool: false
   - import: ./skills/wiki-maintain-query.md
     agent: pkm-operator
     tier: standard
     category: report
+    # DD-287 Phase E.2 — brief read-only packet; renders evidence directly.
+    # Post-cutover services_used drops lens_fts/lens_recall; the legacy lens
+    # surface is reachable only behind STALLARI_BYPASS_CONTEXT_PACKET[_WIKI_MAINTAIN_QUERY].
+    requires_context_packet:
+      level: brief
+      work_object_type: wiki_query
     services_used:
       - service: vault
-        operations: [ read, search, lens_fts, lens_recall, create, append ]
+        operations: [ read ]
+      - service: context_packet
+        operations: [ consume ]
     trigger:
       on_demand: true
     graph: react-verify
@@ -434,20 +453,24 @@ skills:
         type: string
     required_services:
       - vault.read
-      - vault.search
-      - vault.lens_fts
-      - vault.lens_recall
-      - vault.create
-      - vault.append
+      - context_packet.consume
     allow_request_service: true
     allow_request_tool: false
   - import: ./skills/wiki-maintain-lint.md
     agent: pkm-operator
     tier: standard
     category: report
+    # DD-287 Phase E.2 — brief read-only packet; lint evidence (frontmatter,
+    # link graph, hashes) is pre-assembled. Legacy lens_fts surface gated
+    # behind STALLARI_BYPASS_CONTEXT_PACKET[_WIKI_MAINTAIN_LINT].
+    requires_context_packet:
+      level: brief
+      work_object_type: wiki_query
     services_used:
       - service: vault
-        operations: [ read, search, query_properties, lens_fts, create ]
+        operations: [ read, query_properties, create ]
+      - service: context_packet
+        operations: [ consume ]
     briefing:
       card_id: stallari-core-wiki-lint
       refresh_interval: 7d
@@ -455,19 +478,27 @@ skills:
       dismissal: per-version
     required_services:
       - vault.read
-      - vault.search
       - vault.query_properties
-      - vault.lens_fts
       - vault.create
+      - context_packet.consume
     allow_request_service: true
     allow_request_tool: false
   - import: ./skills/wiki-maintain-distil.md
     agent: pkm-operator
     tier: reasoning
     category: ingest
+    # DD-287 Phase E.2 — operational packet drives candidate cluster + related
+    # graph. Memory writes flow through the vault.write proposal envelope per
+    # WriteBackPolicy. Legacy lens_fts/lens_remember surface gated behind
+    # STALLARI_BYPASS_CONTEXT_PACKET[_WIKI_MAINTAIN_DISTIL].
+    requires_context_packet:
+      level: operational
+      work_object_type: wiki_note_enrichment
     services_used:
       - service: vault
-        operations: [ read, search, files, lens_fts, lens_remember, create, append, property_set ]
+        operations: [ read, files, write, create, append, property_set ]
+      - service: context_packet
+        operations: [ consume ]
     trigger:
       on_demand: true
     graph: plan-execute
@@ -520,13 +551,12 @@ skills:
       dismissal: per-version
     required_services:
       - vault.read
-      - vault.search
       - vault.files
-      - vault.lens_fts
-      - vault.lens_remember
+      - vault.write
       - vault.create
       - vault.append
       - vault.property_set
+      - context_packet.consume
     allow_request_service: true
     allow_request_tool: false
   - import: ./skills/corpus-lint.md
@@ -746,15 +776,25 @@ skills:
     agent: fleet-operator
     tier: standard
     category: review
+    # DD-287 Phase E.2 — brief read-only platform_status_snapshot packet
+    # carries lens status / memory stats / heat evidence. Legacy lens
+    # status/memory_stats/heat surface gated behind
+    # STALLARI_BYPASS_CONTEXT_PACKET[_PLATFORM_HEALTH].
+    requires_context_packet:
+      level: brief
+      work_object_type: platform_status_snapshot
     services_used:
       - service: vault
         operations: [ read, create ]
+      - service: context_packet
+        operations: [ consume ]
     trigger:
       on_demand: true
     graph: react
     required_services:
       - vault.read
       - vault.create
+      - context_packet.consume
     allow_request_service: true
     allow_request_tool: false
   - import: ./skills/version-drift-check.md

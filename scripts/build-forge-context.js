@@ -31,7 +31,12 @@ const SCRIPTS_GEN_DIR = join(ROOT, "scripts", "generated");
 const CORE_SERVICES = new Set(["email", "tasks", "calendar", "vault"]);
 
 /** Services that appear in DECLARED_SERVICES but have no contract yet. */
-const ADDITIONAL_SERVICES = ["registry", "dns", "storage"];
+// `context_packet` declared by DD-287 Phase E.2 — packet-evidence consumption
+// surface; no separate contract file (the surface is the env-var injection of
+// STALLARI_CONTEXT_PACKET, not an MCP-tool contract). Listed here so skills
+// that declare context_packet.consume in services_used / required_services
+// pass validation.
+const ADDITIONAL_SERVICES = ["registry", "dns", "storage", "context_packet"];
 
 /** Classification display order. */
 const CLASSIFICATION_ORDER = ["required", "recommended", "optional", "gated"];

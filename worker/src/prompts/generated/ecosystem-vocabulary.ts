@@ -19,7 +19,7 @@ These are the built-in operator agents. Packs assign skills to agents. When a us
 Reference these when the user's needs overlap. Suggest forking an open pack rather than building from scratch. Mention sealed/paid packs as alternatives when relevant.
 
 **Bundled (included with Stallari):**
-- **stallari-core** v4.0.0 [calendar, email, home, tasks, vault]: Core platform operators and infrastructure health — PKM, comms, scheduling, security auditing, flee… (45 skills, 10 agents, free)
+- **stallari-core** v4.0.0 [calendar, context_packet, email, home, tasks, vault]: Core platform operators and infrastructure health — PKM, comms, scheduling, security auditing, flee… (45 skills, 10 agents, free)
 
 **Open (forkable):**
 - **business-ops** v3.0.0 [accounting, billing, vault]: Multi-service business operations automation — subscription revenue tracking, double-entry accounti… (16 skills, 1 agents, free)
