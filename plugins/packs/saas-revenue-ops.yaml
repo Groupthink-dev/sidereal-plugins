@@ -14,7 +14,8 @@ featured: true
 version: "3.0.0"
 tagline: "Subscriptions, orders, and delivery in one view — Paddle, Shopify, and Resend unified"
 description: >-
-  End-to-end SaaS and e-commerce revenue operations — subscription billing, storefront orders, and transactional email delivery. Three services, one agent, seven skills (incl. weekly digest + failed-payment alert briefing surface) that follow the money from checkout to inbox.
+  End-to-end SaaS and e-commerce revenue operations — subscription billing, storefront orders, and transactional email delivery. Three services, one agent, seven skills (incl. weekly digest + failed-payment
+  alert briefing surface) that follow the money from checkout to inbox.
 icon: /icons/saas-revenue-ops.svg
 author:
   name: Stallari
@@ -24,7 +25,7 @@ visibility: open
 tier: certified
 author_type: first-party
 readiness: beta
-pricing: null
+pricing:
 bundled: false
 
 readme:
@@ -171,11 +172,11 @@ recommends:
         - get_domain
         - list_broadcasts
     - service: vault
-      operations: [ read, search, create ]
+      operations: [read, search, create]
 
 data:
-  reads: [ billing, ecommerce, transactional-email, vault ]
-  writes: [ vault ]
+  reads: [billing, ecommerce, transactional-email, vault]
+  writes: [vault]
   stores: nothing
   phones_home: false
 
@@ -237,11 +238,11 @@ skills:
     graph: react-extract
     services_used:
       - service: billing
-        operations: [ subscriptions, transactions, customers, adjustments ]
+        operations: [subscriptions, transactions, customers, adjustments]
       - service: ecommerce
-        operations: [ orders, analytics ]
+        operations: [orders, analytics]
       - service: transactional-email
-        operations: [ list_emails, list_domains ]
+        operations: [list_emails, list_domains]
     trigger:
       on_demand: true
     briefing:
@@ -321,11 +322,11 @@ skills:
     graph: react-extract
     services_used:
       - service: billing
-        operations: [ subscriptions, transactions, events, customers ]
+        operations: [subscriptions, transactions, events, customers]
       - service: ecommerce
-        operations: [ orders, fulfillments, inventory ]
+        operations: [orders, fulfillments, inventory]
       - service: transactional-email
-        operations: [ list_emails, list_domains, list_broadcasts ]
+        operations: [list_emails, list_domains, list_broadcasts]
     trigger:
       on_demand: true
     outputs:
@@ -388,11 +389,11 @@ skills:
     graph: react-extract # tool-loop ending in structured customer profile
     services_used:
       - service: billing
-        operations: [ customers, customer, subscriptions, subscription, transactions, transaction, invoice ]
+        operations: [customers, customer, subscriptions, subscription, transactions, transaction, invoice]
       - service: ecommerce
-        operations: [ customers, customer, orders, order ]
+        operations: [customers, customer, orders, order]
       - service: transactional-email
-        operations: [ list_emails, list_contacts ]
+        operations: [list_emails, list_contacts]
     inputs:
       - key: query
         type: string
@@ -469,11 +470,11 @@ skills:
     graph: react # genuinely freeform investigative trajectory
     services_used:
       - service: billing
-        operations: [ subscriptions, subscription, transactions, adjustments, events ]
+        operations: [subscriptions, subscription, transactions, adjustments, events]
       - service: ecommerce
-        operations: [ customers, orders ]
+        operations: [customers, orders]
       - service: transactional-email
-        operations: [ list_emails ]
+        operations: [list_emails]
     trigger:
       on_demand: true
     outputs:
@@ -533,11 +534,11 @@ skills:
     graph: react-extract
     services_used:
       - service: billing
-        operations: [ subscriptions, transactions ]
+        operations: [subscriptions, transactions]
       - service: ecommerce
-        operations: [ orders ]
+        operations: [orders]
       - service: transactional-email
-        operations: [ list_domains ]
+        operations: [list_domains]
     trigger:
       schedule: "0 7 * * *"
     briefing:
@@ -596,15 +597,15 @@ skills:
     category: digest
     graph: critique-refine
     graph_config:
-      critique_criteria: [ completeness, accuracy, trend-clarity ]
+      critique_criteria: [completeness, accuracy, trend-clarity]
       max_critique_rounds: 2
     services_used:
       - service: billing
-        operations: [ subscriptions, transactions, customers ]
+        operations: [subscriptions, transactions, customers]
       - service: ecommerce
-        operations: [ orders, analytics ]
+        operations: [orders, analytics]
       - service: vault
-        operations: [ read, search, create ]
+        operations: [read, search, create]
     trigger:
       schedule: "0 7 * * 1" # Mondays 07:00
     briefing:
@@ -665,7 +666,7 @@ skills:
     graph: react-extract
     services_used:
       - service: billing
-        operations: [ transactions ]
+        operations: [transactions]
     trigger:
       schedule: "0 8 * * *" # daily 08:00
     prompt: |
@@ -696,17 +697,20 @@ skills:
 workflows:
   - name: morning-revenue
     description: Daily revenue brief + failed-payment sweep
-    schedule: "0 7 * * *"
-    steps:
-      - skill: morning-revenue-brief
-      - skill: failed-payment-alert
-
+    triggers:
+      - schedule: "0 7 * * *"
+    nodes:
+      - id: morning-revenue-brief
+        skill: morning-revenue-brief
+      - id: failed-payment-alert
+        skill: failed-payment-alert
   - name: weekly-review
     description: Weekly revenue digest
-    schedule: "0 7 * * 1"
-    steps:
-      - skill: weekly-revenue-digest
-
+    triggers:
+      - schedule: "0 7 * * 1"
+    nodes:
+      - id: weekly-revenue-digest
+        skill: weekly-revenue-digest
 config:
   user_inputs:
     - key: failed_tx_threshold
@@ -726,23 +730,23 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: data-002
       category: data-handling
       severity: critical
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: exfil-001
       category: exfiltration
       severity: high
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"

@@ -14,7 +14,8 @@ featured: false
 version: "3.0.0"
 readiness: beta
 description: >-
-  Property maintenance logger — drop a photo, voice memo, or text note into an ingest folder to classify issues, assess urgency, draft job descriptions, and match contractors from your vault. Monthly audit surfaces overdue items; seasonal checklist prompts preventive work; quarterly cost rollup shows spend per property. Tracks costs in a per-property CSV (Excel-compatible).
+  Property maintenance logger — drop a photo, voice memo, or text note into an ingest folder to classify issues, assess urgency, draft job descriptions, and match contractors from your vault. Monthly audit
+  surfaces overdue items; seasonal checklist prompts preventive work; quarterly cost rollup shows spend per property. Tracks costs in a per-property CSV (Excel-compatible).
 icon: /icons/home-maintenance.svg
 author:
   name: groupthink-dev
@@ -22,7 +23,7 @@ author:
 license: MIT
 visibility: open
 tier: certified
-pricing: null
+pricing:
 tagline: "Drop a photo, get a classified maintenance ticket with contractor matches"
 
 readme:
@@ -132,18 +133,18 @@ min_stallari: "0.77"
 requires:
   services:
     - service: vault
-      operations: [ read, search, files, create, append, query_properties ]
+      operations: [read, search, files, create, append, query_properties]
 
 recommends:
   services:
     - service: vault
-      operations: [ lens_fts, lens_connections, move ]
+      operations: [lens_fts, lens_connections, move]
     - service: tasks
-      operations: [ create ]
+      operations: [create]
 
 data:
-  reads: [ vault ]
-  writes: [ vault, tasks ]
+  reads: [vault]
+  writes: [vault, tasks]
   stores: nothing
   phones_home: false
 
@@ -196,11 +197,11 @@ skills:
       escalation_tier: standard # ambiguous cases (multi-issue, unknown property) escalate one tier
     services_used:
       - service: vault
-        operations: [ read, search, lens_fts, create ]
+        operations: [read, search, lens_fts, create]
       - service: tasks
-        operations: [ create ]
+        operations: [create]
     trigger:
-      watch: [ "{{config.ingest_path}}" ]
+      watch: ["{{config.ingest_path}}"]
     prompt: |
       A new file has appeared in the maintenance ingest folder. Process it
       step by step.
@@ -285,9 +286,9 @@ skills:
     graph: react-extract # tool-loop ending in a structured open-items table
     services_used:
       - service: vault
-        operations: [ query_properties, search, create, append ]
+        operations: [query_properties, search, create, append]
       - service: tasks
-        operations: [ create ]
+        operations: [create]
     trigger:
       schedule: "0 7 1 * *"
     briefing:
@@ -352,9 +353,9 @@ skills:
     graph: react-extract # query property profiles + season + recent entries → checklist items
     services_used:
       - service: vault
-        operations: [ read, search, query_properties ]
+        operations: [read, search, query_properties]
       - service: tasks
-        operations: [ create ]
+        operations: [create]
     trigger:
       schedule: "0 7 1 */3 *" # 1st of Jan/Apr/Jul/Oct
     briefing:
@@ -415,11 +416,11 @@ skills:
     category: digest
     graph: critique-refine # author + critic for narrative quality
     graph_config:
-      critique_criteria: [ completeness, accuracy, tone ]
+      critique_criteria: [completeness, accuracy, tone]
       max_critique_rounds: 2
     services_used:
       - service: vault
-        operations: [ read, search ]
+        operations: [read, search]
     trigger:
       schedule: "0 7 1 */3 *" # 1st of Jan/Apr/Jul/Oct
     briefing:
@@ -465,7 +466,7 @@ skills:
     graph: plan-execute # high-blast-radius CSV append — plan first, then execute
     services_used:
       - service: vault
-        operations: [ search, read, append ]
+        operations: [search, read, append]
     trigger:
       on_demand: true
     prompt: |
@@ -502,22 +503,25 @@ skills:
 workflows:
   - name: ingest-pipeline
     description: Classify and file a new maintenance item when dropped into the ingest folder
-    steps:
-      - skill: classify-and-file
-
+    nodes:
+      - id: classify-and-file
+        skill: classify-and-file
   - name: monthly-review
     description: Monthly audit of all open maintenance items
-    schedule: "0 7 1 * *"
-    steps:
-      - skill: monthly-audit
-
+    triggers:
+      - schedule: "0 7 1 * *"
+    nodes:
+      - id: monthly-audit
+        skill: monthly-audit
   - name: quarterly-review
     description: Quarterly seasonal checklist + cost rollup
-    schedule: "0 7 1 */3 *"
-    steps:
-      - skill: seasonal-checklist
-      - skill: cost-summary
-
+    triggers:
+      - schedule: "0 7 1 */3 *"
+    nodes:
+      - id: seasonal-checklist
+        skill: seasonal-checklist
+      - id: cost-summary
+        skill: cost-summary
 guardrails:
   version: "1.0.0"
   reviewed: "2026-05-02"
@@ -525,17 +529,17 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
     - id: exfil-001
       category: exfiltration
       severity: high
-      scope: [ community, verified ]
+      scope: [community, verified]
       added: "2026-05-02"
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [ community, verified ]
+      scope: [community, verified]
       added: "2026-05-02"
 
 config:
@@ -552,12 +556,13 @@ config:
       label: Properties
       required: true
       description: >-
-        Map of property slugs to vault area paths. Each property gets its own maintenance subfolder and cost CSV. Example: { "sandy-bay": { "vault_path": "spaces/Family Living/Areas/Property - Sandy Bay" },
+        Map of property slugs to vault area paths. Each property gets its own maintenance subfolder and cost CSV. Example: { "sandy-bay": { "vault_path": "spaces/Family Living/Areas/Property - Sandy Bay"
+        },
           "cascade-st": { "vault_path": "spaces/Family Living/Areas/Property - Cascade St" } }
 
     - key: hemisphere
       type: enum
-      values: [ southern, northern ]
+      values: [southern, northern]
       default: southern
       label: Hemisphere
       description: >-

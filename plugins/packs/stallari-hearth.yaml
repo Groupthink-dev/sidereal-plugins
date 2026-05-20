@@ -9,13 +9,14 @@ runtime:
   distribution: none
   publish_targets: []
 name: stallari-hearth
-aliases: [ stallari-hearth ]
+aliases: [stallari-hearth]
 title: "Stallari Hearth"
 featured: false
 version: "3.0.0"
 readiness: beta
 description: >-
-  Smart home intelligence for Stallari — site status monitoring, device inventory tracking, daily home briefing, unavailable-device watcher, and scene management across your connected home. Multi-site Home Assistant native.
+  Smart home intelligence for Stallari — site status monitoring, device inventory tracking, daily home briefing, unavailable-device watcher, and scene management across your connected home. Multi-site Home
+  Assistant native.
 icon: /icons/stallari-hearth.svg
 author:
   name: Stallari
@@ -23,7 +24,7 @@ author:
 license: MIT
 visibility: open
 tier: certified
-pricing: null
+pricing:
 tagline: "Smart home intelligence — site health, device inventory, and scene control"
 
 readme:
@@ -120,18 +121,18 @@ min_stallari: "0.77"
 requires:
   services:
     - service: vault
-      operations: [ read, search, create, append ]
+      operations: [read, search, create, append]
     - service: home
-      operations: [ entity_list, entity_state, area_list ]
+      operations: [entity_list, entity_state, area_list]
 
 recommends:
   services:
     - service: home
-      operations: [ scene_activate, entity_history, automation_list, automation_traces ]
+      operations: [scene_activate, entity_history, automation_list, automation_traces]
 
 data:
-  reads: [ vault, home ]
-  writes: [ vault ]
+  reads: [vault, home]
+  writes: [vault]
   stores: nothing
   phones_home: false
 
@@ -176,9 +177,9 @@ skills:
     graph: react-extract
     services_used:
       - service: home
-        operations: [ entity_state, area_list ]
+        operations: [entity_state, area_list]
       - service: vault
-        operations: [ create ]
+        operations: [create]
     trigger:
       on_demand: true
     briefing:
@@ -227,13 +228,13 @@ skills:
     category: digest
     graph: critique-refine
     graph_config:
-      critique_criteria: [ completeness, accuracy, brevity ]
+      critique_criteria: [completeness, accuracy, brevity]
       max_critique_rounds: 2
     services_used:
       - service: home
-        operations: [ entity_state, automation_list, automation_traces ]
+        operations: [entity_state, automation_list, automation_traces]
       - service: vault
-        operations: [ read, search, create ]
+        operations: [read, search, create]
     trigger:
       schedule: "0 7 * * *" # daily 07:00
     briefing:
@@ -285,9 +286,9 @@ skills:
     graph: react-extract
     services_used:
       - service: home
-        operations: [ entity_state ]
+        operations: [entity_state]
       - service: vault
-        operations: [ read, search, create ]
+        operations: [read, search, create]
     trigger:
       schedule: "0 8 * * *" # daily 08:00
     prompt: |
@@ -329,9 +330,9 @@ skills:
     graph: react-extract
     services_used:
       - service: home
-        operations: [ entity_list, area_list ]
+        operations: [entity_list, area_list]
       - service: vault
-        operations: [ read, create ]
+        operations: [read, create]
     trigger:
       on_demand: true
     prompt: |
@@ -381,9 +382,9 @@ skills:
       max_replan_attempts: 1
     services_used:
       - service: home
-        operations: [ entity_list, scene_activate ]
+        operations: [entity_list, scene_activate]
       - service: vault
-        operations: [ append ]
+        operations: [append]
     trigger:
       on_demand: true
     prompt: |
@@ -433,18 +434,21 @@ skills:
 workflows:
   - name: site-check
     description: Full site health check — inventory devices then check status
-    steps:
-      - skill: device-inventory
-      - skill: site-status
-        depends_on: [ device-inventory ]
-
+    nodes:
+      - id: device-inventory
+        skill: device-inventory
+      - id: site-status
+        skill: site-status
+        depends_on: [device-inventory]
   - name: morning-brief
     description: Daily home brief + unavailable watcher
-    schedule: "0 7 * * *"
-    steps:
-      - skill: daily-home-brief
-      - skill: unavailable-watcher
-
+    triggers:
+      - schedule: "0 7 * * *"
+    nodes:
+      - id: daily-home-brief
+        skill: daily-home-brief
+      - id: unavailable-watcher
+        skill: unavailable-watcher
 config:
   user_inputs:
     - key: sites
@@ -472,17 +476,17 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: exfil-001
       category: exfiltration
       severity: high
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"

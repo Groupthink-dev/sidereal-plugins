@@ -14,7 +14,8 @@ featured: true
 version: "3.0.0"
 tagline: "Full-stack network visibility — from satellite downlink to DNS query, every layer in one conversation"
 description: >-
-  Cross-layer network monitoring and diagnosis — ISP accounts, DNS filtering, local infrastructure, overlay networks, and LEO satellite terminals. Five services, one agent, eight skills that correlate across the entire stack. Daily new-device alerts, weekly digest briefing card, and at-a-glance stack-health card.
+  Cross-layer network monitoring and diagnosis — ISP accounts, DNS filtering, local infrastructure, overlay networks, and LEO satellite terminals. Five services, one agent, eight skills that correlate across
+  the entire stack. Daily new-device alerts, weekly digest briefing card, and at-a-glance stack-health card.
 icon: /icons/network-observatory.svg
 author:
   name: Stallari
@@ -24,7 +25,7 @@ visibility: open
 tier: certified
 author_type: first-party
 readiness: beta
-pricing: null
+pricing:
 bundled: false
 
 readme:
@@ -165,28 +166,28 @@ suggested_plugins:
 requires:
   services:
     - service: isp
-      operations: [ info, services, usage, outages ]
+      operations: [info, services, usage, outages]
     - service: protective_dns
-      operations: [ info, profiles, filters, rules, devices ]
+      operations: [info, profiles, filters, rules, devices]
 
 recommends:
   services:
     - service: isp
-      operations: [ billing, tickets, diagnostics_list ]
+      operations: [billing, tickets, diagnostics_list]
     - service: protective_dns
-      operations: [ services, service_catalog, network, access ]
+      operations: [services, service_catalog, network, access]
     - service: network
-      operations: [ info, devices, device, clients, client, firewall, port_forwards, traffic_routes ]
+      operations: [info, devices, device, clients, client, firewall, port_forwards, traffic_routes]
     - service: overlay-network
-      operations: [ info, devices, device, device_routes, acl, dns, keys, audit_log ]
+      operations: [info, devices, device, device_routes, acl, dns, keys, audit_log]
     - service: leo-modem
-      operations: [ status, alerts, obstruction, history, diagnostics ]
+      operations: [status, alerts, obstruction, history, diagnostics]
     - service: vault
-      operations: [ read, search, create, append ]
+      operations: [read, search, create, append]
 
 data:
-  reads: [ isp, protective_dns, network, overlay-network, leo-modem, vault ]
-  writes: [ vault ]
+  reads: [isp, protective_dns, network, overlay-network, leo-modem, vault]
+  writes: [vault]
   stores: nothing
   phones_home: false
 
@@ -243,15 +244,15 @@ skills:
     graph: react-extract
     services_used:
       - service: isp
-        operations: [ info, usage, outages ]
+        operations: [info, usage, outages]
       - service: protective_dns
-        operations: [ info, profiles, devices ]
+        operations: [info, profiles, devices]
       - service: network
-        operations: [ info, devices, clients ]
+        operations: [info, devices, clients]
       - service: overlay-network
-        operations: [ info, devices ]
+        operations: [info, devices]
       - service: leo-modem
-        operations: [ status, alerts ]
+        operations: [status, alerts]
     trigger:
       on_demand: true
     briefing:
@@ -335,15 +336,15 @@ skills:
     graph: react-extract
     services_used:
       - service: isp
-        operations: [ info, services ]
+        operations: [info, services]
       - service: protective_dns
-        operations: [ profiles, devices ]
+        operations: [profiles, devices]
       - service: network
-        operations: [ devices, clients, wlans ]
+        operations: [devices, clients, wlans]
       - service: overlay-network
-        operations: [ devices, users, keys ]
+        operations: [devices, users, keys]
       - service: leo-modem
-        operations: [ status, diagnostics ]
+        operations: [status, diagnostics]
     trigger:
       on_demand: true
     outputs:
@@ -394,15 +395,15 @@ skills:
     graph: react-extract
     services_used:
       - service: isp
-        operations: [ info, usage, outages ]
+        operations: [info, usage, outages]
       - service: protective_dns
-        operations: [ info ]
+        operations: [info]
       - service: network
-        operations: [ info ]
+        operations: [info]
       - service: overlay-network
-        operations: [ info ]
+        operations: [info]
       - service: leo-modem
-        operations: [ status ]
+        operations: [status]
     trigger:
       schedule: "0 7 * * *"
     briefing:
@@ -465,13 +466,13 @@ skills:
     category: digest
     graph: critique-refine
     graph_config:
-      critique_criteria: [ completeness, accuracy, trend-clarity ]
+      critique_criteria: [completeness, accuracy, trend-clarity]
       max_critique_rounds: 2
     services_used:
       - service: isp
-        operations: [ usage, outages ]
+        operations: [usage, outages]
       - service: vault
-        operations: [ read, search, create ]
+        operations: [read, search, create]
     trigger:
       schedule: "0 7 * * 1" # Mondays 07:00
     briefing:
@@ -521,15 +522,15 @@ skills:
     graph: react # cannot pre-plan diagnostic trajectory; correct fit
     services_used:
       - service: leo-modem
-        operations: [ status, alerts, obstruction, history ]
+        operations: [status, alerts, obstruction, history]
       - service: isp
-        operations: [ info, usage, outages, diagnostics_list ]
+        operations: [info, usage, outages, diagnostics_list]
       - service: protective_dns
-        operations: [ info, profiles, rules, network ]
+        operations: [info, profiles, rules, network]
       - service: network
-        operations: [ info, devices, clients, firewall, traffic_routes ]
+        operations: [info, devices, clients, firewall, traffic_routes]
       - service: overlay-network
-        operations: [ info, devices, device_routes, acl, dns ]
+        operations: [info, devices, device_routes, acl, dns]
     inputs:
       - key: symptom
         type: string
@@ -624,11 +625,11 @@ skills:
     graph: react-extract
     services_used:
       - service: protective_dns
-        operations: [ profiles, filters, rules, services, devices, access ]
+        operations: [profiles, filters, rules, services, devices, access]
       - service: network
-        operations: [ info, devices, clients, firewall, port_forwards, dpi ]
+        operations: [info, devices, clients, firewall, port_forwards, dpi]
       - service: overlay-network
-        operations: [ info, devices, acl, keys, audit_log ]
+        operations: [info, devices, acl, keys, audit_log]
     trigger:
       on_demand: true
     outputs:
@@ -704,9 +705,9 @@ skills:
     graph: react-extract
     services_used:
       - service: network
-        operations: [ clients ]
+        operations: [clients]
       - service: vault
-        operations: [ read, search, create ]
+        operations: [read, search, create]
     trigger:
       schedule: "0 8 * * *" # daily 08:00
     prompt: |
@@ -746,17 +747,20 @@ skills:
 workflows:
   - name: morning-network
     description: Daily network health check + new-device alert
-    schedule: "0 7 * * *"
-    steps:
-      - skill: morning-network-brief
-      - skill: new-device-alert
-
+    triggers:
+      - schedule: "0 7 * * *"
+    nodes:
+      - id: morning-network-brief
+        skill: morning-network-brief
+      - id: new-device-alert
+        skill: new-device-alert
   - name: weekly-review
     description: Weekly network trend digest
-    schedule: "0 7 * * 1"
-    steps:
-      - skill: weekly-network-digest
-
+    triggers:
+      - schedule: "0 7 * * 1"
+    nodes:
+      - id: weekly-network-digest
+        skill: weekly-network-digest
 guardrails:
   version: "1.0.0"
   reviewed: "2026-05-02"
@@ -764,17 +768,17 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: exfil-001
       category: exfiltration
       severity: high
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"

@@ -1088,35 +1088,48 @@ skills:
 workflows:
   - name: monthly-ops
     description: Monthly financial operations — reconciliation, financials, expenses, vendors
-    schedule: "0 8 1 * *"
-    steps:
-      - skill: invoice-reconciliation
-      - skill: monthly-financials
+    triggers:
+      - schedule: "0 8 1 * *"
+    nodes:
+      - id: invoice-reconciliation
+        skill: invoice-reconciliation
+      - id: monthly-financials
+        skill: monthly-financials
         depends_on: [ invoice-reconciliation ]
-      - skill: vendor-reconciliation
+      - id: vendor-reconciliation
+        skill: vendor-reconciliation
         depends_on: [ invoice-reconciliation ]
 
   - name: quarterly-compliance
     description: Quarterly tax and BAS preparation
-    schedule: "0 9 1 1,4,7,10 *"
-    steps:
-      - skill: tax-prep
-      - skill: bas-lodgement-prep
+    triggers:
+      - schedule: "0 9 1 1,4,7,10 *"
+    nodes:
+      - id: tax-prep
+        skill: tax-prep
+      - id: bas-lodgement-prep
+        skill: bas-lodgement-prep
         depends_on: [ tax-prep ]
 
   - name: monthly-compliance
     description: Monthly compliance and payroll checks
-    schedule: "0 9 1 * *"
-    steps:
-      - skill: compliance-digest
-      - skill: super-compliance
+    triggers:
+      - schedule: "0 9 1 * *"
+    nodes:
+      - id: compliance-digest
+        skill: compliance-digest
+      - id: super-compliance
+        skill: super-compliance
 
   - name: weekly-cash
     description: Weekly cash position rollup + aged-receivables sweep
-    schedule: "0 7 * * 1"
-    steps:
-      - skill: weekly-cash-summary
-      - skill: aged-receivables-alert
+    triggers:
+      - schedule: "0 7 * * 1"
+    nodes:
+      - id: weekly-cash-summary
+        skill: weekly-cash-summary
+      - id: aged-receivables-alert
+        skill: aged-receivables-alert
 
 # ── Configuration ───────────────────────────────────────────────────
 

@@ -13,7 +13,8 @@ title: "Product Operations Starter"
 featured: false
 version: "3.0.0"
 description: >-
-  Starter pack for running product operations with Stallari — release announcements, customer onboarding, subscription monitoring, MRR digest, lapsing-subscription alerts, and contact management. Fork and customise for your own product.
+  Starter pack for running product operations with Stallari — release announcements, customer onboarding, subscription monitoring, MRR digest, lapsing-subscription alerts, and contact management. Fork and
+  customise for your own product.
 icon: /icons/product-operations-starter.svg
 author:
   name: groupthink-dev
@@ -21,7 +22,7 @@ author:
 license: MIT
 visibility: open
 tier: certified
-pricing: null
+pricing:
 tagline: "Release comms, onboarding, MRR briefings, and lapsing-sub alerts for your product"
 
 readme:
@@ -122,20 +123,20 @@ min_stallari: "0.77"
 requires:
   services:
     - service: transactional-email
-      operations: [ send, list_contacts, list_templates, get_template, list_domains ]
+      operations: [send, list_contacts, list_templates, get_template, list_domains]
     - service: vault
-      operations: [ read, search, create ]
+      operations: [read, search, create]
 
 recommends:
   services:
     - service: billing
-      operations: [ subscriptions, customers, products ]
+      operations: [subscriptions, customers, products]
     - service: transactional-email
-      operations: [ create_contact, list_segments, create_broadcast, send_broadcast ]
+      operations: [create_contact, list_segments, create_broadcast, send_broadcast]
 
 data:
-  reads: [ transactional-email, billing, vault ]
-  writes: [ transactional-email, vault ]
+  reads: [transactional-email, billing, vault]
+  writes: [transactional-email, vault]
   stores: nothing
   phones_home: false
 
@@ -181,13 +182,13 @@ skills:
     category: notify
     graph: critique-refine
     graph_config:
-      critique_criteria: [ accuracy, tone, completeness, no-overclaim ]
+      critique_criteria: [accuracy, tone, completeness, no-overclaim]
       max_critique_rounds: 2
     services_used:
       - service: transactional-email
-        operations: [ send, list_templates, list_contacts, list_segments ]
+        operations: [send, list_templates, list_contacts, list_segments]
       - service: vault
-        operations: [ create ]
+        operations: [create]
     trigger:
       on_demand: true
     prompt: |
@@ -241,9 +242,9 @@ skills:
       max_replan_attempts: 1
     services_used:
       - service: transactional-email
-        operations: [ send, list_contacts, create_contact, get_template ]
+        operations: [send, list_contacts, create_contact, get_template]
       - service: vault
-        operations: [ create ]
+        operations: [create]
     trigger:
       on_demand: true
     prompt: |
@@ -296,9 +297,9 @@ skills:
     graph: react-extract # tool-loop ending in a structured dashboard JSON
     services_used:
       - service: billing
-        operations: [ subscriptions, customers, products ]
+        operations: [subscriptions, customers, products]
       - service: vault
-        operations: [ create ]
+        operations: [create]
     trigger:
       on_demand: true
     prompt: |
@@ -333,13 +334,13 @@ skills:
     category: digest
     graph: critique-refine
     graph_config:
-      critique_criteria: [ completeness, accuracy, trend-clarity ]
+      critique_criteria: [completeness, accuracy, trend-clarity]
       max_critique_rounds: 2
     services_used:
       - service: billing
-        operations: [ subscriptions ]
+        operations: [subscriptions]
       - service: vault
-        operations: [ read, search, create ]
+        operations: [read, search, create]
     trigger:
       schedule: "0 7 * * 1" # Mondays 07:00
     briefing:
@@ -392,7 +393,7 @@ skills:
     graph: react-extract
     services_used:
       - service: billing
-        operations: [ subscriptions ]
+        operations: [subscriptions]
     trigger:
       schedule: "0 8 * * *" # daily 08:00
     prompt: |
@@ -431,9 +432,9 @@ skills:
     graph: react-extract
     services_used:
       - service: transactional-email
-        operations: [ list_contacts, create_contact ]
+        operations: [list_contacts, create_contact]
       - service: vault
-        operations: [ read, search ]
+        operations: [read, search]
     trigger:
       on_demand: true
     prompt: |
@@ -471,18 +472,21 @@ skills:
 workflows:
   - name: new-customer
     description: Full onboarding — welcome email then contact sync sweep
-    steps:
-      - skill: customer-welcome
-      - skill: contact-sync
-        depends_on: [ customer-welcome ]
-
+    nodes:
+      - id: customer-welcome
+        skill: customer-welcome
+      - id: contact-sync
+        skill: contact-sync
+        depends_on: [customer-welcome]
   - name: weekly-review
     description: Weekly MRR digest + lapsing-subscription check
-    schedule: "0 7 * * 1"
-    steps:
-      - skill: weekly-mrr-digest
-      - skill: lapsing-subscription-alert
-
+    triggers:
+      - schedule: "0 7 * * 1"
+    nodes:
+      - id: weekly-mrr-digest
+        skill: weekly-mrr-digest
+      - id: lapsing-subscription-alert
+        skill: lapsing-subscription-alert
 config:
   user_inputs:
     - key: product_name
@@ -512,17 +516,17 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: identity-001
       category: identity
       severity: critical
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"

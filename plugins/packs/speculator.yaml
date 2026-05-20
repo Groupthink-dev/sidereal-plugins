@@ -14,7 +14,8 @@ featured: true
 version: "3.0.0"
 tagline: "Prediction markets and brokerage — cross-market pricing in one conversation"
 description: >-
-  Cross-market speculation and analysis — Polymarket prediction prices and Interactive Brokers portfolio data. Two market types, one agent, seven skills (incl. opening + closing briefs, watchlist movement alerts, exposure briefing card). Strictly read-only — no order execution under any circumstance.
+  Cross-market speculation and analysis — Polymarket prediction prices and Interactive Brokers portfolio data. Two market types, one agent, seven skills (incl. opening + closing briefs, watchlist movement
+  alerts, exposure briefing card). Strictly read-only — no order execution under any circumstance.
 icon: /icons/speculator.svg
 author:
   name: Stallari
@@ -24,7 +25,7 @@ visibility: open
 tier: certified
 author_type: first-party
 readiness: beta
-pricing: null
+pricing:
 bundled: false
 
 readme:
@@ -157,11 +158,11 @@ recommends:
         - pnl
         - trades
     - service: vault
-      operations: [ read, search, create ]
+      operations: [read, search, create]
 
 data:
-  reads: [ prediction-market, brokerage, vault ]
-  writes: [ vault ]
+  reads: [prediction-market, brokerage, vault]
+  writes: [vault]
   stores: nothing
   phones_home: false
 
@@ -236,9 +237,9 @@ skills:
     graph: react # genuinely freeform exploratory analysis across 3 disparate market shapes
     services_used:
       - service: prediction-market
-        operations: [ search, events, markets, prices, orderbook ]
+        operations: [search, events, markets, prices, orderbook]
       - service: brokerage
-        operations: [ contract_search, quote ]
+        operations: [contract_search, quote]
     inputs:
       - key: query
         type: string
@@ -303,9 +304,9 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [ markets, prices, spread, price_history ]
+        operations: [markets, prices, spread, price_history]
       - service: brokerage
-        operations: [ quote, historical ]
+        operations: [quote, historical]
     inputs:
       - key: market_id
         type: string
@@ -316,7 +317,7 @@ skills:
         type: choice
         label: Market type
         description: "Which market system to query"
-        choices: [ prediction, exchange, brokerage, all ]
+        choices: [prediction, exchange, brokerage, all]
         default: all
         required: false
     trigger:
@@ -363,9 +364,9 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [ positions, portfolio_value ]
+        operations: [positions, portfolio_value]
       - service: brokerage
-        operations: [ positions, portfolio_summary, cash_balances, pnl ]
+        operations: [positions, portfolio_summary, cash_balances, pnl]
     trigger:
       on_demand: true
     briefing:
@@ -426,9 +427,9 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [ trade_history ]
+        operations: [trade_history]
       - service: brokerage
-        operations: [ trades, orders ]
+        operations: [trades, orders]
     trigger:
       on_demand: true
     outputs:
@@ -468,9 +469,9 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [ trending, events, closing_soon ]
+        operations: [trending, events, closing_soon]
       - service: brokerage
-        operations: [ portfolio_summary, pnl ]
+        operations: [portfolio_summary, pnl]
     trigger:
       schedule: "0 7 * * *"
     briefing:
@@ -531,9 +532,9 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [ trending, trade_history ]
+        operations: [trending, trade_history]
       - service: brokerage
-        operations: [ pnl, portfolio_summary ]
+        operations: [pnl, portfolio_summary]
     trigger:
       schedule: "0 17 * * *" # daily 17:00 (post-close for most western markets)
     briefing:
@@ -588,11 +589,11 @@ skills:
     graph: react-extract
     services_used:
       - service: prediction-market
-        operations: [ markets, prices, price_history ]
+        operations: [markets, prices, price_history]
       - service: brokerage
-        operations: [ quote, historical ]
+        operations: [quote, historical]
       - service: vault
-        operations: [ read, search ]
+        operations: [read, search]
     trigger:
       schedule: "0 8 * * *" # daily 08:00
     inputs:
@@ -600,7 +601,8 @@ skills:
         type: string_array
         label: Watchlist market IDs
         description: >
-          Array of market identifiers to watch — prediction-market IDs or brokerage tickers. Source determined by format. If empty, reads watchlist from atlas/registers/markets/watchlist.md frontmatter `markets:` field (one wikilink-list of identifiers).
+          Array of market identifiers to watch — prediction-market IDs or brokerage tickers. Source determined by format. If empty, reads watchlist from atlas/registers/markets/watchlist.md frontmatter
+          `markets:` field (one wikilink-list of identifiers).
         required: false
     prompt: |
       Detect significant moves on watched markets in the trailing 24h.
@@ -647,17 +649,20 @@ skills:
 workflows:
   - name: morning-markets
     description: Pre-open brief + watchlist sweep
-    schedule: "0 7 * * *"
-    steps:
-      - skill: morning-markets
-      - skill: watchlist-movement-alert
-
+    triggers:
+      - schedule: "0 7 * * *"
+    nodes:
+      - id: morning-markets
+        skill: morning-markets
+      - id: watchlist-movement-alert
+        skill: watchlist-movement-alert
   - name: closing-bell
     description: Post-close brief
-    schedule: "0 17 * * *"
-    steps:
-      - skill: closing-bell-brief
-
+    triggers:
+      - schedule: "0 17 * * *"
+    nodes:
+      - id: closing-bell-brief
+        skill: closing-bell-brief
 config:
   user_inputs:
     - key: watchlist_threshold_pct
@@ -677,29 +682,29 @@ guardrails:
     - id: data-001
       category: data-handling
       severity: critical
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: data-002
       category: data-handling
       severity: critical
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: identity-001
       category: identity
       severity: critical
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: exfil-001
       category: exfiltration
       severity: high
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"
 
     - id: prompt-001
       category: prompt-hygiene
       severity: high
-      scope: [ community, verified, certified ]
+      scope: [community, verified, certified]
       added: "2026-05-02"

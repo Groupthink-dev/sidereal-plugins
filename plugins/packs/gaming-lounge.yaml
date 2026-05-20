@@ -525,16 +525,20 @@ skills:
 workflows:
   - name: friday-night
     description: Game night quick check — who's online, what can we play
-    steps:
-      - skill: whos-online
-      - skill: game-night
+    nodes:
+      - id: whos-online
+        skill: whos-online
+      - id: game-night
+        skill: game-night
         depends_on: [ whos-online ]
 
   - name: weekly-reflection
     description: Sunday weekly play summary
-    schedule: "0 18 * * 0"
-    steps:
-      - skill: weekly-play-summary
+    triggers:
+      - schedule: "0 18 * * 0"
+    nodes:
+      - id: weekly-play-summary
+        skill: weekly-play-summary
 
 guardrails:
   version: "1.0.0"
