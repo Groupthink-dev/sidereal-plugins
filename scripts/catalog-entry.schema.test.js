@@ -1,14 +1,14 @@
 /**
- * DD-333 Phase A.6 — catalog-entry schema fixture tests.
+ * DD-333 catalog-entry schema fixture tests.
  *
- * Three fixtures exercise the AJV gate added in Phase A.1:
+ * Three fixtures exercise the AJV gate:
  *   - tool-with-granularity.json    — valid; tools[] carries full granularity blocks
- *   - tool-missing-granularity.json — valid; tools[] present but granularity omitted (additive optional at pack-spec 3.x)
+ *   - tool-missing-granularity.json — INVALID at pack-spec 4.0.0 (DD-333 Phase D cutover 2026-05-21); tools[] present but granularity omitted
  *   - tool-malformed-granularity.json — invalid; one out-of-enum value + one missing required dimension
  *
  * As an additional smoke gate, every real plugin entry under plugins/tools/
- * must validate against the schema — this catches regressions where the
- * additive surface tightens accidentally.
+ * must validate against the schema — this catches regressions and confirms
+ * the Phase A.3 sweep declarations are complete.
  */
 
 import { describe, it } from "node:test";
@@ -33,10 +33,22 @@ describe("DD-333 catalog-entry schema — granularity fixtures", () => {
     assert.equal(verdict.valid, true, verdict.errorsText);
   });
 
-  it("accepts entry with tools[] but no granularity blocks (additive optional at 3.x)", async () => {
+  it("rejects entry with tools[] but no granularity blocks (required at 4.0.0)", async () => {
     const entry = loadFixture("tool-missing-granularity.json");
     const verdict = await validateCatalogEntry(entry);
-    assert.equal(verdict.valid, true, verdict.errorsText);
+    assert.equal(verdict.valid, false);
+    // Each tool entry omitting granularity must produce a missingProperty
+    // error citing granularity at the tools[i] path.
+    const hasMissingGranularity = verdict.errors.some(
+      (e) =>
+        e.params &&
+        e.params.missingProperty === "granularity" &&
+        /^\/tools\/\d+$/.test(e.instancePath),
+    );
+    assert.ok(
+      hasMissingGranularity,
+      `Expected missingProperty: granularity at /tools/N; got: ${verdict.errorsText}`,
+    );
   });
 
   it("rejects entry with out-of-enum scope_filtering value", async () => {

@@ -84,11 +84,11 @@
     },
     "tools": {
       "type": "array",
-      "description": "DD-333 Phase A per-tool catalog inventory + granularity declarations. Optional at pack-spec 3.x (additive; `.warning` lint S-MCP-001 in stallari-secops-scanner). Promoted to required at pack-spec 4.x (DD-333 Phase D). Per-tool, not per-blade: different tools in the same pack legitimately have different granularity — a blade with `list_notes` (server-side) + `dump_all` (no scope) declares each honestly.",
+      "description": "DD-333 per-tool catalog inventory + granularity declarations. Required at pack-spec 4.0.0 (Phase D cutover 2026-05-21). Pairs with S-MCP-001 `.error` lint in stallari-secops-scanner. Per-tool, not per-blade: different tools in the same pack legitimately have different granularity — a blade with `list_notes` (server-side) + `dump_all` (no scope) declares each honestly.",
       "items": {
         "type": "object",
         "additionalProperties": true,
-        "required": ["name"],
+        "required": ["name", "granularity"],
         "properties": {
           "name": {
             "type": "string",
@@ -104,7 +104,7 @@
           },
           "granularity": {
             "type": "object",
-            "description": "DD-333 four-dimension granularity declaration per tool. Declare honestly — `client-side`/`none`/`unstable`/`minimal` is the correct declaration when that's the actual behaviour. The assembler's verdict logic infers worst-case when omitted; honest under-declaration passes conformance.",
+            "description": "DD-333 four-dimension granularity declaration per tool. Required at pack-spec 4.0.0 (Phase D cutover 2026-05-21). Declare honestly — `client-side`/`none`/`unstable`/`minimal` is the correct declaration when that's the actual behaviour. The assembler's verdict logic refuses evidentiary-level packets through inferred-worst-case tools; honest under-declaration passes conformance.",
             "additionalProperties": false,
             "required": ["scope_filtering", "field_projection", "deterministic_ordering", "audit_surface"],
             "properties": {
