@@ -1,0 +1,28 @@
+{
+  "name": "legacy-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 Phase A.6 fixture — valid entry with tools[] array but tools omit the granularity block. Granularity is optional at pack-spec 3.x (additive); the AJV gate MUST accept this. The S-MCP-001 lint in stallari-secops-scanner fires a `.warning` against this shape, but the catalog build itself is green.",
+  "version": "0.4.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "verified",
+  "author_type": "first-party",
+  "contract": "legacy-v1",
+  "repository": "https://github.com/Groupthink-dev/legacy-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "legacy-blade-mcp"
+  },
+  "risk_class": "read_only",
+  "tools": [
+    {
+      "name": "list_things",
+      "description": "Tool without a granularity declaration — assembler infers worst-case."
+    },
+    {
+      "name": "get_thing",
+      "description": "Another bare tool entry.",
+      "risk_class": "read_only"
+    }
+  ]
+}

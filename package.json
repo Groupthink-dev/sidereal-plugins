@@ -8,6 +8,8 @@
     "yaml": "^2.7.0"
   },
   "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "stallari-secops-scanner": "github:Groupthink-dev/stallari-secops-scanner"
   }
 }

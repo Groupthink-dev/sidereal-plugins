@@ -4,7 +4,7 @@
   "title": "Stallari Catalog Entry",
   "description": "Schema for entries in the registry catalog (plugins/*.json). Supports both plugin and pack types via discriminated union on the 'type' field.",
   "type": "object",
-  "required": ["name", "type", "description", "version", "author", "tier"],
+  "required": ["name", "description", "version", "author"],
   "additionalProperties": true,
   "allOf": [
     {
@@ -69,22 +69,68 @@
       "description": "SPDX license identifier. Required for plugins."
     },
     "tier": {
-      "type": "string",
-      "enum": ["certified", "verified", "community"]
+      "type": ["string", "null"],
+      "enum": ["certified", "verified", "community", null]
     },
     "contract": {
-      "type": "string",
-      "pattern": "^[a-z]+-v\\d+$",
-      "description": "Domain contract identifier. Required for plugins."
+      "type": ["string", "array", "null"],
+      "description": "Domain contract identifier(s). String for single contract; array for multi-contract plugins (e.g. cloudflare-blade declares four). Required for plugins.",
+      "items": { "type": "string" }
     },
     "risk_class": {
       "type": ["string", "null"],
       "enum": ["read_only", "reversible_write", "external_side_effect", "high_risk", null],
       "description": "DD-280 coarse risk class for this plugin's tool surface."
     },
+    "tools": {
+      "type": "array",
+      "description": "DD-333 Phase A per-tool catalog inventory + granularity declarations. Optional at pack-spec 3.x (additive; `.warning` lint S-MCP-001 in stallari-secops-scanner). Promoted to required at pack-spec 4.x (DD-333 Phase D). Per-tool, not per-blade: different tools in the same pack legitimately have different granularity — a blade with `list_notes` (server-side) + `dump_all` (no scope) declares each honestly.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "MCP tool name as registered by the blade at list_tools time."
+          },
+          "description": {
+            "type": "string"
+          },
+          "risk_class": {
+            "type": "string",
+            "enum": ["read_only", "reversible_write", "external_side_effect", "high_risk"],
+            "description": "DD-280 risk class per tool. Per-tool declaration takes precedence over the plugin-level risk_class for tools that diverge from the blade's typical posture."
+          },
+          "granularity": {
+            "type": "object",
+            "description": "DD-333 four-dimension granularity declaration per tool. Declare honestly — `client-side`/`none`/`unstable`/`minimal` is the correct declaration when that's the actual behaviour. The assembler's verdict logic infers worst-case when omitted; honest under-declaration passes conformance.",
+            "additionalProperties": false,
+            "required": ["scope_filtering", "field_projection", "deterministic_ordering", "audit_surface"],
+            "properties": {
+              "scope_filtering": {
+                "enum": ["server-side", "client-side", "none"],
+                "description": "server-side: tool accepts a scope argument and the plugin honours it before bytes leave the plugin's address space (safe for over-fetch threat model). client-side: tool returns unfiltered results and the assembler filters post-hoc (carries over-fetch leak). none: tool has no concept of scope (data is naturally unscoped, or the plugin punts entirely)."
+              },
+              "field_projection": {
+                "enum": ["per-field", "top-level", "none"],
+                "description": "per-field: tool accepts a fields=[...] argument and returns only requested fields. top-level: tool returns a fixed projection (assembler must select the right tool variant, e.g. get_summary vs get_full). none: tool returns its native shape regardless of caller intent."
+              },
+              "deterministic_ordering": {
+                "enum": ["stable", "unstable", "unsorted"],
+                "description": "stable: identical inputs produce identical output order (content_hash reproducible). unstable: output order varies between calls (hash will not reproduce). unsorted: tool explicitly returns an unordered set (assembler must sort to derive a hash)."
+              },
+              "audit_surface": {
+                "enum": ["structured", "minimal", "none"],
+                "description": "structured: tool returns a _meta envelope alongside results (matched_total, returned, filtered_by, redactions) the assembler lifts into ContextPacket.provenance. minimal: tool returns only the data payload; assembler records call shape only. none: tool returns opaque data with no introspection."
+              }
+            }
+          }
+        }
+      }
+    },
     "repository": {
-      "type": "string",
-      "format": "uri"
+      "type": ["string", "null"]
     },
     "install": {
       "type": "object",
@@ -92,7 +138,7 @@
       "properties": {
         "runtime": {
           "type": "string",
-          "enum": ["uv", "npm", "npx", "docker", "remote", "native", "library"],
+          "enum": ["uv", "uvx", "npm", "npx", "node", "docker", "remote", "native", "library"],
           "description": "Runtime kind. 'library' (DD-265) means the plugin is compiled into the Stallari daemon binary via SPM — never fetched, never installed; the consumer is the daemon process itself."
         },
         "package": { "type": "string" },
@@ -135,8 +181,8 @@
     },
     "author_type": {
       "type": "string",
-      "enum": ["first-party", "verified", "community", "unverified"],
-      "description": "Authorship class. DD-265: required for runtime == 'library' (must be 'first-party' — only first-party builds can edit Package.swift)."
+      "enum": ["first-party", "verified", "community", "unverified", "stallari", "third-party"],
+      "description": "Authorship class. DD-265: required for runtime == 'library' (must be 'first-party' — only first-party builds can edit Package.swift). Legacy values 'stallari' (≡ first-party) and 'third-party' (≡ community) remain accepted."
     },
     "hidden": {
       "type": "boolean",
@@ -157,9 +203,8 @@
     "multi_instance": { "type": "boolean" },
     "env": { "type": "array" },
     "services": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Abstract service names this entry provides or uses."
+      "type": ["array", "object"],
+      "description": "Abstract service names this entry provides or uses. Array of strings is the canonical shape; object form is legacy (apple-docs-mcp et al.)."
     },
     "min_stallari": {
       "type": "string",
@@ -175,12 +220,13 @@
     },
     "conformance": {
       "type": "object",
+      "additionalProperties": true,
       "properties": {
-        "required": { "type": "string", "pattern": "^\\d+/\\d+$" },
-        "recommended": { "type": "string", "pattern": "^\\d+/\\d+$" },
-        "optional": { "type": "string", "pattern": "^\\d+/\\d+$" },
-        "gated": { "type": "string", "pattern": "^\\d+/\\d+$" },
-        "last_tested": { "type": "string", "format": "date" }
+        "required": { "type": ["string", "null"] },
+        "recommended": { "type": ["string", "null"] },
+        "optional": { "type": ["string", "null"] },
+        "gated": { "type": ["string", "null"] },
+        "last_tested": { "type": ["string", "null"] }
       },
       "description": "Contract conformance test results. Primarily for plugins."
     },

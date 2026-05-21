@@ -1,0 +1,37 @@
+{
+  "name": "malformed-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 Phase A.6 fixture — INVALID entry with malformed granularity. tools[0].granularity.scope_filtering uses 'always' which is outside the enum; tools[1].granularity is missing the required `audit_surface` dimension. AJV must reject both violations.",
+  "version": "0.1.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "community",
+  "author_type": "first-party",
+  "contract": "malformed-v1",
+  "repository": "https://github.com/Groupthink-dev/malformed-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "malformed-blade-mcp"
+  },
+  "tools": [
+    {
+      "name": "bogus_scope",
+      "description": "scope_filtering value outside enum.",
+      "granularity": {
+        "scope_filtering": "always",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "incomplete_block",
+      "description": "Granularity missing required audit_surface dimension.",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable"
+      }
+    }
+  ]
+}

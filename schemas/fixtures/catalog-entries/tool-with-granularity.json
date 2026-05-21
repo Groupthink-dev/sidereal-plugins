@@ -1,0 +1,52 @@
+{
+  "name": "example-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 Phase A.6 fixture — valid entry with tools[] array carrying granularity declarations spanning the enum space.",
+  "version": "1.0.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "certified",
+  "author_type": "first-party",
+  "contract": "example-v1",
+  "repository": "https://github.com/Groupthink-dev/example-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "example-blade-mcp"
+  },
+  "risk_class": "read_only",
+  "tools": [
+    {
+      "name": "list_records",
+      "description": "List records honouring caller scope server-side.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "dump_all",
+      "description": "Dump everything; no scope concept by design.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "search_records",
+      "description": "Client-side filter / unstable ordering — honest degraded shape.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "none"
+      }
+    }
+  ]
+}
