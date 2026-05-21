@@ -24,6 +24,129 @@
       "default": "false"
     }
   ],
+  "tools": [
+    {
+      "name": "reminders_info",
+      "description": "System info: macOS version, Reminders access status, list count, write gate state.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "reminders_lists",
+      "description": "List all reminder lists with id, name, reminder count.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "reminders_items",
+      "description": "Get reminders with server-side list_name + completed filters + limit pushed into the AppleScript whose-clause.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "reminders_item",
+      "description": "Get a single reminder by reminder_id or by name (optionally scoped to a list).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "reminders_search",
+      "description": "Search reminder titles across all lists with limit. Match is AppleScript-side; full corpus enumerated then filtered in-script.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "reminders_due",
+      "description": "Reminders due within N days. AppleScript enumerates all lists; due-date comparison pushed into the script.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "reminders_stats",
+      "description": "Aggregate statistics: total, completed, incomplete, overdue, per-list breakdown.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "reminders_create",
+      "description": "Create a new reminder. Write — gated by REMINDERS_WRITE_ENABLED + confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "reminders_complete",
+      "description": "Mark a reminder completed/uncompleted. Write — gated by REMINDERS_WRITE_ENABLED + confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "reminders_update",
+      "description": "Update reminder properties (title, due_date, priority, notes, flagged). Write — gated by REMINDERS_WRITE_ENABLED + confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "reminders_delete",
+      "description": "Delete a reminder. Destructive — gated by REMINDERS_WRITE_ENABLED + confirm; cannot be undone.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "setup": {
     "auth_model": "none",
     "complexity": "moderate",

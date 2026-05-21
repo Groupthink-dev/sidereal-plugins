@@ -18,6 +18,63 @@
     "bundled_in": "stallari-harness"
   },
   "env": [],
+  "tools": [
+    {
+      "name": "apple_notes_list_folders",
+      "description": "List Notes folders with optional account_id filter pushed into SQL.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_notes_list_notes",
+      "description": "List notes in a folder with server-side folder_id/since/limit/offset (index-only; never decodes bodies).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_notes_search_notes",
+      "description": "Title + snippet search with server-side query/account_id/folder_id/since/limit (LIKE against ZTITLE1+ZSNIPPET; never opens body bytes).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_notes_head",
+      "description": "Cheap metadata lookup by note id (never inflates ZDATA).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_notes_read_note",
+      "description": "Inflate and decode the note's protobuf body; include_html surfaces htmlNotImplemented signal at v0.1.0.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "setup": {
     "auth_model": "none",
     "complexity": "moderate",
