@@ -2,7 +2,7 @@
   "name": "syncthing-blade-mcp",
   "type": "plugin",
   "title": "Syncthing",
-  "description": "Syncthing replication management MCP — multi-instance, token-efficient output, safe disk-space reclamation. Read and control access to Syncthing's REST API with a focus on replication awareness: knowing which folders are fully replicated across devices so you can confidently reclaim local disk space.",
+  "description": "Syncthing replication management MCP \u2014 multi-instance, token-efficient output, safe disk-space reclamation. Read and control access to Syncthing's REST API with a focus on replication awareness: knowing which folders are fully replicated across devices so you can confidently reclaim local disk space.",
   "tagline": "Mesh file sync with replication-aware disk reclamation",
   "version": "0.4.0",
   "author": "groupthink-dev",
@@ -25,10 +25,430 @@
     "runtime": "uv",
     "package": "syncthing-blade-mcp"
   },
+  "tools": [
+    {
+      "name": "syncthing_list_devices",
+      "description": "List all configured Syncthing devices with online/offline status.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_device_completion",
+      "description": "Sync completion percentage for a device or folder.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_connections",
+      "description": "Active peer connections \u2014 addresses, throughput, latency.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_device_stats",
+      "description": "Per-device sync stats \u2014 last seen, files transferred.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_pending_devices",
+      "description": "Devices waiting for acceptance.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_pending_folders",
+      "description": "Folders offered by remote devices but not yet shared.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_accept_device",
+      "description": "Accept a pending device. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_reject_device",
+      "description": "Reject a pending device. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_accept_folder",
+      "description": "Accept a pending folder offer. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_reject_folder",
+      "description": "Reject a pending folder offer. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_get_ignores",
+      "description": "Get the .stignore patterns for a folder.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_set_ignores",
+      "description": "Replace the .stignore patterns for a folder. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_get_default_ignores",
+      "description": "Get the instance-wide default ignore patterns.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_set_default_ignores",
+      "description": "Set the instance-wide default ignore patterns. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_folder_status",
+      "description": "Current sync state, error count, and need bytes for a folder.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_folder_completion",
+      "description": "Completion percentage for a folder.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_replication_report",
+      "description": "Cross-device replication summary for a folder.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_pause_folder",
+      "description": "Pause syncing for a folder. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_resume_folder",
+      "description": "Resume syncing for a folder. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_scan_folder",
+      "description": "Trigger a rescan of a folder. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_folder_errors",
+      "description": "Errors recorded for a folder.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_browse_folder",
+      "description": "Browse files within a synced folder. fs walk \u2014 stable on disk.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_file_info",
+      "description": "Metadata for a single file within a folder.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_folder_need",
+      "description": "Files this device needs to be in sync.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_remote_need",
+      "description": "Files a remote device needs from this device.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_override_folder",
+      "description": "Override remote changes with local state for a send-only folder. Destructive.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_revert_folder",
+      "description": "Revert local changes from remote state for a receive-only folder. Destructive.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_list_instances",
+      "description": "List configured Syncthing instances (multi-instance support).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_list_folders",
+      "description": "List all folders configured on an instance.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_system_status",
+      "description": "System health \u2014 uptime, memory, goroutines, peers connected.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_system_errors",
+      "description": "Recent system-level errors.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_clear_errors",
+      "description": "Clear the system error list. Destructive.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_system_log",
+      "description": "Recent system log entries.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_recent_changes",
+      "description": "Recent file changes across all folders.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_restart_required",
+      "description": "Whether a restart is needed to apply config changes.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_restart",
+      "description": "Restart the Syncthing daemon. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_check_upgrade",
+      "description": "Check for available Syncthing upgrades.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "syncthing_health_summary",
+      "description": "Aggregate health summary across all folders + devices + system.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "env": [
     {
       "name": "SYNCTHING_API_KEY",
-      "description": "Syncthing REST API key (single-instance mode). Find in Actions → Settings → API Key in the Syncthing web GUI.",
+      "description": "Syncthing REST API key (single-instance mode). Find in Actions \u2192 Settings \u2192 API Key in the Syncthing web GUI.",
       "secret": true
     },
     {
@@ -47,14 +467,14 @@
     "complexity": "simple",
     "icon": "externaldrive.connected.to.line.below",
     "product": "Syncthing API Key",
-    "help_text": "Find your API key in the Syncthing web GUI: Actions → Settings → API Key. For multi-instance mode, provide a JSON object mapping instance names to {url, apiKey} pairs.",
+    "help_text": "Find your API key in the Syncthing web GUI: Actions \u2192 Settings \u2192 API Key. For multi-instance mode, provide a JSON object mapping instance names to {url, apiKey} pairs.",
     "help_url": "https://docs.syncthing.net/users/config.html#config-option-gui.apikey",
     "fields": [
       {
         "key": "SYNCTHING_API_KEY",
         "label": "API Key",
         "secret": true,
-        "placeholder": "From Syncthing GUI → Actions → Settings → API Key"
+        "placeholder": "From Syncthing GUI \u2192 Actions \u2192 Settings \u2192 API Key"
       },
       {
         "key": "SYNCTHING_URL",
@@ -90,32 +510,32 @@
         "url": "https://github.com/piersdd/syncthing-blade-mcp"
       }
     ],
-    "blurb": "Syncthing replication management MCP — multi-instance, token-efficient output, safe disk-space reclamation."
+    "blurb": "Syncthing replication management MCP \u2014 multi-instance, token-efficient output, safe disk-space reclamation."
   },
   "highlights": [
     {
-      "icon": "🔄",
-      "text": "Folder sync — list, status, completion, replication across the mesh"
+      "icon": "\ud83d\udd04",
+      "text": "Folder sync \u2014 list, status, completion, replication across the mesh"
     },
     {
-      "icon": "♻️",
-      "text": "Reclaim disk space — safe-to-remove flags from replication analysis"
+      "icon": "\u267b\ufe0f",
+      "text": "Reclaim disk space \u2014 safe-to-remove flags from replication analysis"
     },
     {
-      "icon": "🧭",
-      "text": "Multi-instance — manage multiple Syncthing nodes from one server"
+      "icon": "\ud83e\udded",
+      "text": "Multi-instance \u2014 manage multiple Syncthing nodes from one server"
     },
     {
-      "icon": "⚡",
-      "text": "Token-efficient — concise JSON by default, full detail on demand"
+      "icon": "\u26a1",
+      "text": "Token-efficient \u2014 concise JSON by default, full detail on demand"
     },
     {
-      "icon": "🛡️",
-      "text": "Mesh-local — talks to Syncthing's REST API, no cloud egress"
+      "icon": "\ud83d\udee1\ufe0f",
+      "text": "Mesh-local \u2014 talks to Syncthing's REST API, no cloud egress"
     },
     {
-      "icon": "🧰",
-      "text": "Device pairing — accept/reject pending devices, manage ignore patterns"
+      "icon": "\ud83e\uddf0",
+      "text": "Device pairing \u2014 accept/reject pending devices, manage ignore patterns"
     }
   ],
   "links": [
@@ -136,7 +556,7 @@
       "url": "https://syncthing.net/"
     }
   ],
-  "readme": "### What it does\n\nSyncthing Blade MCP gives your AI agent read and control access to one or more Syncthing nodes. Your agent can audit replication health across the mesh, identify which folders are fully replicated (and therefore safe to reclaim locally), inspect sync errors, pause and resume folders, scan on demand, and manage device pairing.\n\nIdeal for fleet operators running Syncthing across a personal Mac fleet, NAS appliances, or a mix — where you want to know which copies are durable, which folders are stuck, and which devices are misbehaving without logging into each web GUI.\n\n### Multi-instance from one server\n\nSet `SYNCTHING_INSTANCES` to a JSON object and the blade connects to every node simultaneously. Every tool accepts an optional `instance` parameter; when only one instance is configured, the parameter can be omitted. Drop in a `tn-sb`, `viking`, `voyager` triple and ask the agent to compare folder coverage across all three in one call.\n\n### Token efficiency\n\nSyncthing's REST API returns large, deeply-nested objects (folder configs with per-device addresses, history, ignore patterns; system status with platform / version / connection counts). Each tool's concise formatter extracts the fields that matter — folder id, label, state, completion %, error count — keeping context windows lean. Pass `concise=false` to any tool when you need the full payload.\n\n### Safety model\n\n- **Reads** work immediately — folder listings, replication reports, device stats, system errors.\n- **Mutations** are scoped to non-destructive operations — pause/resume folders, trigger rescans, accept/reject pending pairs, edit ignore patterns.\n- **Override and revert** (send-only / receive-only conflict resolution) are present but operate on the folder's existing replication mode — they do not delete files outside of that mode's contract.\n- **No folder or device creation** — the contract's `folder_add` / `device_add` / `folder_remove` / `device_remove` operations are deliberately not exposed in this blade; pairing is bootstrapped through Syncthing's own pending-device flow.",
+  "readme": "### What it does\n\nSyncthing Blade MCP gives your AI agent read and control access to one or more Syncthing nodes. Your agent can audit replication health across the mesh, identify which folders are fully replicated (and therefore safe to reclaim locally), inspect sync errors, pause and resume folders, scan on demand, and manage device pairing.\n\nIdeal for fleet operators running Syncthing across a personal Mac fleet, NAS appliances, or a mix \u2014 where you want to know which copies are durable, which folders are stuck, and which devices are misbehaving without logging into each web GUI.\n\n### Multi-instance from one server\n\nSet `SYNCTHING_INSTANCES` to a JSON object and the blade connects to every node simultaneously. Every tool accepts an optional `instance` parameter; when only one instance is configured, the parameter can be omitted. Drop in a `tn-sb`, `viking`, `voyager` triple and ask the agent to compare folder coverage across all three in one call.\n\n### Token efficiency\n\nSyncthing's REST API returns large, deeply-nested objects (folder configs with per-device addresses, history, ignore patterns; system status with platform / version / connection counts). Each tool's concise formatter extracts the fields that matter \u2014 folder id, label, state, completion %, error count \u2014 keeping context windows lean. Pass `concise=false` to any tool when you need the full payload.\n\n### Safety model\n\n- **Reads** work immediately \u2014 folder listings, replication reports, device stats, system errors.\n- **Mutations** are scoped to non-destructive operations \u2014 pause/resume folders, trigger rescans, accept/reject pending pairs, edit ignore patterns.\n- **Override and revert** (send-only / receive-only conflict resolution) are present but operate on the folder's existing replication mode \u2014 they do not delete files outside of that mode's contract.\n- **No folder or device creation** \u2014 the contract's `folder_add` / `device_add` / `folder_remove` / `device_remove` operations are deliberately not exposed in this blade; pairing is bootstrapped through Syncthing's own pending-device flow.",
   "scenarios": [
     {
       "type": "workflow",

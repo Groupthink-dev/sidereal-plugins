@@ -1,7 +1,7 @@
 {
   "name": "caldav-blade-mcp",
   "title": "Calendar (CalDAV)",
-  "description": "CalDAV calendar operations — protocol-level access to any CalDAV server",
+  "description": "CalDAV calendar operations \u2014 protocol-level access to any CalDAV server",
   "tagline": "Universal calendar access over the CalDAV protocol",
   "version": "0.1.1",
   "author": "groupthink-dev",
@@ -14,28 +14,28 @@
   "repository": "https://github.com/groupthink-dev/caldav-blade-mcp",
   "highlights": [
     {
-      "icon": "📅",
-      "text": "Events — list, search, create, update, delete across all calendars"
+      "icon": "\ud83d\udcc5",
+      "text": "Events \u2014 list, search, create, update, delete across all calendars"
     },
     {
-      "icon": "⏰",
-      "text": "Today & week views — token-efficient daily and weekly snapshots"
+      "icon": "\u23f0",
+      "text": "Today & week views \u2014 token-efficient daily and weekly snapshots"
     },
     {
-      "icon": "📊",
-      "text": "Free/busy — check availability across calendar sets"
+      "icon": "\ud83d\udcca",
+      "text": "Free/busy \u2014 check availability across calendar sets"
     },
     {
-      "icon": "🔀",
-      "text": "Batch operations — fetch multiple date ranges in a single call"
+      "icon": "\ud83d\udd00",
+      "text": "Batch operations \u2014 fetch multiple date ranges in a single call"
     },
     {
-      "icon": "🔒",
-      "text": "Write-gated — reads always work, writes require explicit opt-in"
+      "icon": "\ud83d\udd12",
+      "text": "Write-gated \u2014 reads always work, writes require explicit opt-in"
     },
     {
-      "icon": "🌐",
-      "text": "Any provider — iCloud, Fastmail, Google, Nextcloud, Radicale"
+      "icon": "\ud83c\udf10",
+      "text": "Any provider \u2014 iCloud, Fastmail, Google, Nextcloud, Radicale"
     }
   ],
   "links": [
@@ -56,11 +56,156 @@
       "url": "https://www.fastmail.help/hc/en-us/articles/1500000278342-Server-names-and-ports"
     }
   ],
-  "readme": "### What it does\n\nCalDAV Blade gives your AI agent direct protocol-level access to any CalDAV calendar server — iCloud, Fastmail, Google, Nextcloud, Radicale, or any standards-compliant provider. 13 tools cover the full calendar lifecycle: listing calendars, querying events by date range, searching by keyword, creating and updating events, checking free/busy availability, and moving events between calendars.\n\n### Token efficiency\n\nCalendar APIs return verbose iCalendar data full of timezone definitions, recurrence rules, and organiser metadata. Each tool includes a concise formatter that extracts only the fields your agent needs — title, time, location, description, and attendees. The `cal_today` and `cal_week` views provide pre-formatted daily and weekly snapshots in a single call, and `cal_events_batch` fetches multiple date ranges without round-trips.\n\n### Safety model\n\nAll 13 tools follow a read-free, write-gated pattern:\n\n- **Reads** work immediately — list calendars, query events, check availability\n- **Writes** require `CALDAV_WRITE_ENABLED=true` — create, update, delete, move events\n\nThis means your agent can explore your calendar freely but cannot make changes unless you explicitly enable write access.\n\n### Provider compatibility\n\n| Provider | CalDAV URL | Auth |\n|----------|-----------|------|\n| iCloud | `https://caldav.icloud.com` | App-specific password |\n| Fastmail | `https://caldav.fastmail.com/dav/calendars` | API token |\n| Google | `https://apidata.googleusercontent.com/caldav/v2` | OAuth or app password |\n| Nextcloud | `https://your-server/remote.php/dav` | Username + password |",
+  "readme": "### What it does\n\nCalDAV Blade gives your AI agent direct protocol-level access to any CalDAV calendar server \u2014 iCloud, Fastmail, Google, Nextcloud, Radicale, or any standards-compliant provider. 13 tools cover the full calendar lifecycle: listing calendars, querying events by date range, searching by keyword, creating and updating events, checking free/busy availability, and moving events between calendars.\n\n### Token efficiency\n\nCalendar APIs return verbose iCalendar data full of timezone definitions, recurrence rules, and organiser metadata. Each tool includes a concise formatter that extracts only the fields your agent needs \u2014 title, time, location, description, and attendees. The `cal_today` and `cal_week` views provide pre-formatted daily and weekly snapshots in a single call, and `cal_events_batch` fetches multiple date ranges without round-trips.\n\n### Safety model\n\nAll 13 tools follow a read-free, write-gated pattern:\n\n- **Reads** work immediately \u2014 list calendars, query events, check availability\n- **Writes** require `CALDAV_WRITE_ENABLED=true` \u2014 create, update, delete, move events\n\nThis means your agent can explore your calendar freely but cannot make changes unless you explicitly enable write access.\n\n### Provider compatibility\n\n| Provider | CalDAV URL | Auth |\n|----------|-----------|------|\n| iCloud | `https://caldav.icloud.com` | App-specific password |\n| Fastmail | `https://caldav.fastmail.com/dav/calendars` | API token |\n| Google | `https://apidata.googleusercontent.com/caldav/v2` | OAuth or app password |\n| Nextcloud | `https://your-server/remote.php/dav` | Username + password |",
   "install": {
     "runtime": "uv",
     "package": "caldav-blade-mcp"
   },
+  "tools": [
+    {
+      "name": "cal_info",
+      "description": "Health check \u2014 list providers, connection status, calendar count, write gate status.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_calendars",
+      "description": "List all calendars across all providers \u2014 returns name, UID, and provider for each.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_events",
+      "description": "Get events from a single calendar in a date range. Compact one-line-per-event output.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_events_batch",
+      "description": "Fetch events from multiple calendars in one call, grouped by calendar \u2014 preferred for digests.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_event",
+      "description": "Get a single event by UID with full details including attendees, recurrence, and description.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_search",
+      "description": "Search events by text, attendee email, or location. Optional calendar and date scope.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_today",
+      "description": "Today's events across all calendars, grouped by calendar. Compact output.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_week",
+      "description": "This week's events across all calendars, grouped by calendar. Compact output.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_freebusy",
+      "description": "Free/busy availability across one or more calendars in a date range.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_create",
+      "description": "Create a new event. Write \u2014 gated by CALDAV_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_update",
+      "description": "Update an existing event by UID. Write \u2014 gated by CALDAV_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_delete",
+      "description": "Delete an event by UID. Destructive \u2014 gated by CALDAV_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cal_move",
+      "description": "Move an event between calendars. Write \u2014 gated by CALDAV_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "env": [
     {
       "name": "CALDAV_URL",
@@ -81,7 +226,7 @@
     "complexity": "moderate",
     "icon": "calendar",
     "product": "CalDAV Account",
-    "help_text": "Provide your CalDAV server URL, username, and password. For iCloud: use appleid.apple.com → Sign-In and Security → App-Specific Passwords. For Fastmail: use an API token as the password. For Google Calendar: use a Google app password.",
+    "help_text": "Provide your CalDAV server URL, username, and password. For iCloud: use appleid.apple.com \u2192 Sign-In and Security \u2192 App-Specific Passwords. For Fastmail: use an API token as the password. For Google Calendar: use a Google app password.",
     "fields": [
       {
         "key": "CALDAV_URL",
@@ -116,7 +261,7 @@
         "url": "https://www.fastmail.help/hc/en-us/articles/1500000278342-Server-names-and-ports"
       }
     ],
-    "blurb": "CalDAV calendar operations — protocol-level access to any CalDAV server"
+    "blurb": "CalDAV calendar operations \u2014 protocol-level access to any CalDAV server"
   },
   "scenarios": [
     {
