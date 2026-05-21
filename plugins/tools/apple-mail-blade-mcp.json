@@ -21,6 +21,129 @@
     "bundled_in": "stallari-harness"
   },
   "env": [],
+  "tools": [
+    {
+      "name": "apple_mail_list_accounts",
+      "description": "List Mail accounts derived from mailboxes.url prefixes. No arguments.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_mail_list_mailboxes",
+      "description": "List mailboxes with optional account_id filter pushed into SQL.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_mail_list_messages",
+      "description": "List messages in a mailbox with server-side mailbox_id/since/until/limit/offset (index-only; never opens .emlx).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_mail_search_messages",
+      "description": "FTS5 sidecar search with server-side query/account_id/mailbox_id/since/limit; LIKE fallback when FTS dormant.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_mail_head",
+      "description": "Cheap metadata lookup by message_id (index-only; never opens .emlx).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_mail_read_message",
+      "description": "Open .emlx for message_id, parse RFC822 + multipart MIME, return decoded headers + body (HTML optional).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_mail_read_attachment",
+      "description": "Read attachment bytes by message_id + attachment_id from the on-disk Attachments subtree; base64-encoded with 25MB hard cap.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_mail_read_thread",
+      "description": "Reconstruct a thread starting from message_id via conversation_id + In-Reply-To/References. Cross-account hops flagged.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_mail_extract_entities",
+      "description": "Deterministic NLTagger + NSDataDetector entity extraction over the message body (DD-240 invariant #3 carve-out). No persistence; recomputes per call.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_mail_index_status",
+      "description": "Return current MailIndexHealth snapshot — lag rows, FTS readiness, dormancy flag.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "apple_mail_reindex",
+      "description": "Post a reindex request via DistributedNotificationCenter; force=true bypasses the AC-power gate. Idempotent — internal state change only, no external side effects.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "setup": {
     "auth_model": "none",
     "complexity": "moderate",

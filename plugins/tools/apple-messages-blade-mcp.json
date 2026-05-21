@@ -29,6 +29,173 @@
       "description": "Override chat.db path (default: ~/Library/Messages/chat.db)"
     }
   ],
+  "tools": [
+    {
+      "name": "messages_info",
+      "description": "System info: macOS version, FDA status, write gate state, Messages.app status, chat.db path + counts.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_chats",
+      "description": "List all conversations with server-side limit. Direct SQL against chat.db.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_chat",
+      "description": "Get a specific conversation by chat_id or handle. Server-side WHERE in SQL.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_messages",
+      "description": "Get messages from a conversation with server-side chat_id + limit + before-cursor pagination.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_recent",
+      "description": "Recent messages across all conversations with server-side limit + since-ISO filter pushed into SQL.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_search",
+      "description": "Full-text search across all messages with server-side query + limit (SQL LIKE against text column).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_contacts",
+      "description": "List known handles (phone numbers, emails, iCloud accounts) with server-side limit.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_contact",
+      "description": "Get details for a specific handle including message count + last interaction.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_attachments",
+      "description": "List attachments from a conversation with server-side chat_id + limit (metadata only; never reads file content).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_attachment_info",
+      "description": "Get detailed metadata for a specific attachment by attachment_id (never reads file content).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_stats",
+      "description": "Aggregate statistics: total chats, messages, date range, top contacts.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_unread",
+      "description": "Unread message count per conversation.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_send",
+      "description": "Send a text message via AppleScript bridge. Write — gated by MESSAGES_WRITE_ENABLED + confirm; messages cannot be unsent (DD-249 write amendment).",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_send_file",
+      "description": "Send a file attachment via AppleScript bridge. Write — gated by MESSAGES_WRITE_ENABLED + confirm; files cannot be unsent (DD-249 write amendment).",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "messages_start_group",
+      "description": "Start a new group conversation via AppleScript bridge. Write — gated by MESSAGES_WRITE_ENABLED + confirm; group creation cannot be undone (DD-249 write amendment).",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "setup": {
     "auth_model": "none",
     "complexity": "moderate",
