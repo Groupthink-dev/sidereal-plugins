@@ -42,13 +42,13 @@
     },
     {
       "name": "mastodon_timeline_home",
-      "description": "Home timeline \u2014 accounts you follow. Cursor pagination.",
+      "description": "Home timeline \u2014 accounts you follow. Cursor pagination. Accepts scope=public|personal|family|work mapped to Mastodon lists via MASTODON_*_LIST_ID env vars.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unstable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -119,13 +119,13 @@
     },
     {
       "name": "mastodon_search",
-      "description": "Search statuses, accounts, and hashtags.",
+      "description": "Search statuses, accounts, and hashtags. Accepts scope=public|personal|family|work to restrict status results to accounts in the scope's list.",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "client-side",
+        "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unstable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -141,13 +141,13 @@
     },
     {
       "name": "mastodon_account_statuses",
-      "description": "Statuses authored by an account.",
+      "description": "Statuses authored by an account. Accepts scope=public|personal|family|work as a membership precondition — refuses if account_id is outside the scope's list.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unstable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -185,13 +185,13 @@
     },
     {
       "name": "mastodon_notifications",
-      "description": "Recent notifications \u2014 mentions, follows, boosts, favourites.",
+      "description": "Recent notifications \u2014 mentions, follows, boosts, favourites. Accepts scope=public|personal|family|work to filter to actors in the scope's list.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unstable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -532,6 +532,21 @@
       "name": "MASTODON_WRITE_ENABLED",
       "description": "Enable write operations (posting, favouriting, following)",
       "default": "false"
+    },
+    {
+      "name": "MASTODON_PERSONAL_LIST_ID",
+      "description": "Mastodon list ID mapped to scope=personal. Per-instance form: MASTODON_PERSONAL_LIST_ID_<INSTANCE>. Leave unset → scope=personal degrades to passthrough.",
+      "default": ""
+    },
+    {
+      "name": "MASTODON_FAMILY_LIST_ID",
+      "description": "Mastodon list ID mapped to scope=family. Per-instance form: MASTODON_FAMILY_LIST_ID_<INSTANCE>.",
+      "default": ""
+    },
+    {
+      "name": "MASTODON_WORK_LIST_ID",
+      "description": "Mastodon list ID mapped to scope=work. Per-instance form: MASTODON_WORK_LIST_ID_<INSTANCE>.",
+      "default": ""
     }
   ],
   "setup": {
