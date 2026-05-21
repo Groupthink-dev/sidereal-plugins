@@ -17,6 +17,591 @@
     "functions-v1"
   ],
   "contract_notes": "edge-platform-v1/v2 was retired in pack-spec 2.0.0 (DD-181). Cloudflare blade declares the four decomposed contracts directly. D1, Tunnels, Pages, Vectorize, AI Search, AI Gateway, Workers AI, and Cache are exposed as native tools.",
+  "tools": [
+    {
+      "name": "cf_dns_list_zones",
+      "description": "List DNS zones in the account with optional filters (name, status, account_id).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_dns_get_zone",
+      "description": "Get details for a single zone by ID or domain name.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_dns_list_records",
+      "description": "List DNS records for a zone with rich server-side filters (type, name, content, proxied, comment, tag).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_dns_get_record",
+      "description": "Get a single DNS record by zone_id + record_id.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_dns_export_records",
+      "description": "Export a zone's DNS records in BIND format.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_dns_create_record",
+      "description": "Create a new DNS record in a zone. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_dns_update_record",
+      "description": "Update an existing DNS record. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_dns_delete_record",
+      "description": "Delete a DNS record. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_dns_bulk_create",
+      "description": "Bulk-create DNS records in a zone. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_dns_bulk_update",
+      "description": "Bulk-update DNS records in a zone. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_kv_list_namespaces",
+      "description": "List KV namespaces in the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_kv_list_keys",
+      "description": "List keys in a KV namespace with optional prefix filter and cursor pagination.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_kv_get",
+      "description": "Get the value of a single KV key.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_kv_put",
+      "description": "Put a KV key-value pair. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_kv_delete",
+      "description": "Delete a KV key. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_kv_bulk_put",
+      "description": "Bulk-put KV key-value pairs. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_kv_bulk_delete",
+      "description": "Bulk-delete KV keys. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_d1_list_databases",
+      "description": "List D1 databases in the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_d1_get_database",
+      "description": "Get details for a single D1 database.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_d1_query",
+      "description": "Run a read-only SELECT-style SQL query against a D1 database.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_d1_execute",
+      "description": "Execute a mutating SQL statement (INSERT/UPDATE/DELETE/CREATE/DROP) against a D1 database. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_d1_export",
+      "description": "Export a D1 database as SQL.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_d1_list_tables",
+      "description": "List tables in a D1 database.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_d1_describe_table",
+      "description": "Describe schema for a single D1 table.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_tunnel_list",
+      "description": "List Cloudflare Tunnels in the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_tunnel_get",
+      "description": "Get details for a single Cloudflare Tunnel.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_tunnel_create",
+      "description": "Create a new Cloudflare Tunnel. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_tunnel_delete",
+      "description": "Delete a Cloudflare Tunnel. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_tunnel_list_configs",
+      "description": "List ingress configurations for a Cloudflare Tunnel.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_tunnel_update_config",
+      "description": "Update ingress configuration for a Cloudflare Tunnel. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_tunnel_list_connections",
+      "description": "List active connections for a Cloudflare Tunnel.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_workers_list_scripts",
+      "description": "List Workers scripts in the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_workers_get_script",
+      "description": "Get details for a single Worker script.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_workers_list_deployments",
+      "description": "List deployments for a Worker script.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_workers_create_deployment",
+      "description": "Create a new deployment for a Worker script. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_workers_list_versions",
+      "description": "List versions of a Worker script.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_workers_list_secrets",
+      "description": "List secret names bound to a Worker script (values not returned).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_workers_put_secret",
+      "description": "Put a secret on a Worker script. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_workers_delete_secret",
+      "description": "Delete a secret from a Worker script. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_workers_get_schedules",
+      "description": "Get cron schedules for a Worker script.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_workers_put_schedules",
+      "description": "Replace cron schedules for a Worker script. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_pages_list_projects",
+      "description": "List Cloudflare Pages projects in the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_pages_get_project",
+      "description": "Get details for a single Pages project.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_pages_list_deployments",
+      "description": "List deployments for a Pages project.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_pages_get_deployment",
+      "description": "Get details for a single Pages deployment.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_pages_rollback",
+      "description": "Roll back a Pages project to a previous deployment. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_pages_list_domains",
+      "description": "List custom domains attached to a Pages project.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_pages_purge_build_cache",
+      "description": "Purge the build cache for a Pages project. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_r2_list_buckets",
+      "description": "List R2 buckets in the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "cf_r2_get_bucket",
+      "description": "Get details for a single R2 bucket.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_r2_create_bucket",
+      "description": "Create a new R2 bucket. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_r2_delete_bucket",
+      "description": "Delete an R2 bucket. Destructive — double-gated.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "cf_cache_purge",
+      "description": "Purge Cloudflare cache by URL, tag, host, prefix, or everything. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "homepage": "https://github.com/groupthink-dev/cloudflare-blade-mcp",
   "repository": "https://github.com/groupthink-dev/cloudflare-blade-mcp",
   "highlights": [
