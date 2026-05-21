@@ -1,0 +1,60 @@
+{
+  "name": "apple-notes-blade-mcp",
+  "title": "Apple Notes",
+  "description": "On-disk Apple Notes reader — NoteStore.sqlite + protobuf body decode + folder hierarchy. Read-only; never opens the network. Library form factor (DD-240 Phase A) — compiled into Stallari.",
+  "tagline": "Years of notes, on-device, no iCloud round-trip",
+  "version": "0.1.0",
+  "author": "groupthink-dev",
+  "license": "MIT",
+  "icon": "/icons/apple-notes-blade-mcp.svg",
+  "tier": "certified",
+  "author_type": "first-party",
+  "readiness": "production",
+  "contract": "notes-v1",
+  "repository": "https://github.com/Groupthink-dev/apple-notes-blade-mcp",
+  "multi_instance": false,
+  "install": {
+    "runtime": "library",
+    "bundled_in": "stallari-harness"
+  },
+  "env": [],
+  "setup": {
+    "auth_model": "none",
+    "complexity": "moderate",
+    "icon": "note.text",
+    "product": "Apple Notes",
+    "consent_tile_link": "stallari://settings/general/local-corpus/notes",
+    "blurb": "Read on-disk Notes.app data — folders, notes, search, body content via protobuf decode, attachment metadata. Years of notes on-device that an iCloud-side API can't reach (locally-cached drafts, removed-account archives, pre-iCloud history).",
+    "help_text": "Local-corpus class blade (DD-240). Library form factor — compiled into Stallari, not a separate subprocess. Requires Full Disk Access on the Stallari daemon binary so it can read ~/Library/Group Containers/group.com.apple.notes/NoteStore.sqlite. Open System Settings → Privacy & Security → Full Disk Access and enable Stallari.app + the stallari-helper binary inside it.",
+    "fields": [],
+    "help": [
+      {
+        "label": "Grant Full Disk Access",
+        "url": "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles",
+        "description": "Open System Settings → Privacy & Security → Full Disk Access. Add /Applications/Stallari.app and /Applications/Stallari.app/Contents/MacOS/stallari-helper, then toggle both on."
+      },
+      {
+        "label": "DD-240 — apple-notes-blade-mcp",
+        "url": "https://github.com/Groupthink-dev/apple-notes-blade-mcp",
+        "description": "Library form factor inside StallariKit (DD-240 invariant #8 — never advertised externally)."
+      }
+    ],
+    "test": {
+      "endpoint": "file://~/Library/Group%20Containers/group.com.apple.notes/NoteStore.sqlite",
+      "auth_style": "none"
+    },
+    "prerequisites": [
+      "macOS 14 (Sonoma) or later",
+      "Full Disk Access granted to the Stallari daemon binary (stallari-helper) — needed to read ~/Library/Group Containers/group.com.apple.notes/",
+      "Notes.app must have been launched at least once (so NoteStore.sqlite exists)"
+    ]
+  },
+  "conformance": {
+    "required": "5/5",
+    "recommended": "0/0",
+    "optional": "0/0",
+    "last_tested": "2026-05-21"
+  },
+  "notes": "5 read-only tools (list_folders, list_notes, search_notes, head, read_note). Library form factor (DD-240 Phase A) — compiled into StallariKit via SPM dep on apple-notes-blade-mcp v0.1.0. **Never advertised on the daemon's :9847/mcp HTTP MCP surface per DD-240 invariant #8** — consumed only via the in-process Dispatcher path through AppleNotesBladeWiring. NoteStore.sqlite SQLite reads + protobuf body decode; no AppleScript, no probabilistic inference inside the blade.",
+  "hidden": false
+}
