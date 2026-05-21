@@ -13,12 +13,51 @@ import { createHash } from "node:crypto";
 import { readdir, readFile, mkdir, writeFile, copyFile, stat } from "node:fs/promises";
 import { join, resolve, basename, extname } from "node:path";
 import { parse as parseYaml } from "yaml";
+import Ajv2020 from "ajv/dist/2020.js";
+import addFormats from "ajv-formats";
 const ROOT = resolve(import.meta.dirname, "..");
 const TOOLS_DIR = join(ROOT, "plugins", "tools");
 const PACKS_DIR = join(ROOT, "plugins", "packs");
 const PRIVATE_PACKS_DIR = process.env.PRIVATE_PACKS_DIR || null;
 const DATA_DIR = join(ROOT, "data");
 const DIST_DIR = join(ROOT, "dist");
+
+/**
+ * DD-333 Phase A.1 — build-time AJV gate over plugins/tools/*.json against
+ * schemas/catalog-entry.schema.json. Catches malformed `granularity:` blocks
+ * before they reach dist/catalog.json. Schema is loaded lazily on first
+ * `validateCatalogEntry` call to keep the import surface synchronous for
+ * test consumers.
+ */
+let _validateCatalogEntryCache = null;
+async function loadCatalogEntryValidator() {
+  if (_validateCatalogEntryCache) return _validateCatalogEntryCache;
+  const ajv = new Ajv2020({ allErrors: true, strict: false });
+  addFormats(ajv);
+  const schemaPath = join(ROOT, "schemas", "catalog-entry.schema.json");
+  const schema = JSON.parse(await readFile(schemaPath, "utf-8"));
+  _validateCatalogEntryCache = ajv.compile(schema);
+  return _validateCatalogEntryCache;
+}
+
+/**
+ * Validate a raw catalog entry (the plugins/tools/*.json shape) against
+ * catalog-entry.schema.json. Returns `{ valid: true }` on pass, or
+ * `{ valid: false, errors: [...], errorsText: "..." }` on fail. The build
+ * fails-fast on the first invalid entry per DD-333 Phase A.1.
+ */
+async function validateCatalogEntry(entry) {
+  const validate = await loadCatalogEntryValidator();
+  const valid = validate(entry);
+  if (valid) return { valid: true };
+  return {
+    valid: false,
+    errors: validate.errors,
+    errorsText: validate.errors
+      .map((e) => `  ${e.instancePath || "(root)"} ${e.message}${e.params ? " " + JSON.stringify(e.params) : ""}`)
+      .join("\n"),
+  };
+}
 
 /** Convert a pack name to a URL-safe kebab-case slug: "Business Operations" → "business-operations" */
 function slugify(name) {
@@ -562,6 +601,17 @@ async function main() {
   for (const file of pluginFiles) {
     const raw = JSON.parse(await readFile(join(TOOLS_DIR, file), "utf-8"));
     if (raw.hidden) continue;
+
+    // DD-333 Phase A.1 — fail-fast schema validation over raw plugin JSON.
+    // Catches malformed `granularity:` blocks and any future schema drift
+    // before bytes reach dist/catalog.json.
+    const verdict = await validateCatalogEntry(raw);
+    if (!verdict.valid) {
+      throw new Error(
+        `Catalog entry ${raw.name || file} fails schema validation:\n${verdict.errorsText}`,
+      );
+    }
+
     const warnings = validatePluginUX(raw);
     if (warnings.length > 0) {
       uxWarnings.push({ name: raw.name || file, warnings });
@@ -731,6 +781,8 @@ export {
   buildServices,
   buildScenarios,
   validatePluginUX,
+  validateCatalogEntry,
+  loadCatalogEntryValidator,
 };
 
 // Run main() only when executed directly (not imported as a module)
