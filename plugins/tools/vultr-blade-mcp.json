@@ -60,6 +60,558 @@
     "runtime": "npx",
     "package": "vultr-blade-mcp"
   },
+  "tools": [
+    {
+      "name": "vultr_account_info",
+      "description": "Get Vultr account info — email, name, balance, payment method.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_billing_history",
+      "description": "Recent billing history — invoices, charges, dates.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_list",
+      "description": "List Vultr VM instances with server-side per_page/cursor + optional label/region/tag filters.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_get",
+      "description": "Full detail for a single VM by ID.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_status",
+      "description": "Lightweight VM status — power_status, server_status, main_ip.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_bandwidth",
+      "description": "Bandwidth usage for a VM by date range.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_list_plans",
+      "description": "List available VM plans (CPU/RAM/storage, GPU types, regions).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_list_images",
+      "description": "List available OS images and ISO IDs.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_list_regions",
+      "description": "List available datacenter regions.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_ssh_keys",
+      "description": "List SSH keys registered on the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_create",
+      "description": "Create a new VM instance. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_delete",
+      "description": "Delete a VM instance. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_start",
+      "description": "Start a stopped VM. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_stop",
+      "description": "Stop a running VM. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_reboot",
+      "description": "Reboot a VM. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_update",
+      "description": "Update VM label/tag/plan. Write — gated by confirm.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_vm_set_reverse_dns",
+      "description": "Set reverse DNS for an IP. Write — gated by confirm.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_bm_list",
+      "description": "List bare metal instances with server-side per_page/cursor + optional label/region filters.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_bm_get",
+      "description": "Full detail for a single bare metal instance.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_bm_bandwidth",
+      "description": "Bandwidth usage for a bare metal instance.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_bm_list_plans",
+      "description": "List available bare metal plans.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_bm_create",
+      "description": "Provision a new bare metal instance. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_bm_delete",
+      "description": "Delete a bare metal instance. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_bm_start",
+      "description": "Start a stopped bare metal instance. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_bm_stop",
+      "description": "Stop a running bare metal instance. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_bm_reboot",
+      "description": "Reboot a bare metal instance. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_dns_list_domains",
+      "description": "List DNS domains managed by Vultr (server-side per_page/cursor).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_dns_list_records",
+      "description": "List DNS records for a domain (server-side domain + per_page/cursor).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_dns_create_record",
+      "description": "Create a DNS record. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_dns_update_record",
+      "description": "Update an existing DNS record. Write — gated by confirm.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_dns_delete_record",
+      "description": "Delete a DNS record. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_fw_list_groups",
+      "description": "List firewall groups (server-side per_page/cursor).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_fw_get_group",
+      "description": "Get a single firewall group by ID.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_fw_create_group",
+      "description": "Create a firewall group. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_fw_delete_group",
+      "description": "Delete a firewall group. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_fw_list_rules",
+      "description": "List rules in a firewall group (server-side firewall_group_id + per_page/cursor).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_fw_create_rule",
+      "description": "Create a firewall rule in a group. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_script_list",
+      "description": "List startup scripts (server-side per_page/cursor + optional type filter).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_script_get",
+      "description": "Get a startup script by ID.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_script_create",
+      "description": "Create a startup script. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_script_delete",
+      "description": "Delete a startup script. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_snap_list",
+      "description": "List snapshots (server-side per_page/cursor + optional description filter).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_snap_get",
+      "description": "Get a snapshot by ID.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_snap_create",
+      "description": "Create a snapshot from a VM. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_snap_delete",
+      "description": "Delete a snapshot. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_inference_list",
+      "description": "List inference (Serverless Inference) subscriptions (server-side per_page/cursor).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_inference_get",
+      "description": "Get an inference subscription by ID.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_inference_create",
+      "description": "Create an inference subscription. Write — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_inference_delete",
+      "description": "Delete an inference subscription. Destructive — gated by confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vultr_inference_usage",
+      "description": "Inference subscription usage metrics by date range.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "env": [
     {
       "name": "VULTR_API_KEY",

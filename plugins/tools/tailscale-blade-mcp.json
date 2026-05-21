@@ -62,6 +62,206 @@
     "runtime": "uv",
     "package": "tailscale-blade-mcp"
   },
+  "tools": [
+    {
+      "name": "ts_info",
+      "description": "Health check — device counts, online/offline, key expiry warnings, updates, tailnet settings.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_devices",
+      "description": "List devices — hostname, OS, IP, online/offline, key expiry, tags, update status.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_device",
+      "description": "Full detail for a single device — addresses, OS, client version, key status, tags, user.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_device_routes",
+      "description": "Routes for a device — advertised subnets, approved/unapproved status.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_dns",
+      "description": "DNS configuration — nameservers, MagicDNS status, search paths, split DNS rules.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_acl",
+      "description": "ACL policy summary — groups, rules, SSH rules, tag owners.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_acl_validate",
+      "description": "Validate an ACL policy without applying it. Returns errors or 'passed'. Gated by TAILSCALE_WRITE_ENABLED.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_keys",
+      "description": "List auth keys — ID, description, reusable/ephemeral/preauth flags, tags, expiry.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_users",
+      "description": "List users — name, login, role, status, device count, online/last seen.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_webhooks",
+      "description": "List configured webhooks — endpoint URL, event subscriptions, created date.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_audit_log",
+      "description": "Configuration audit log — who changed what, when. Server-side count parameter for bound result set.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_authorize_device",
+      "description": "Authorize or deauthorize a device. Write — gated by TAILSCALE_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_set_tags",
+      "description": "Set ACL tags on a device — replaces existing tags. Write — gated by TAILSCALE_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_expire_device",
+      "description": "Force key expiry on a device — it must re-authenticate. Write — gated by TAILSCALE_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_approve_routes",
+      "description": "Approve subnet routes on a device. Write — gated by TAILSCALE_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_create_key",
+      "description": "Create a new auth key. Write — gated by TAILSCALE_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_delete_key",
+      "description": "Revoke an auth key. Destructive — gated by TAILSCALE_WRITE_ENABLED + confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ts_delete_device",
+      "description": "Remove a device. Destructive — gated by TAILSCALE_WRITE_ENABLED + confirm.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "env": [
     {
       "name": "TAILSCALE_API_KEY",
