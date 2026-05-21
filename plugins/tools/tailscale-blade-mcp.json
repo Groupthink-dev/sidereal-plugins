@@ -76,24 +76,24 @@
     },
     {
       "name": "ts_devices",
-      "description": "List devices — hostname, OS, IP, online/offline, key expiry, tags, update status.",
+      "description": "List devices — hostname, OS, IP, online/offline, key expiry, tags, update status. DD-278 scope-tag filter applied client-side.",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "none",
+        "scope_filtering": "client-side",
         "field_projection": "none",
         "deterministic_ordering": "unstable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "ts_device",
-      "description": "Full detail for a single device — addresses, OS, client version, key status, tags, user.",
+      "description": "Full detail for a single device — addresses, OS, client version, key status, tags, user. Track 3 _meta envelope on single-record fetch.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -142,13 +142,13 @@
     },
     {
       "name": "ts_keys",
-      "description": "List auth keys — ID, description, reusable/ephemeral/preauth flags, tags, expiry.",
+      "description": "List auth keys — ID, description, reusable/ephemeral/preauth flags, tags, expiry. DD-278 scope-tag filter applied client-side over capabilities.devices.create.tags.",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "none",
+        "scope_filtering": "client-side",
         "field_projection": "none",
         "deterministic_ordering": "unstable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -175,13 +175,13 @@
     },
     {
       "name": "ts_audit_log",
-      "description": "Configuration audit log — who changed what, when. Server-side count parameter for bound result set.",
+      "description": "Configuration audit log — who changed what, when. Server-side count parameter for bound result set. DD-278 scope filter applied client-side via secondary device-tag fetch (Tailscale REST API has no server-side actor/target tag filter primitive).",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "server-side",
+        "scope_filtering": "client-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
