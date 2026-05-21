@@ -3,7 +3,7 @@
   "title": "Google Gmail",
   "description": "Gmail email operations via Google API \u2014 search, read, send, threads, labels, drafts, filters. Gemini-powered classification and summarisation.",
   "tagline": "Gmail management with Gemini-powered classification",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/gmail-blade-mcp.svg",
@@ -64,46 +64,46 @@
   "tools": [
     {
       "name": "gmail_search",
-      "description": "Search messages by Gmail query language (from:, to:, subject:, has:, newer_than:, etc.). Server-side filter.",
+      "description": "Search messages by Gmail query language (from:, to:, subject:, has:, newer_than:, etc.). Server-side filter with DD-278 scope-tag wrapper (scope=work|personal|family|public).",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unstable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "gmail_read",
-      "description": "Read a single message by ID \u2014 headers, body, attachments metadata.",
+      "description": "Read a single message by ID \u2014 headers, body, attachments metadata. DD-278 scope-tag wrapper (scope=work|personal|family|public) verifies labelIds post-fetch.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "gmail_snippets",
-      "description": "Compact snippet view across recent or filtered messages.",
+      "description": "Compact snippet view across recent or filtered messages. DD-278 scope-tag wrapper (scope=work|personal|family|public).",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unstable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "gmail_thread",
-      "description": "Read an entire thread by thread ID with all messages.",
+      "description": "Read an entire thread by thread ID with all messages. DD-278 scope-tag wrapper (scope=work|personal|family|public) verifies labelIds post-fetch.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -299,6 +299,21 @@
       "name": "GOOGLE_API_KEY",
       "description": "Google API key for Gemini AI features (optional \u2014 classification and summarisation)",
       "secret": true
+    },
+    {
+      "name": "GMAIL_WORK_LABEL",
+      "description": "Gmail q= fragment for DD-278 scope=work (default: category:work). Override e.g. label:Work for custom workflows.",
+      "secret": false
+    },
+    {
+      "name": "GMAIL_PERSONAL_LABEL",
+      "description": "Gmail q= fragment for DD-278 scope=personal (default: category:personal).",
+      "secret": false
+    },
+    {
+      "name": "GMAIL_FAMILY_LABEL",
+      "description": "Gmail q= fragment for DD-278 scope=family (default: label:Family).",
+      "secret": false
     }
   ],
   "setup": {
