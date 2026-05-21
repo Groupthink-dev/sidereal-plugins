@@ -61,6 +61,228 @@
     "runtime": "uv",
     "package": "fastmail-blade-mcp"
   },
+  "tools": [
+    {
+      "name": "fastmail_info",
+      "description": "Health check — account email, capabilities, limits.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "fastmail_identities",
+      "description": "List sender identities (ID, name, email) — used by mail_send + mail_reply.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_mailboxes",
+      "description": "List all mailboxes — ID, name, total/unread counts, role.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_read",
+      "description": "Read a full email by ID — headers + body (text or HTML).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_search",
+      "description": "Search emails with rich JMAP server-side filters (from, to, subject, body, after/before, in_mailbox, has_keyword, not_keyword, limit).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_threads",
+      "description": "Get all messages in a thread by ID, ordered chronologically.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_snippets",
+      "description": "Search emails returning short snippets — JMAP server-side filters (from, subject, body, after/before, in_mailbox, limit).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_state",
+      "description": "Get the current JMAP Email state token — used for incremental change tracking via mail_changes.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_changes",
+      "description": "Get email changes since a previous state — server-side since_state + max_changes.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_send",
+      "description": "Compose and send a new email. Write — gated by FASTMAIL_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_reply",
+      "description": "Reply to an email — preserves threading. Write — gated by FASTMAIL_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_move",
+      "description": "Move one or more emails to a mailbox. Write — gated by FASTMAIL_WRITE_ENABLED.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_flag",
+      "description": "Flag or unflag emails (set/clear a keyword). Write — gated by FASTMAIL_WRITE_ENABLED.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_delete",
+      "description": "Delete emails — to Trash by default, or permanent. Write — gated by FASTMAIL_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mail_bulk",
+      "description": "Bulk action across email IDs (mark_read/unread, flag/unflag, move, delete; max 50). Write — gated by FASTMAIL_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "masked_list",
+      "description": "List masked email aliases with server-side state + for_domain + limit filters.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "masked_create",
+      "description": "Create a new masked email alias. Write — gated by FASTMAIL_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "masked_update",
+      "description": "Update a masked email alias (state/description/for_domain). Write — gated by FASTMAIL_WRITE_ENABLED.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "push_subscribe",
+      "description": "Subscribe to JMAP EventSource push notifications. Blocking — returns state change events or timeout.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "push_status",
+      "description": "Check EventSource push notification availability and connection status.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "env": [
     {
       "name": "FASTMAIL_API_TOKEN",
