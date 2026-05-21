@@ -14,6 +14,580 @@
   "readiness": "production",
   "contract": "vault-v1",
   "risk_class": "reversible_write",
+  "tools": [
+    {
+      "name": "vault_info",
+      "description": "Vault metadata: path, note count, folder count.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_help",
+      "description": "Quick-reference help for vault tools, optionally filtered by topic.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_read",
+      "description": "Read full content of a note (resolved via file= wikilink or path=).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_create",
+      "description": "Create a new note in the vault.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_append",
+      "description": "Append content to an existing note.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_prepend",
+      "description": "Prepend content to an existing note (after frontmatter).",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_patch",
+      "description": "Replace exact text span in a note body. Destructive within reversible-trash model.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_files",
+      "description": "List files in the vault with optional folder/extension filter and sort order.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_file_info",
+      "description": "Get metadata for a single file (size, timestamps, frontmatter summary).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_folders",
+      "description": "List all folders in the vault.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_recents",
+      "description": "List recently modified files, newest first.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_property_read",
+      "description": "Read a single frontmatter property value.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_property_set",
+      "description": "Set a frontmatter property (atomic).",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_property_remove",
+      "description": "Remove a frontmatter property.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_properties",
+      "description": "List all frontmatter properties for a note.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_query_properties",
+      "description": "Query notes by frontmatter property with optional path scope, fields projection, and limit.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_search",
+      "description": "Full-text vault search with optional path scope and case-sensitive flag.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_search_context",
+      "description": "Full-text vault search with matching context lines per result.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_context_prepare",
+      "description": "DD-288 — assemble a VaultContextBundle for a work object, query, seeds, and optional scope.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_context_expand",
+      "description": "DD-288 — expand a VaultContextBundle with bounded additional sources (scope frozen).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_context_sources",
+      "description": "DD-288 — return the live source trail for a VaultContextBundle with drift detection.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_section_read",
+      "description": "Read content under a specific heading in a note.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_section_replace",
+      "description": "Replace content under a specific heading. Destructive within reversible-trash model.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_tags",
+      "description": "List tags with usage counts, or return the hierarchical tag taxonomy.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_tag",
+      "description": "List all files carrying a specific tag.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_outline",
+      "description": "Get heading outline of a note with line numbers.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_aliases",
+      "description": "List aliases declared in a note's frontmatter.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_resolve_link",
+      "description": "Resolve a wikilink target to a vault-relative path with primary + candidates.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_schema",
+      "description": "Return frontmatter schema for a note kind, or list all known kinds.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_tasks",
+      "description": "List tasks (checkboxes) in the vault with optional file/path/status filters.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_task_update",
+      "description": "Toggle / complete / uncomplete a task by reference.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_bookmarks",
+      "description": "List bookmarks in the vault (files, folders, searches, URLs).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_bookmark_add",
+      "description": "Add a bookmark (file, folder, search, or URL).",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_delete",
+      "description": "Delete a file (trash by default; permanent=true is irreversible).",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_rename",
+      "description": "Rename a file with automatic wikilink update.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_move",
+      "description": "Move a file to a new folder with automatic wikilink update.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_links",
+      "description": "List outbound wikilinks from a note (Lens index).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_backlinks",
+      "description": "List inbound wikilinks to a note (Lens index).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_orphans",
+      "description": "List orphan notes (no inbound links). Defaults to count-only.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_deadends",
+      "description": "List dead-end notes (no outbound links). Defaults to count-only.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_unresolved",
+      "description": "List unresolved (broken) wikilinks.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_lens_status",
+      "description": "Lens index health: note/link counts, kind distribution, daemon heartbeat.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_lens_remember",
+      "description": "DD-301 — record a durable memory with domains, importance, tier, and optional note_path link.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "vault_lens_recall",
+      "description": "DD-301 — recall memories with rich scope (domains, source, tier, importance) and structured _meta envelope (matched_total, returned, filtered_by).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_lens_search",
+      "description": "Hybrid semantic + FTS search across the Lens index with scope filters.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_lens_fts",
+      "description": "Pure FTS5 search across the Lens index with scope filters.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_lens_related",
+      "description": "Related-notes lookup via Lens semantic embeddings.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_lens_connections",
+      "description": "Hebbian connection lookup for a memory or note via the Lens graph.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_lens_heat",
+      "description": "Lens heat-map analysis: recently accessed memories / hot domains.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_lens_velocity",
+      "description": "Lens velocity analysis: growth rate of memories / domains over time.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_lens_consolidate",
+      "description": "DD-301 — consolidate memories (decay, rehearsal, merge). Mutating maintenance.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "vault_lens_memory_stats",
+      "description": "Memory store statistics: total count, per-domain distribution, tier breakdown.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "top-level",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    }
+  ],
   "repository": "https://github.com/groupthink-dev/stallari-vault",
   "install": {
     "runtime": "library",
