@@ -4,7 +4,7 @@
   "title": "Syncthing",
   "description": "Syncthing replication management MCP \u2014 multi-instance, token-efficient output, safe disk-space reclamation. Read and control access to Syncthing's REST API with a focus on replication awareness: knowing which folders are fully replicated across devices so you can confidently reclaim local disk space.",
   "tagline": "Mesh file sync with replication-aware disk reclamation",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/syncthing-blade-mcp.svg",
@@ -28,13 +28,13 @@
   "tools": [
     {
       "name": "syncthing_list_devices",
-      "description": "List all configured Syncthing devices with online/offline status.",
+      "description": "List all configured Syncthing devices with online/offline status. (DD-278 `scope=` tag accepted; folder set resolved via `SYNCTHING_<SCOPE>_FOLDERS` env var; canonical sort by deviceID; _meta envelope tail.)",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "none",
+        "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -182,13 +182,13 @@
     },
     {
       "name": "syncthing_folder_status",
-      "description": "Current sync state, error count, and need bytes for a folder.",
+      "description": "Current sync state, error count, and need bytes for a folder. (DD-278 `scope=` tag accepted as folder-membership precondition; _meta envelope tail.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -204,13 +204,13 @@
     },
     {
       "name": "syncthing_replication_report",
-      "description": "Cross-device replication summary for a folder.",
+      "description": "Cross-device replication summary for a folder. (DD-278 `scope=` tag accepted; folder set resolved via `SYNCTHING_<SCOPE>_FOLDERS` env var; sort tie-broken by folder id; _meta envelope tail.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
