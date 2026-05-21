@@ -3,7 +3,7 @@
   "title": "Home Assistant",
   "description": "Home Assistant operations \u2014 entities, state, history, device control, automations, energy, multi-site management",
   "tagline": "Multi-site Home Assistant control with write gating",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/home-assistant-blade-mcp.svg",
@@ -112,10 +112,10 @@
       "description": "List all devices with manufacturer, model, area assignment.",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "client-side",
+        "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unsorted",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -123,10 +123,10 @@
       "description": "List entities, optionally filtered by domain, area, or label.",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "client-side",
+        "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unsorted",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -203,7 +203,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unsorted",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -236,7 +236,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
