@@ -1,7 +1,7 @@
 {
   "name": "home-assistant-blade-mcp",
   "title": "Home Assistant",
-  "description": "Home Assistant operations — entities, state, history, device control, automations, energy, multi-site management",
+  "description": "Home Assistant operations \u2014 entities, state, history, device control, automations, energy, multi-site management",
   "tagline": "Multi-site Home Assistant control with write gating",
   "version": "0.1.1",
   "author": "groupthink-dev",
@@ -14,28 +14,28 @@
   "repository": "https://github.com/groupthink-dev/home-assistant-blade-mcp",
   "highlights": [
     {
-      "icon": "🏠",
-      "text": "Entities & state — query any entity, filter by domain, area, or floor"
+      "icon": "\ud83c\udfe0",
+      "text": "Entities & state \u2014 query any entity, filter by domain, area, or floor"
     },
     {
-      "icon": "📊",
-      "text": "History & energy — state history, energy monitoring, long-term statistics"
+      "icon": "\ud83d\udcca",
+      "text": "History & energy \u2014 state history, energy monitoring, long-term statistics"
     },
     {
-      "icon": "🎮",
-      "text": "Device control — call services, activate scenes, trigger automations"
+      "icon": "\ud83c\udfae",
+      "text": "Device control \u2014 call services, activate scenes, trigger automations"
     },
     {
-      "icon": "🤖",
-      "text": "Automations — list, toggle, create, and manage automation rules"
+      "icon": "\ud83e\udd16",
+      "text": "Automations \u2014 list, toggle, create, and manage automation rules"
     },
     {
-      "icon": "🌐",
-      "text": "Multi-site — manage multiple HA instances from a single plugin"
+      "icon": "\ud83c\udf10",
+      "text": "Multi-site \u2014 manage multiple HA instances from a single plugin"
     },
     {
-      "icon": "🔒",
-      "text": "Write-gated — reads always work, device commands require explicit opt-in"
+      "icon": "\ud83d\udd12",
+      "text": "Write-gated \u2014 reads always work, device commands require explicit opt-in"
     }
   ],
   "links": [
@@ -56,12 +56,410 @@
       "url": "https://www.home-assistant.io/docs/"
     }
   ],
-  "readme": "### What it does\n\nHome Assistant Blade gives your AI agent full operational control over one or more Home Assistant instances. 36 tools cover entity state queries, device control, automation management, energy monitoring, history analysis, and scene activation.\n\nYour agent can check which lights are on, review energy consumption for the past week, trigger an automation, activate a scene, and manage smart home devices across multiple sites — all in a single conversation.\n\n### Multi-site support\n\nUnlike most Home Assistant integrations, this plugin supports multiple instances natively. Set `HA_PROVIDERS` to a comma-separated list of site names, then configure per-provider URL and token environment variables. Each tool call is scoped to a specific provider, so your agent can compare energy usage between two homes or check device status across sites.\n\n### Token efficiency\n\nHome Assistant's REST API returns verbose entity state payloads with deep attribute nesting. Each tool includes a concise formatter that extracts only the fields your agent needs. Entity lists are filtered by domain, area, or floor so you never waste context on irrelevant devices.\n\n### Safety model\n\nAll 36 tools follow a read-free, write-gated pattern:\n\n- **Reads** work immediately — entity state, history, energy stats, automation list\n- **Writes** require `HA_WRITE_ENABLED=true` — call services, activate scenes, toggle automations, create automations\n\nThis means your agent can monitor your home freely but cannot change anything without explicit permission.",
+  "readme": "### What it does\n\nHome Assistant Blade gives your AI agent full operational control over one or more Home Assistant instances. 36 tools cover entity state queries, device control, automation management, energy monitoring, history analysis, and scene activation.\n\nYour agent can check which lights are on, review energy consumption for the past week, trigger an automation, activate a scene, and manage smart home devices across multiple sites \u2014 all in a single conversation.\n\n### Multi-site support\n\nUnlike most Home Assistant integrations, this plugin supports multiple instances natively. Set `HA_PROVIDERS` to a comma-separated list of site names, then configure per-provider URL and token environment variables. Each tool call is scoped to a specific provider, so your agent can compare energy usage between two homes or check device status across sites.\n\n### Token efficiency\n\nHome Assistant's REST API returns verbose entity state payloads with deep attribute nesting. Each tool includes a concise formatter that extracts only the fields your agent needs. Entity lists are filtered by domain, area, or floor so you never waste context on irrelevant devices.\n\n### Safety model\n\nAll 36 tools follow a read-free, write-gated pattern:\n\n- **Reads** work immediately \u2014 entity state, history, energy stats, automation list\n- **Writes** require `HA_WRITE_ENABLED=true` \u2014 call services, activate scenes, toggle automations, create automations\n\nThis means your agent can monitor your home freely but cannot change anything without explicit permission.",
   "multi_instance": true,
   "install": {
     "runtime": "uv",
     "package": "home-assistant-blade-mcp"
   },
+  "tools": [
+    {
+      "name": "ha_info",
+      "description": "Health check \u2014 instance URL, version, entity count, area count.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_config",
+      "description": "HA server configuration \u2014 components loaded, location, timezone.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_error_log",
+      "description": "Recent error log entries from the HA instance.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_areas",
+      "description": "List all areas with entity counts.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_devices",
+      "description": "List all devices with manufacturer, model, area assignment.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_entities",
+      "description": "List entities, optionally filtered by domain, area, or label.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_floors",
+      "description": "List all floors with area assignments.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_labels",
+      "description": "List all labels with entity counts.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_search",
+      "description": "Fuzzy search across entities, devices, areas, and automations.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_services_list",
+      "description": "List all available services across loaded components.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_state",
+      "description": "Current state and attributes of a single entity by entity_id.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_states",
+      "description": "Current state of all entities \u2014 bulk state snapshot.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_states_by_domain",
+      "description": "Current state of all entities within a domain (light, switch, sensor, etc.).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_history",
+      "description": "State history for one or more entities in a time range.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_logbook",
+      "description": "Logbook entries (state changes + automation triggers) for a time range.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_statistics",
+      "description": "Long-term statistics for entities (hourly/daily aggregates).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_statistics_list",
+      "description": "List all entities with long-term statistics available.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_calendar_events",
+      "description": "Events from HA calendar entities in a date range.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_call_service",
+      "description": "Call an arbitrary HA service with a data payload. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_light",
+      "description": "Control a light entity \u2014 on/off, brightness, colour. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_climate",
+      "description": "Control a climate entity \u2014 mode, setpoint, fan, swing. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_scene",
+      "description": "Activate a scene by entity_id. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_lock",
+      "description": "Lock or unlock a lock entity. Write \u2014 destructive.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_alarm",
+      "description": "Arm, disarm, or trigger an alarm control panel. Write \u2014 destructive.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_automations",
+      "description": "List all automation entities with state and last triggered.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unsorted",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_automation_get",
+      "description": "Get full configuration (triggers, conditions, actions) for an automation.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_automation_trigger",
+      "description": "Force-trigger an automation. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_automation_toggle",
+      "description": "Enable or disable an automation. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_automation_create",
+      "description": "Create a new automation from a YAML/JSON spec. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_automation_delete",
+      "description": "Delete an automation by ID. Destructive.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_script_run",
+      "description": "Execute a script entity by entity_id. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_template",
+      "description": "Render a Jinja2 template against current HA state. Read.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_camera_snapshot",
+      "description": "Capture a still image from a camera entity.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_webhook",
+      "description": "Trigger a webhook automation by webhook ID. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_events",
+      "description": "Recent state-change events from HA event bus.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ha_notify",
+      "description": "Send a notification via an HA notify service. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "env": [
     {
       "name": "HA_URL",
@@ -88,7 +486,7 @@
     "icon": "house.fill",
     "product": "Home Assistant",
     "blurb": "Connect to Home Assistant for smart home control, monitoring, and automation management. Supports multi-site.",
-    "help_text": "Create a Long-Lived Access Token at Profile → Security → Long-Lived Access Tokens in your Home Assistant instance. For multi-site, set HA_PROVIDERS and per-provider URL/token env vars.",
+    "help_text": "Create a Long-Lived Access Token at Profile \u2192 Security \u2192 Long-Lived Access Tokens in your Home Assistant instance. For multi-site, set HA_PROVIDERS and per-provider URL/token env vars.",
     "fields": [
       {
         "key": "HA_URL",
@@ -102,7 +500,7 @@
         "label": "Long-Lived Access Token",
         "secret": true,
         "placeholder": "eyJhbGciOiJIUzI1NiIs...",
-        "help": "Profile → Security → Long-Lived Access Tokens"
+        "help": "Profile \u2192 Security \u2192 Long-Lived Access Tokens"
       },
       {
         "key": "HA_WRITE_ENABLED",

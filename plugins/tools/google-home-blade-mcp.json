@@ -1,7 +1,7 @@
 {
   "name": "google-home-blade-mcp",
   "title": "Google Home",
-  "description": "Google Home / Nest device control via SDM API — thermostats, cameras, doorbells, event streams",
+  "description": "Google Home / Nest device control via SDM API \u2014 thermostats, cameras, doorbells, event streams",
   "tagline": "Nest thermostat, camera, and doorbell control via SDM",
   "version": "0.1.1",
   "author": "groupthink-dev",
@@ -14,28 +14,28 @@
   "repository": "https://github.com/groupthink-dev/google-home-blade-mcp",
   "highlights": [
     {
-      "icon": "🌡️",
-      "text": "Thermostats — read temperature, set mode, adjust setpoints, fan control"
+      "icon": "\ud83c\udf21\ufe0f",
+      "text": "Thermostats \u2014 read temperature, set mode, adjust setpoints, fan control"
     },
     {
-      "icon": "📷",
-      "text": "Cameras — stream URLs, snapshot events, motion and person detection"
+      "icon": "\ud83d\udcf7",
+      "text": "Cameras \u2014 stream URLs, snapshot events, motion and person detection"
     },
     {
-      "icon": "🚪",
-      "text": "Doorbells — press events, chime status, visitor detection"
+      "icon": "\ud83d\udeaa",
+      "text": "Doorbells \u2014 press events, chime status, visitor detection"
     },
     {
-      "icon": "📡",
-      "text": "Event streams — real-time Pub/Sub for device state changes"
+      "icon": "\ud83d\udce1",
+      "text": "Event streams \u2014 real-time Pub/Sub for device state changes"
     },
     {
-      "icon": "🏠",
-      "text": "Structure-aware — devices grouped by rooms and structures"
+      "icon": "\ud83c\udfe0",
+      "text": "Structure-aware \u2014 devices grouped by rooms and structures"
     },
     {
-      "icon": "🔒",
-      "text": "Write-gated — reads always work, commands require explicit opt-in"
+      "icon": "\ud83d\udd12",
+      "text": "Write-gated \u2014 reads always work, commands require explicit opt-in"
     }
   ],
   "links": [
@@ -56,11 +56,178 @@
       "url": "https://console.cloud.google.com/"
     }
   ],
-  "readme": "### What it does\n\nGoogle Home Blade connects your AI agent to Google Nest devices through the Smart Device Management (SDM) API. It provides tools for reading device state, controlling thermostats, viewing camera streams, monitoring doorbell events, and subscribing to real-time device event streams via Pub/Sub.\n\nYour agent can check the current temperature across your home, adjust thermostat setpoints, view camera feeds, and react to doorbell presses or motion events — all through a structured tool interface.\n\n### Device support\n\nThe SDM API exposes Nest thermostats, cameras, and doorbells. Devices are organised by structure (home) and room, so your agent understands the physical layout. Supported device traits include temperature, humidity, HVAC mode, fan control, camera live stream, and event history.\n\n### Safety model\n\nAll tools follow a read-free, write-gated pattern:\n\n- **Reads** work immediately — list devices, check temperature, view camera status\n- **Commands** require `GOOGLE_HOME_WRITE_ENABLED=true` — set thermostat, change mode, toggle fan\n\nEvent streams (Pub/Sub) are read-only and available without the write gate.\n\n### Setup complexity\n\nThis plugin has the most involved setup of any Blade MCP — it requires a Google Cloud project, SDM API access ($5 USD one-time Device Access Console fee), OAuth 2.0 credentials, and optionally a Pub/Sub subscription for event streams. The `make auth` command handles the OAuth flow once credentials are configured.",
+  "readme": "### What it does\n\nGoogle Home Blade connects your AI agent to Google Nest devices through the Smart Device Management (SDM) API. It provides tools for reading device state, controlling thermostats, viewing camera streams, monitoring doorbell events, and subscribing to real-time device event streams via Pub/Sub.\n\nYour agent can check the current temperature across your home, adjust thermostat setpoints, view camera feeds, and react to doorbell presses or motion events \u2014 all through a structured tool interface.\n\n### Device support\n\nThe SDM API exposes Nest thermostats, cameras, and doorbells. Devices are organised by structure (home) and room, so your agent understands the physical layout. Supported device traits include temperature, humidity, HVAC mode, fan control, camera live stream, and event history.\n\n### Safety model\n\nAll tools follow a read-free, write-gated pattern:\n\n- **Reads** work immediately \u2014 list devices, check temperature, view camera status\n- **Commands** require `GOOGLE_HOME_WRITE_ENABLED=true` \u2014 set thermostat, change mode, toggle fan\n\nEvent streams (Pub/Sub) are read-only and available without the write gate.\n\n### Setup complexity\n\nThis plugin has the most involved setup of any Blade MCP \u2014 it requires a Google Cloud project, SDM API access ($5 USD one-time Device Access Console fee), OAuth 2.0 credentials, and optionally a Pub/Sub subscription for event streams. The `make auth` command handles the OAuth flow once credentials are configured.",
   "install": {
     "runtime": "uv",
     "package": "google-home-blade-mcp"
   },
+  "tools": [
+    {
+      "name": "ghome_info",
+      "description": "Health check \u2014 auth status, structure count, device count.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_structures",
+      "description": "List all structures (homes) accessible to the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_rooms",
+      "description": "List rooms within a structure.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_devices",
+      "description": "List devices, optionally filtered by structure or type.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_device",
+      "description": "Full detail for a single device by ID \u2014 traits, state, last update.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_thermostat_mode",
+      "description": "Set thermostat mode (HEAT, COOL, OFF, etc.). Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_thermostat_setpoint",
+      "description": "Set thermostat target temperature. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_thermostat_eco",
+      "description": "Toggle thermostat eco mode. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_fan_set",
+      "description": "Set fan timer or mode. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_camera_stream",
+      "description": "Generate an RTSP/WebRTC stream URL for a camera. Read.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_camera_image",
+      "description": "Capture a still image from a camera. Read.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_command",
+      "description": "Execute an arbitrary SDM command against a device. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_events",
+      "description": "Recent events emitted by devices in a structure.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_status",
+      "description": "Aggregate status across all devices \u2014 compact summary.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "ghome_thermostats",
+      "description": "Compact summary of all thermostats \u2014 current temp, target, mode.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "env": [
     {
       "name": "GOOGLE_HOME_CLIENT_ID",
@@ -157,7 +324,7 @@
         "url": "https://console.cloud.google.com/"
       }
     ],
-    "blurb": "Google Home / Nest device control via SDM API — thermostats, cameras, doorbells, event streams"
+    "blurb": "Google Home / Nest device control via SDM API \u2014 thermostats, cameras, doorbells, event streams"
   },
   "scenarios": [
     {

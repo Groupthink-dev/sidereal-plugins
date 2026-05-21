@@ -1,7 +1,7 @@
 {
   "name": "gmail-blade-mcp",
   "title": "Google Gmail",
-  "description": "Gmail email operations via Google API — search, read, send, threads, labels, drafts, filters. Gemini-powered classification and summarisation.",
+  "description": "Gmail email operations via Google API \u2014 search, read, send, threads, labels, drafts, filters. Gemini-powered classification and summarisation.",
   "tagline": "Gmail management with Gemini-powered classification",
   "version": "0.2.1",
   "author": "groupthink-dev",
@@ -14,28 +14,28 @@
   "repository": "https://github.com/groupthink-dev/gmail-blade-mcp",
   "highlights": [
     {
-      "icon": "🔍",
-      "text": "Search & threads — Gmail query syntax, thread grouping, label filtering"
+      "icon": "\ud83d\udd0d",
+      "text": "Search & threads \u2014 Gmail query syntax, thread grouping, label filtering"
     },
     {
-      "icon": "✉️",
-      "text": "Send & draft — compose, reply, forward, save drafts for review"
+      "icon": "\u2709\ufe0f",
+      "text": "Send & draft \u2014 compose, reply, forward, save drafts for review"
     },
     {
-      "icon": "🏷️",
-      "text": "Labels & filters — organise mail with labels and automated filter rules"
+      "icon": "\ud83c\udff7\ufe0f",
+      "text": "Labels & filters \u2014 organise mail with labels and automated filter rules"
     },
     {
-      "icon": "🧠",
-      "text": "Gemini AI — on-device classification and summarisation via Gemini Flash"
+      "icon": "\ud83e\udde0",
+      "text": "Gemini AI \u2014 on-device classification and summarisation via Gemini Flash"
     },
     {
-      "icon": "🔐",
-      "text": "OAuth 2.0 — standard Google consent flow, no stored passwords"
+      "icon": "\ud83d\udd10",
+      "text": "OAuth 2.0 \u2014 standard Google consent flow, no stored passwords"
     },
     {
-      "icon": "🔒",
-      "text": "Write-gated — reads always work, sends require explicit opt-in"
+      "icon": "\ud83d\udd12",
+      "text": "Write-gated \u2014 reads always work, sends require explicit opt-in"
     }
   ],
   "links": [
@@ -56,15 +56,248 @@
       "url": "https://ai.google.dev/gemini-api/docs"
     }
   ],
-  "readme": "### What it does\n\nGmail Blade gives your AI agent full access to a Gmail account through the official Google API. Tools cover search, reading, sending, thread management, labels, drafts, and filters. An optional Gemini integration adds on-device email classification and summarisation using Google's lightweight Gemini 2.0 Flash Lite model.\n\nYour agent can search by Gmail query syntax, read full message content, manage labels, create draft replies for human review, and set up filter rules — all through a clean tool interface.\n\n### Gemini integration\n\nWhen a `GOOGLE_API_KEY` is provided, Gmail Blade can classify incoming messages by priority and category, and generate concise summaries of long threads. This runs via the Gemini API — not the host LLM — so it works regardless of which model is driving the agent. The Gemini features are optional; all core email operations work without an API key.\n\n### Safety model\n\nAll tools follow a read-free, write-gated pattern:\n\n- **Reads** work immediately — search, read messages, list labels, view threads\n- **Writes** require explicit opt-in — send, reply, create drafts, modify labels, create filters\n\n### Setup\n\nGmail Blade uses OAuth 2.0 with the standard Google consent flow. You create a Cloud project, enable the Gmail API, download OAuth credentials, and complete a one-time browser-based authorisation. No passwords are stored — the refresh token handles subsequent sessions.",
+  "readme": "### What it does\n\nGmail Blade gives your AI agent full access to a Gmail account through the official Google API. Tools cover search, reading, sending, thread management, labels, drafts, and filters. An optional Gemini integration adds on-device email classification and summarisation using Google's lightweight Gemini 2.0 Flash Lite model.\n\nYour agent can search by Gmail query syntax, read full message content, manage labels, create draft replies for human review, and set up filter rules \u2014 all through a clean tool interface.\n\n### Gemini integration\n\nWhen a `GOOGLE_API_KEY` is provided, Gmail Blade can classify incoming messages by priority and category, and generate concise summaries of long threads. This runs via the Gemini API \u2014 not the host LLM \u2014 so it works regardless of which model is driving the agent. The Gemini features are optional; all core email operations work without an API key.\n\n### Safety model\n\nAll tools follow a read-free, write-gated pattern:\n\n- **Reads** work immediately \u2014 search, read messages, list labels, view threads\n- **Writes** require explicit opt-in \u2014 send, reply, create drafts, modify labels, create filters\n\n### Setup\n\nGmail Blade uses OAuth 2.0 with the standard Google consent flow. You create a Cloud project, enable the Gmail API, download OAuth credentials, and complete a one-time browser-based authorisation. No passwords are stored \u2014 the refresh token handles subsequent sessions.",
   "install": {
     "runtime": "uv",
     "package": "gmail-blade-mcp"
   },
+  "tools": [
+    {
+      "name": "gmail_search",
+      "description": "Search messages by Gmail query language (from:, to:, subject:, has:, newer_than:, etc.). Server-side filter.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_read",
+      "description": "Read a single message by ID \u2014 headers, body, attachments metadata.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_snippets",
+      "description": "Compact snippet view across recent or filtered messages.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_thread",
+      "description": "Read an entire thread by thread ID with all messages.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_mailboxes",
+      "description": "List all labels (mailboxes) in the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_info",
+      "description": "Account health \u2014 quota, identity, label count, write gate status.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_state",
+      "description": "Current sync state and account-wide counters.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_changes",
+      "description": "Incremental changes since a history ID.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_identities",
+      "description": "Send-as identities and aliases configured in the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_filters",
+      "description": "Server-side filter rules configured in the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_send",
+      "description": "Send a new message. Write \u2014 gated by GMAIL_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_reply",
+      "description": "Reply to a thread. Write \u2014 gated by GMAIL_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_draft",
+      "description": "Create a draft message. Write \u2014 gated by GMAIL_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_flag",
+      "description": "Add or remove labels on messages. Reversible write \u2014 gated.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_move",
+      "description": "Move messages between labels. Reversible write \u2014 gated.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_bulk",
+      "description": "Bulk operations on a set of message IDs. Write \u2014 gated.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_delete",
+      "description": "Permanently delete messages. Destructive \u2014 gated by GMAIL_WRITE_ENABLED.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_filter_create",
+      "description": "Create a server-side filter rule. Write \u2014 gated.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_filter_delete",
+      "description": "Delete a server-side filter rule. Destructive \u2014 gated.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_classify",
+      "description": "Classify a message against pre-configured categories. Read-only inference.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "gmail_summarise",
+      "description": "Generate a token-efficient summary of a message or thread.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "env": [
     {
       "name": "GOOGLE_API_KEY",
-      "description": "Google API key for Gemini AI features (optional — classification and summarisation)",
+      "description": "Google API key for Gemini AI features (optional \u2014 classification and summarisation)",
       "secret": true
     }
   ],
@@ -102,7 +335,7 @@
         "url": "https://console.cloud.google.com/apis/credentials"
       }
     ],
-    "blurb": "Gmail email operations via Google API — search, read, send, threads, labels, drafts, filters. Gemini-powered classification and summarisation.",
+    "blurb": "Gmail email operations via Google API \u2014 search, read, send, threads, labels, drafts, filters. Gemini-powered classification and summarisation.",
     "test": {
       "endpoint": "https://www.googleapis.com/oauth2/v3/userinfo",
       "auth_style": "oauth2",

@@ -1,7 +1,7 @@
 {
   "name": "mastodon-blade-mcp",
   "title": "Mastodon",
-  "description": "Mastodon operations — timelines, statuses, notifications, search, interactions, multi-instance",
+  "description": "Mastodon operations \u2014 timelines, statuses, notifications, search, interactions, multi-instance",
   "tagline": "Browse, post, and interact across the fediverse",
   "version": "0.1.1",
   "author": "groupthink-dev",
@@ -17,6 +17,503 @@
     "runtime": "uv",
     "package": "mastodon-blade-mcp"
   },
+  "tools": [
+    {
+      "name": "mastodon_info",
+      "description": "Health check \u2014 instance URL, account, write gate status.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_verify",
+      "description": "Verify credentials against the configured instance.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_timeline_home",
+      "description": "Home timeline \u2014 accounts you follow. Cursor pagination.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_timeline_public",
+      "description": "Public timeline (federated or local-only).",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_timeline_local",
+      "description": "Local timeline of the configured instance.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_timeline_hashtag",
+      "description": "Timeline filtered by a hashtag.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_timeline_list",
+      "description": "Timeline of a user-defined list.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_status",
+      "description": "Fetch a single status by ID.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_context",
+      "description": "Replies and ancestors for a status.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_search",
+      "description": "Search statuses, accounts, and hashtags.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_account",
+      "description": "Fetch an account by ID or @handle.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_account_statuses",
+      "description": "Statuses authored by an account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_relationships",
+      "description": "Follow/mute/block relationships for one or more accounts.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_followers",
+      "description": "Followers of an account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_following",
+      "description": "Accounts followed by an account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_notifications",
+      "description": "Recent notifications \u2014 mentions, follows, boosts, favourites.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_trending_tags",
+      "description": "Currently trending hashtags on the instance.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_trending_statuses",
+      "description": "Currently trending statuses on the instance.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_trending_links",
+      "description": "Currently trending links on the instance.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_bookmarks",
+      "description": "Statuses bookmarked by the authenticated account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_favourites",
+      "description": "Statuses favourited by the authenticated account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_lists",
+      "description": "User-defined lists belonging to the authenticated account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_list_accounts",
+      "description": "Accounts in a specific list.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_conversations",
+      "description": "Direct-message conversations involving the authenticated account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_filters",
+      "description": "Server-side content filters configured on the account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_post",
+      "description": "Post a new status. Write \u2014 gated.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_reply",
+      "description": "Reply to a status. Write \u2014 gated.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_edit",
+      "description": "Edit an existing status. Write \u2014 gated.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_delete",
+      "description": "Delete a status. Destructive \u2014 gated.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_favourite",
+      "description": "Favourite a status. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_unfavourite",
+      "description": "Remove a favourite. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_boost",
+      "description": "Boost (reblog) a status. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_unboost",
+      "description": "Remove a boost. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_bookmark",
+      "description": "Bookmark a status. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_unbookmark",
+      "description": "Remove a bookmark. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_pin",
+      "description": "Pin a status to the profile. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_unpin",
+      "description": "Unpin a status from the profile. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_follow",
+      "description": "Follow an account. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_unfollow",
+      "description": "Unfollow an account. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_block",
+      "description": "Block an account. Reversible write \u2014 destructive social impact.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_unblock",
+      "description": "Unblock an account. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_mute",
+      "description": "Mute an account. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_unmute",
+      "description": "Unmute an account. Reversible write.",
+      "risk_class": "reversible_write",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_dismiss_notification",
+      "description": "Dismiss a single notification. Destructive.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "mastodon_media_upload",
+      "description": "Upload media for use in a subsequent post. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "env": [
     {
       "name": "MASTODON_INSTANCE",
@@ -89,28 +586,28 @@
   },
   "highlights": [
     {
-      "icon": "📨",
-      "text": "Timelines — home, local, federated, hashtag, and list feeds"
+      "icon": "\ud83d\udce8",
+      "text": "Timelines \u2014 home, local, federated, hashtag, and list feeds"
     },
     {
-      "icon": "🔍",
-      "text": "Search — accounts, statuses, and hashtags across the fediverse"
+      "icon": "\ud83d\udd0d",
+      "text": "Search \u2014 accounts, statuses, and hashtags across the fediverse"
     },
     {
-      "icon": "🔔",
-      "text": "Notifications — mentions, boosts, favourites, follow requests"
+      "icon": "\ud83d\udd14",
+      "text": "Notifications \u2014 mentions, boosts, favourites, follow requests"
     },
     {
-      "icon": "✍️",
-      "text": "Compose — post, reply, boost, favourite, bookmark"
+      "icon": "\u270d\ufe0f",
+      "text": "Compose \u2014 post, reply, boost, favourite, bookmark"
     },
     {
-      "icon": "🌐",
-      "text": "Multi-instance — manage multiple accounts from one server"
+      "icon": "\ud83c\udf10",
+      "text": "Multi-instance \u2014 manage multiple accounts from one server"
     },
     {
-      "icon": "🔒",
-      "text": "Write-gated — posting disabled by default, explicit opt-in"
+      "icon": "\ud83d\udd12",
+      "text": "Write-gated \u2014 posting disabled by default, explicit opt-in"
     }
   ],
   "links": [
@@ -131,7 +628,7 @@
       "url": "https://docs.joinmastodon.org/api/oauth-scopes/"
     }
   ],
-  "readme": "### What it does\n\nMastodon Blade MCP gives your AI agent access to the Mastodon social network — reading timelines, searching content, managing notifications, and composing posts. It works with any Mastodon-compatible instance (Mastodon, Pleroma, GoToSocial, Akkoma) through the standard Mastodon API.\n\nYour agent can catch up on your home timeline, search for discussions on a topic, check notifications, and draft or publish posts — all from a single conversation.\n\n### Multi-instance support\n\nConfigure multiple accounts across different instances using `MASTODON_PROVIDERS`. Each provider gets its own instance URL and token, and your agent can switch between them within a session. Useful for managing personal and project accounts separately.\n\n### Safety model\n\nAll write operations (posting, replying, boosting, favouriting, following) are disabled by default:\n\n- **Read-only by default** — timelines, search, and notifications work immediately\n- **Write gate** — set `MASTODON_WRITE_ENABLED=true` to unlock posting and interactions\n- **Confirm gate** — each write tool requires `confirm: true` per call\n\nThis prevents accidental posts or follows while still allowing full read access for monitoring and research.",
+  "readme": "### What it does\n\nMastodon Blade MCP gives your AI agent access to the Mastodon social network \u2014 reading timelines, searching content, managing notifications, and composing posts. It works with any Mastodon-compatible instance (Mastodon, Pleroma, GoToSocial, Akkoma) through the standard Mastodon API.\n\nYour agent can catch up on your home timeline, search for discussions on a topic, check notifications, and draft or publish posts \u2014 all from a single conversation.\n\n### Multi-instance support\n\nConfigure multiple accounts across different instances using `MASTODON_PROVIDERS`. Each provider gets its own instance URL and token, and your agent can switch between them within a session. Useful for managing personal and project accounts separately.\n\n### Safety model\n\nAll write operations (posting, replying, boosting, favouriting, following) are disabled by default:\n\n- **Read-only by default** \u2014 timelines, search, and notifications work immediately\n- **Write gate** \u2014 set `MASTODON_WRITE_ENABLED=true` to unlock posting and interactions\n- **Confirm gate** \u2014 each write tool requires `confirm: true` per call\n\nThis prevents accidental posts or follows while still allowing full read access for monitoring and research.",
   "scenarios": [
     {
       "type": "workflow",

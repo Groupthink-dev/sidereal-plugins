@@ -1,7 +1,7 @@
 {
   "name": "things3-blade-mcp",
   "title": "Things 3",
-  "description": "Things 3 task management via AppleScript and URL scheme — macOS only",
+  "description": "Things 3 task management via AppleScript and URL scheme \u2014 macOS only",
   "tagline": "GTD task management through Things 3 on macOS",
   "version": "0.1.1",
   "author": "groupthink-dev",
@@ -16,13 +16,345 @@
     "runtime": "uv",
     "package": "things3-blade-mcp"
   },
+  "tools": [
+    {
+      "name": "get_inbox",
+      "description": "Items in the Things 3 inbox.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_today",
+      "description": "Items scheduled for today.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_upcoming",
+      "description": "Upcoming scheduled items.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_anytime",
+      "description": "Items in the Anytime list.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_someday",
+      "description": "Items in the Someday list.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_logbook",
+      "description": "Completed items in the logbook.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_trash",
+      "description": "Items in the trash.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_deadlines",
+      "description": "Items with deadlines.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_random_inbox",
+      "description": "A random sample of items from the inbox.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_random_today",
+      "description": "A random sample of items from today.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_random_anytime",
+      "description": "A random sample of items from anytime.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_random_todos",
+      "description": "A random sample of todos across all lists.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_todos",
+      "description": "All todos with optional client-side filters.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_projects",
+      "description": "All projects.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_areas",
+      "description": "All areas of focus.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_tags",
+      "description": "All tags.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_tagged_items",
+      "description": "Items tagged with one or more specific tags.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "search_todos",
+      "description": "Full-text search across todos.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "search_advanced",
+      "description": "Advanced search with multiple filter criteria.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_recent",
+      "description": "Recently modified items.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "show_item",
+      "description": "Open a specific item in the Things 3 app. AppleScript-triggered UI surface.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "get_summary",
+      "description": "Aggregate counts across inbox, today, projects, and areas.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "add_todo",
+      "description": "Create a new todo via the Things 3 URL scheme. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "add_project",
+      "description": "Create a new project via the Things 3 URL scheme. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "update_todo",
+      "description": "Update an existing todo via the Things 3 URL scheme. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "update_project",
+      "description": "Update an existing project via the Things 3 URL scheme. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "show_in_things",
+      "description": "Open an item in the Things 3 app UI. AppleScript-triggered.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "search_in_things",
+      "description": "Open the Things 3 app's search UI with a query. AppleScript-triggered.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "json_import",
+      "description": "Bulk-import todos and projects via the Things 3 JSON URL scheme. Write.",
+      "risk_class": "external_side_effect",
+      "granularity": {
+        "scope_filtering": "none",
+        "field_projection": "none",
+        "deterministic_ordering": "stable",
+        "audit_surface": "minimal"
+      }
+    },
+    {
+      "name": "json_export",
+      "description": "Export todos and projects as JSON.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "client-side",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
   "setup": {
     "auth_model": "none",
     "complexity": "trivial",
     "icon": "checkmark.circle.fill",
     "product": "Things 3",
-    "blurb": "Connect to Things 3 for GTD task management — inbox, today, projects, areas, tags, and task creation via AppleScript and URL scheme.",
-    "help_text": "Things 3 must be installed from the Mac App Store. No API keys required — access is via AppleScript and the Things URL scheme.",
+    "blurb": "Connect to Things 3 for GTD task management \u2014 inbox, today, projects, areas, tags, and task creation via AppleScript and URL scheme.",
+    "help_text": "Things 3 must be installed from the Mac App Store. No API keys required \u2014 access is via AppleScript and the Things URL scheme.",
     "prerequisites": [
       "macOS with Things 3 installed",
       "AppleScript permission for terminal (auto-prompted on first use)"
@@ -39,33 +371,33 @@
     ],
     "test": {
       "skip": true,
-      "skip_reason": "AppleScript-only access to Things 3 — no HTTP surface."
+      "skip_reason": "AppleScript-only access to Things 3 \u2014 no HTTP surface."
     }
   },
   "highlights": [
     {
-      "icon": "📥",
-      "text": "Inbox — capture and triage tasks in the Things inbox"
+      "icon": "\ud83d\udce5",
+      "text": "Inbox \u2014 capture and triage tasks in the Things inbox"
     },
     {
-      "icon": "⭐",
-      "text": "Today — view and manage today’s focused task list"
+      "icon": "\u2b50",
+      "text": "Today \u2014 view and manage today\u2019s focused task list"
     },
     {
-      "icon": "📁",
-      "text": "Projects — browse projects, areas, headings, and checklists"
+      "icon": "\ud83d\udcc1",
+      "text": "Projects \u2014 browse projects, areas, headings, and checklists"
     },
     {
-      "icon": "🏷️",
-      "text": "Tags — filter and organise tasks by tag"
+      "icon": "\ud83c\udff7\ufe0f",
+      "text": "Tags \u2014 filter and organise tasks by tag"
     },
     {
-      "icon": "➕",
-      "text": "Create — add tasks with dates, tags, projects, checklists"
+      "icon": "\u2795",
+      "text": "Create \u2014 add tasks with dates, tags, projects, checklists"
     },
     {
-      "icon": "🔄",
-      "text": "Sync — changes sync to Things Cloud on all devices"
+      "icon": "\ud83d\udd04",
+      "text": "Sync \u2014 changes sync to Things Cloud on all devices"
     }
   ],
   "links": [
@@ -86,7 +418,7 @@
       "url": "https://culturedcode.com/things/support/articles/2803572/"
     }
   ],
-  "readme": "### What it does\n\nThings 3 gives your AI agent access to Cultured Code’s GTD task manager on macOS. Browse your inbox, today list, upcoming and someday tasks, projects, areas, and tags — and create new tasks with full metadata.\n\nYour agent can review what’s due today, capture new tasks into the inbox, create structured projects with headings and checklists, and search across your entire task database.\n\n### macOS integration\n\nThis plugin uses two native interfaces: AppleScript for reading Things’ database, and the Things URL scheme for creating and modifying tasks. No API keys, no cloud configuration — just Things 3 installed on your Mac.\n\nChanges sync automatically via Things Cloud to your iPhone, iPad, and other Macs.\n\n### Safety model\n\nRead operations (inbox, today, projects, areas, tags, search) work immediately.\n\nTask creation uses the Things URL scheme, which opens Things briefly to process the command. This is a native macOS interaction — no network requests involved.\n\n### GTD workflow support\n\n| View | What you can do |\n|------|-----------------|\n| Inbox | Browse and triage uncategorised captures |\n| Today | See today’s focused list |\n| Upcoming | Review scheduled tasks with dates |\n| Someday | Browse deferred items |\n| Projects | Navigate project hierarchies with headings |\n| Areas | Browse areas of responsibility |\n| Tags | Filter tasks by any tag |\n| Logbook | Review completed tasks |",
+  "readme": "### What it does\n\nThings 3 gives your AI agent access to Cultured Code\u2019s GTD task manager on macOS. Browse your inbox, today list, upcoming and someday tasks, projects, areas, and tags \u2014 and create new tasks with full metadata.\n\nYour agent can review what\u2019s due today, capture new tasks into the inbox, create structured projects with headings and checklists, and search across your entire task database.\n\n### macOS integration\n\nThis plugin uses two native interfaces: AppleScript for reading Things\u2019 database, and the Things URL scheme for creating and modifying tasks. No API keys, no cloud configuration \u2014 just Things 3 installed on your Mac.\n\nChanges sync automatically via Things Cloud to your iPhone, iPad, and other Macs.\n\n### Safety model\n\nRead operations (inbox, today, projects, areas, tags, search) work immediately.\n\nTask creation uses the Things URL scheme, which opens Things briefly to process the command. This is a native macOS interaction \u2014 no network requests involved.\n\n### GTD workflow support\n\n| View | What you can do |\n|------|-----------------|\n| Inbox | Browse and triage uncategorised captures |\n| Today | See today\u2019s focused list |\n| Upcoming | Review scheduled tasks with dates |\n| Someday | Browse deferred items |\n| Projects | Navigate project hierarchies with headings |\n| Areas | Browse areas of responsibility |\n| Tags | Filter tasks by any tag |\n| Logbook | Review completed tasks |",
   "scenarios": [
     {
       "type": "workflow",
@@ -94,7 +426,7 @@
       "target_type": "plugin",
       "shared_services": [],
       "label": "Morning task triage",
-      "body": "Review the Things inbox for uncategorised captures, move items to appropriate projects with due dates and tags, then check today’s list to confirm priorities."
+      "body": "Review the Things inbox for uncategorised captures, move items to appropriate projects with due dates and tags, then check today\u2019s list to confirm priorities."
     },
     {
       "type": "workflow",
