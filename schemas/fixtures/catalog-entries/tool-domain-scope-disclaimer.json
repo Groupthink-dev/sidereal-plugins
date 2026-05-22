@@ -1,0 +1,38 @@
+{
+  "name": "domain-scope-disclaimer-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 F.4 fixture — tool declares domain_scope=\"single\" AND advertises a `scope` argument BUT carries `// scope-arg-disclaimer: <reason>` in description. AJV pass; build-catalog emits S-DOM-002 info-level finding (not warning).",
+  "version": "1.0.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "certified",
+  "author_type": "first-party",
+  "contract": "example-v1",
+  "repository": "https://github.com/Groupthink-dev/domain-scope-disclaimer-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "domain-scope-disclaimer-blade-mcp"
+  },
+  "risk_class": "read_only",
+  "tools": [
+    {
+      "name": "list_records",
+      "description": "List records. Caller passes scope to select exactly ONE domain at a time. // scope-arg-disclaimer: scope argument accepts only a single value per call; multi-domain calls require N separate invocations.",
+      "risk_class": "read_only",
+      "arguments": [
+        {
+          "name": "scope",
+          "type": "string",
+          "description": "Domain scope filter (single value only)."
+        }
+      ],
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured",
+        "domain_scope": "single"
+      }
+    }
+  ]
+}

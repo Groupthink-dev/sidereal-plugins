@@ -1,0 +1,49 @@
+# DD-333 F.4 example — INCORRECT single-with-scope-arg shape (S-DOM-002 violation).
+#
+# This pack documents a NEGATIVE case: tool author declared
+# granularity.domain_scope="single" but the tool also advertises a `scope`
+# argument with string type. build-catalog.js emits an S-DOM-002 warning
+# because the contract is internally inconsistent — a scope argument that
+# admits multiple domain values contradicts the single-domain contract.
+#
+# Author fix paths:
+#   (a) Change domain_scope to "multi" (and populate _meta.domain_attribution
+#       per A.2.dom) if the tool genuinely spans multiple domains.
+#   (b) Remove the `scope` argument if the tool is genuinely bound to one
+#       domain (caller cannot select a different domain).
+#   (c) If the `scope` argument truly accepts only a single value at a time
+#       (so each call is single-domain even though the arg name resembles
+#       a domain selector), add `// scope-arg-disclaimer: <reason>` to the
+#       tool description to downgrade the finding to info-level.
+#
+# Reference shape only — see negative fixture in
+# schemas/fixtures/catalog-entries/tool-domain-scope-single-with-scope-arg-violation.json.
+pack: "1.0"
+name: domain-scope-single-violation-pack
+version: 1.0.0
+description: |
+  Negative reference pack — illustrates the S-DOM-002 violation shape
+  (domain_scope="single" alongside a `scope` argument with string type).
+author: stallari
+tier: community
+skills:
+  - name: list_legacy_records
+    description: List records using the legacy scope-filtered endpoint.
+    category: catalog
+    services_used:
+      - service: example
+        tool: list_records
+# Reference VIOLATION tools[] shape (do NOT copy verbatim):
+#
+#   tools:
+#     - name: list_records
+#       description: Caller passes scope to filter; legacy contradictory declaration.
+#       arguments:
+#         - name: scope
+#           type: string
+#       granularity:
+#         scope_filtering: server-side
+#         field_projection: per-field
+#         deterministic_ordering: stable
+#         audit_surface: structured
+#         domain_scope: single  # ← Contradicts the scope argument above.
