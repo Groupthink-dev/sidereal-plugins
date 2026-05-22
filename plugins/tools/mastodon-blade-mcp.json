@@ -25,7 +25,7 @@
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -36,7 +36,7 @@
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -141,7 +141,7 @@
     },
     {
       "name": "mastodon_account_statuses",
-      "description": "Statuses authored by an account. Accepts scope=public|personal|family|work as a membership precondition — refuses if account_id is outside the scope's list.",
+      "description": "Statuses authored by an account. Accepts scope=public|personal|family|work as a membership precondition \u2014 refuses if account_id is outside the scope's list.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
@@ -535,7 +535,7 @@
     },
     {
       "name": "MASTODON_PERSONAL_LIST_ID",
-      "description": "Mastodon list ID mapped to scope=personal. Per-instance form: MASTODON_PERSONAL_LIST_ID_<INSTANCE>. Leave unset → scope=personal degrades to passthrough.",
+      "description": "Mastodon list ID mapped to scope=personal. Per-instance form: MASTODON_PERSONAL_LIST_ID_<INSTANCE>. Leave unset \u2192 scope=personal degrades to passthrough.",
       "default": ""
     },
     {
