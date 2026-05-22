@@ -1,7 +1,7 @@
 {
   "name": "legacy-blade-mcp",
   "type": "plugin",
-  "description": "DD-333 fixture — entry with tools[] array but tools omit the granularity block. INVALID at pack-spec 4.0.0 (Phase D cutover 2026-05-21); the AJV gate MUST reject this. The S-MCP-001 lint in stallari-secops-scanner fires `.error` against this shape.",
+  "description": "DD-333 fixture — entry with tools[] array but tools omit the granularity block. AJV accepts at DD-333 F.1 (pack-spec 4.2.0) because tools[].items.required relaxed to [\"name\"] for the rationale escape hatch; the procedural gate in build-catalog.js enforceNonConformanceRationale() rejects (Constraint B). The S-MCP-001 lint in stallari-secops-scanner fires `.error` against this shape post-build.",
   "version": "0.4.0",
   "author": "stallari",
   "license": "MIT",

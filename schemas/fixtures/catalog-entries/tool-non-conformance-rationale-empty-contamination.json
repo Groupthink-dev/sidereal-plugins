@@ -1,0 +1,25 @@
+{
+  "name": "nrr-empty-contamination-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 F.1 fixture — INVALID: contamination_risks must be non-empty (AJV minItems:1).",
+  "version": "1.0.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "community",
+  "author_type": "community",
+  "contract": "example-v1",
+  "repository": "https://github.com/Groupthink-dev/nrr-empty-contamination-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "nrr-empty-contamination-blade-mcp"
+  },
+  "tools": [
+    { "name": "dump_legacy", "description": "Legacy endpoint." }
+  ],
+  "non_conformance_rationale": {
+    "reason": "Upstream IMAP backend lacks per-folder scope.",
+    "scope_filtering_off": true,
+    "contamination_risks": [],
+    "affected_tools": ["dump_legacy"]
+  }
+}

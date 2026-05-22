@@ -1,0 +1,40 @@
+{
+  "name": "nrr-valid-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 F.1 fixture — valid entry with non_conformance_rationale block; mixes a fully-declared tool with one in affected_tools that omits granularity.",
+  "version": "1.0.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "community",
+  "author_type": "community",
+  "contract": "example-v1",
+  "repository": "https://github.com/Groupthink-dev/nrr-valid-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "nrr-valid-blade-mcp"
+  },
+  "risk_class": "read_only",
+  "tools": [
+    {
+      "name": "list_scoped",
+      "description": "Honest server-side scope filtering.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    },
+    {
+      "name": "dump_legacy",
+      "description": "Legacy endpoint listed in non_conformance_rationale.affected_tools; granularity omitted — build-catalog.js derives non-conforming-explicit row at build time."
+    }
+  ],
+  "non_conformance_rationale": {
+    "reason": "dump_legacy endpoint predates the scope substrate; upstream rewrite scheduled v3.0.",
+    "scope_filtering_off": true,
+    "contamination_risks": ["cross-scope-packet-bleed"],
+    "affected_tools": ["dump_legacy"]
+  }
+}
