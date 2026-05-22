@@ -1,0 +1,42 @@
+# DD-333 F.4 example — honest multi-domain pack.
+#
+# Demonstrates a pack whose blade tools legitimately span multiple
+# user-declared domains in a single response. The blade's tools[] declare
+# granularity.domain_scope="multi" AND advertise a `scope` argument so the
+# caller can restrict the cross-domain query. The blade is expected to
+# populate _meta.domain_attribution per DD-338 A.2.dom; the assembler
+# partitions per-domain on packet ingest.
+#
+# Reference shape only — see canonical declaration in plugins/tools/.
+pack: "1.0"
+name: domain-scope-multi-honest-pack
+version: 1.0.0
+description: |
+  Reference pack showing honest domain_scope="multi" declarations for tools
+  that legitimately span multiple bound domains. `scope` argument is
+  contractually consistent with `multi`.
+author: stallari
+tier: certified
+skills:
+  - name: cross_account_search
+    description: Search messages across all bound mail accounts.
+    category: inbox
+    services_used:
+      - service: mail
+        tool: search_messages
+# Reference tools[] shape:
+#
+#   tools:
+#     - name: search_messages
+#       arguments:
+#         - name: scope
+#           type: string
+#           description: Optional comma-separated list of account domains.
+#         - name: query
+#           type: string
+#       granularity:
+#         scope_filtering: server-side
+#         field_projection: per-field
+#         deterministic_ordering: stable
+#         audit_surface: structured
+#         domain_scope: multi

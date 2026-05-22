@@ -1,0 +1,38 @@
+{
+  "name": "domain-scope-single-violation-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 F.4 fixture — tool declares domain_scope=\"single\" but advertises a `scope` argument with string type. AJV pass; build-catalog emits S-DOM-002 warning (author likely meant \"multi\" since scope arg admits multiple domains).",
+  "version": "1.0.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "community",
+  "author_type": "community",
+  "contract": "example-v1",
+  "repository": "https://github.com/Groupthink-dev/domain-scope-single-violation-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "domain-scope-single-violation-blade-mcp"
+  },
+  "risk_class": "read_only",
+  "tools": [
+    {
+      "name": "list_records",
+      "description": "List records. Caller passes scope to filter; legacy contradictory declaration.",
+      "risk_class": "read_only",
+      "arguments": [
+        {
+          "name": "scope",
+          "type": "string",
+          "description": "Domain scope filter."
+        }
+      ],
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured",
+        "domain_scope": "single"
+      }
+    }
+  ]
+}

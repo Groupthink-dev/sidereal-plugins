@@ -123,6 +123,10 @@
               "audit_surface": {
                 "enum": ["structured", "minimal", "none"],
                 "description": "structured: tool returns a _meta envelope alongside results (matched_total, returned, filtered_by, redactions) the assembler lifts into ContextPacket.provenance. minimal: tool returns only the data payload; assembler records call shape only. none: tool returns opaque data with no introspection."
+              },
+              "domain_scope": {
+                "enum": ["single", "multi", "non-conforming-explicit"],
+                "description": "DD-333 F.4 — 5th granularity dimension declaring whether this tool's result-set originates from a single user-declared domain or from multiple/all domains (cross-DD with DD-341 domain substrate and DD-338 _meta.domain_attribution). single: tool's response covers exactly ONE user-declared domain — either the tool is scoped by upstream binding (e.g. a per-account blade) or the caller's domain selection is honoured server-side. multi: tool's response may legitimately span multiple domains in one call (e.g. cross-account search, cross-domain aggregation) — at A.2.dom the blade must populate _meta.domain_attribution; assembler partitions per-domain on packet ingest. non-conforming-explicit: build-catalog.js derives this for tools listed in non_conformance_rationale.domain_scope_unspecified — author has explicitly acknowledged the tool cannot yet declare domain_scope; assembler treats as worst-case (single-only safe). Optional at F.4 ship; promoted to required at F.4.b after A.2.dom blade backfill. S-DOM-002 lint (severity warning at F.4) flags tools declaring `single` that also expose a user-domain-shaped scope argument — likely indicates the author meant `multi` (scope arg admits multiple domains)."
               }
             }
           }
@@ -165,6 +169,12 @@
           "uniqueItems": true,
           "items": { "type": "string" },
           "description": "Tool names from this entry's tools[].name. Every entry here MUST cross-reference an actual tool name (procedural gate in build-catalog.js + S-MCP-002 in stallari-secops-scanner enforce the cross-field invariant — JSON Schema 2020-12 cannot express it)."
+        },
+        "domain_scope_unspecified": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string" },
+          "description": "DD-333 F.4 — additive non-conformance escape hatch for the 5th granularity dimension (domain_scope). Optional list of tool names from this entry's tools[].name that legitimately cannot yet declare domain_scope (upstream provider doesn't expose per-domain partitioning, blade pre-dates DD-341 substrate, etc.). build-catalog.js derives `granularity.domain_scope: \"non-conforming-explicit\"` for each listed tool (sister to existing scope_filtering derivation). Cross-field invariant (every entry must cross-reference an actual tools[].name) is enforced procedurally in build-catalog.js. Promoted to mandatory backfill at F.4.b after A.2.dom blade declarations land."
         }
       }
     },

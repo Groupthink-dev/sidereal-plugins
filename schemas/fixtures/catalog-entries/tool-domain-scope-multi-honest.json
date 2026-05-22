@@ -1,0 +1,42 @@
+{
+  "name": "domain-scope-multi-honest-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 F.4 fixture — tool legitimately declares domain_scope=\"multi\" because results may span multiple user-declared domains. AJV pass; no S-DOM-002 finding (multi is the contract that legitimises a scope argument).",
+  "version": "1.0.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "certified",
+  "author_type": "first-party",
+  "contract": "example-v1",
+  "repository": "https://github.com/Groupthink-dev/domain-scope-multi-honest-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "domain-scope-multi-honest-blade-mcp"
+  },
+  "risk_class": "read_only",
+  "tools": [
+    {
+      "name": "search_messages",
+      "description": "Search messages across multiple bound accounts. Caller selects subset via scope argument; results carry _meta.domain_attribution per A.2.dom.",
+      "risk_class": "read_only",
+      "arguments": [
+        {
+          "name": "scope",
+          "type": "string",
+          "description": "Optional comma-separated list of account domains to restrict the search to."
+        },
+        {
+          "name": "query",
+          "type": "string"
+        }
+      ],
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured",
+        "domain_scope": "multi"
+      }
+    }
+  ]
+}

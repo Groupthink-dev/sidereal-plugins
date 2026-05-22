@@ -128,6 +128,114 @@ function enforceNonConformanceRationale(raw, filename) {
   }
 }
 
+/**
+ * DD-333 F.4 — heuristic regex matching a user-domain-shaped argument name.
+ * Per spec architect-lock #5: simple narrow heuristic. Tool authors can
+ * disable per-tool via `// scope-arg-disclaimer: <reason>` in description.
+ */
+const DOMAIN_SCOPE_ARG_PATTERN = /^(scope|domain|domains|domainName|domain_name)$/i;
+const DOMAIN_SCOPE_DISCLAIMER_PATTERN = /\/\/\s*scope-arg-disclaimer:/i;
+
+/**
+ * Inspect a tool entry's `arguments[]` (if declared) for a user-domain-shaped
+ * argument that matches DOMAIN_SCOPE_ARG_PATTERN AND has a string-or-enum
+ * type. Returns the matched argument name, or null if none. Strict on type
+ * shape — the heuristic is intentionally narrow per architect-lock #5.
+ */
+function findDomainScopeArg(tool) {
+  const args = Array.isArray(tool && tool.arguments) ? tool.arguments : [];
+  for (const arg of args) {
+    if (!arg || typeof arg.name !== "string") continue;
+    if (!DOMAIN_SCOPE_ARG_PATTERN.test(arg.name)) continue;
+    // Accept type: "string", type: ["string", ...], or presence of `enum`.
+    const type = arg.type;
+    const hasStringType =
+      type === "string" ||
+      (Array.isArray(type) && type.includes("string")) ||
+      Array.isArray(arg.enum);
+    if (hasStringType) return arg.name;
+  }
+  return null;
+}
+
+/**
+ * DD-333 F.4 — procedural cross-field gate for granularity.domain_scope.
+ *
+ * Two responsibilities:
+ *   1. Derivation: for each tool listed in
+ *      `non_conformance_rationale.domain_scope_unspecified` whose own
+ *      `granularity.domain_scope` is omitted, mutate in place with
+ *      "non-conforming-explicit". Sister to scope_filtering derivation in
+ *      enforceNonConformanceRationale.
+ *   2. Constraint A: every name in `domain_scope_unspecified` MUST appear
+ *      as a `tools[].name`. Throws on mismatch (mirrors affected_tools gate).
+ *   3. S-DOM-002 finding: for each tool whose effective `granularity.domain_scope`
+ *      is "single" AND tools[].arguments[] declares a user-domain-shaped arg
+ *      matching DOMAIN_SCOPE_ARG_PATTERN, emit a warning-level finding to
+ *      the build output. If the tool's `description` contains a
+ *      `// scope-arg-disclaimer: <reason>` annotation, emit an info-level
+ *      finding instead (per architect-lock #5 advisory).
+ *
+ * @param {object} raw - plugin catalog entry (mutated for derivation step)
+ * @param {string} filename - source file name for finding context
+ * @returns {Array<{level: "warning"|"info", id: "S-DOM-002", message: string}>}
+ *   list of findings (empty = clean)
+ * @throws {Error} on Constraint A failure
+ */
+function enforceDomainScope(raw, filename) {
+  const findings = [];
+  const rationale = raw.non_conformance_rationale;
+  const tools = Array.isArray(raw.tools) ? raw.tools : [];
+  const toolNames = new Set(
+    tools.map((t) => t && t.name).filter((n) => typeof n === "string"),
+  );
+  const unspecified = new Set(
+    rationale && Array.isArray(rationale.domain_scope_unspecified)
+      ? rationale.domain_scope_unspecified
+      : [],
+  );
+
+  // Constraint A — domain_scope_unspecified cross-reference.
+  if (unspecified.size > 0) {
+    const missing = [...unspecified].filter((name) => !toolNames.has(name));
+    if (missing.length > 0) {
+      throw new Error(
+        `Catalog entry ${raw.name || filename}: non_conformance_rationale.domain_scope_unspecified references tool names not present in tools[]: ${missing.map((n) => `"${n}"`).join(", ")}. Every entry in domain_scope_unspecified MUST cross-reference an actual tools[].name. See stallari-pack-spec/docs/domain-scope.md.`,
+      );
+    }
+  }
+
+  // Derivation — mutate granularity.domain_scope in place for each unspecified
+  // tool that lacks its own declaration. Idempotent (skip when already set).
+  for (const tool of tools) {
+    if (!tool || typeof tool.name !== "string") continue;
+    if (!unspecified.has(tool.name)) continue;
+    if (!tool.granularity || typeof tool.granularity !== "object") continue;
+    if (tool.granularity.domain_scope) continue;
+    tool.granularity.domain_scope = "non-conforming-explicit";
+  }
+
+  // S-DOM-002 — scan each tool for a user-domain-shaped scope arg that
+  // contradicts a `single` declaration.
+  for (const tool of tools) {
+    if (!tool || typeof tool.name !== "string") continue;
+    const declared = tool.granularity && tool.granularity.domain_scope;
+    if (declared !== "single") continue;
+    const scopeArgName = findDomainScopeArg(tool);
+    if (!scopeArgName) continue;
+    const description = typeof tool.description === "string" ? tool.description : "";
+    const hasDisclaimer = DOMAIN_SCOPE_DISCLAIMER_PATTERN.test(description);
+    const message = `S-DOM-002 ${raw.name || filename}/${tool.name}: granularity.domain_scope=\"single\" but tool advertises user-domain-shaped argument \"${scopeArgName}\" (matches /^(scope|domain|domains|domainName|domain_name)$/i with string-or-enum type). Author likely meant domain_scope=\"multi\" since the scope argument admits multiple domains. If this is intentional (e.g. scope arg accepts only one value at a time), add a `// scope-arg-disclaimer: <reason>` annotation to the tool description to downgrade this finding to info-level.`;
+    findings.push({
+      level: hasDisclaimer ? "info" : "warning",
+      id: "S-DOM-002",
+      message,
+    });
+  }
+
+  return findings;
+}
+
 /** Convert a pack name to a URL-safe kebab-case slug: "Business Operations" → "business-operations" */
 function slugify(name) {
   return name
@@ -672,6 +780,7 @@ async function main() {
 
   const entries = [];
   const uxWarnings = []; // [{ name, warnings: [] }]
+  const domainScopeFindings = []; // [{ name, findings: [{level, id, message}] }] — DD-333 F.4
 
   // Plugins
   for (const file of pluginFiles) {
@@ -700,6 +809,18 @@ async function main() {
     // uniform regardless of whether granularity was author-declared or
     // rationale-derived.
     enforceNonConformanceRationale(raw, file);
+
+    // DD-333 F.4 — procedural cross-field gate for granularity.domain_scope.
+    // Derives "non-conforming-explicit" for tools listed in
+    // non_conformance_rationale.domain_scope_unspecified AND emits S-DOM-002
+    // findings when a tool declares domain_scope="single" but advertises a
+    // user-domain-shaped scope argument (likely meant "multi"). Findings are
+    // surfaced post-build alongside Manifest UX warnings; they do not fail
+    // the build at F.4 (severity warning, mirrors S-DOM-001 v1 posture).
+    const dsFindings = enforceDomainScope(raw, file);
+    if (dsFindings.length > 0) {
+      domainScopeFindings.push({ name: raw.name || file, findings: dsFindings });
+    }
 
     const warnings = validatePluginUX(raw);
     if (warnings.length > 0) {
@@ -842,6 +963,31 @@ async function main() {
     console.log(`Output: dist/packs/ (${packCount} pack manifests)`);
   }
 
+  // DD-333 F.4 — S-DOM-002 findings report. Severity is .warning at F.4
+  // (mirrors S-DOM-001 v1 posture); promotion to .error follows A.2.dom
+  // blade backfill (separate spec).
+  if (domainScopeFindings.length > 0) {
+    console.log("");
+    const warnCount = domainScopeFindings.reduce(
+      (sum, e) => sum + e.findings.filter((f) => f.level === "warning").length,
+      0,
+    );
+    const infoCount = domainScopeFindings.reduce(
+      (sum, e) => sum + e.findings.filter((f) => f.level === "info").length,
+      0,
+    );
+    console.log(
+      `DD-333 F.4 S-DOM-002 — ${warnCount} warning(s) + ${infoCount} info finding(s) across ${domainScopeFindings.length} plugin(s):`,
+    );
+    for (const { name, findings } of domainScopeFindings) {
+      console.log(`  ${name}:`);
+      for (const f of findings) {
+        const tag = f.level === "info" ? "[info]" : "[warn]";
+        console.log(`    ${tag} ${f.message}`);
+      }
+    }
+  }
+
   // Manifest UX quality report — install-dialog completeness across plugins
   if (uxWarnings.length > 0) {
     const strict = process.env.STRICT_UX === "1";
@@ -872,6 +1018,10 @@ export {
   validatePluginUX,
   validateCatalogEntry,
   loadCatalogEntryValidator,
+  enforceDomainScope,
+  findDomainScopeArg,
+  DOMAIN_SCOPE_ARG_PATTERN,
+  DOMAIN_SCOPE_DISCLAIMER_PATTERN,
 };
 
 // Run main() only when executed directly (not imported as a module)

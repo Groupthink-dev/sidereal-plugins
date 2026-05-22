@@ -1,0 +1,31 @@
+{
+  "name": "domain-scope-single-honest-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 F.4 fixture — single tool honestly declares domain_scope=\"single\" with no user-domain-shaped scope argument. AJV pass; no S-DOM-002 finding.",
+  "version": "1.0.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "certified",
+  "author_type": "first-party",
+  "contract": "example-v1",
+  "repository": "https://github.com/Groupthink-dev/domain-scope-single-honest-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "domain-scope-single-honest-blade-mcp"
+  },
+  "risk_class": "read_only",
+  "tools": [
+    {
+      "name": "list_inbox_messages",
+      "description": "List inbox messages for the bound account. Caller cannot select a different account.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured",
+        "domain_scope": "single"
+      }
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+# DD-333 F.4 example — honest single-domain pack.
+#
+# Demonstrates a pack whose blade tools each declare granularity.domain_scope
+# honestly. Every tool is bound to a single user-declared domain (e.g. one
+# Apple Mail account, one Notes vault). No tool exposes a user-domain-shaped
+# scope argument (no `scope`, `domain`, `domains`, `domainName`, `domain_name`).
+#
+# Reference shape only — this fixture is intentionally minimal; the live
+# catalog tools[] declaration lives in plugins/tools/<plugin>.json. This
+# file documents the authoring pattern for tool authors choosing the
+# `single` declaration.
+pack: "1.0"
+name: domain-scope-single-honest-pack
+version: 1.0.0
+description: |
+  Reference pack showing honest domain_scope="single" declarations across
+  bound-to-one-domain blade tools.
+author: stallari
+tier: certified
+skills:
+  - name: list_inbox_today
+    description: List today's inbox messages from the bound account.
+    category: inbox
+    services_used:
+      - service: mail
+        tool: list_inbox_messages
+# Reference tools[] shape (mirrors plugins/tools/<plugin>.json):
+#
+#   tools:
+#     - name: list_inbox_messages
+#       granularity:
+#         scope_filtering: server-side
+#         field_projection: per-field
+#         deterministic_ordering: stable
+#         audit_surface: structured
+#         domain_scope: single

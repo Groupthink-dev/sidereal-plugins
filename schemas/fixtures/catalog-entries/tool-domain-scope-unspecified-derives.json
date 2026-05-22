@@ -1,0 +1,37 @@
+{
+  "name": "domain-scope-unspecified-derives-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 F.4 fixture — tool lacks granularity.domain_scope but is listed in non_conformance_rationale.domain_scope_unspecified; build-catalog.js derives granularity.domain_scope=\"non-conforming-explicit\" in place.",
+  "version": "1.0.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "community",
+  "author_type": "community",
+  "contract": "example-v1",
+  "repository": "https://github.com/Groupthink-dev/domain-scope-unspecified-derives-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "domain-scope-unspecified-derives-blade-mcp"
+  },
+  "risk_class": "read_only",
+  "tools": [
+    {
+      "name": "dump_legacy",
+      "description": "Legacy endpoint predating the DD-341 domain substrate.",
+      "risk_class": "read_only",
+      "granularity": {
+        "scope_filtering": "non-conforming-explicit",
+        "field_projection": "none",
+        "deterministic_ordering": "unstable",
+        "audit_surface": "minimal"
+      }
+    }
+  ],
+  "non_conformance_rationale": {
+    "reason": "Upstream provider doesn't expose per-domain partitioning; pre-DD-341 substrate.",
+    "scope_filtering_off": true,
+    "contamination_risks": ["audit-context-leak"],
+    "affected_tools": ["dump_legacy"],
+    "domain_scope_unspecified": ["dump_legacy"]
+  }
+}
