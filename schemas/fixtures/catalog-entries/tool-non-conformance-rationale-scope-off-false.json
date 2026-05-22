@@ -1,0 +1,25 @@
+{
+  "name": "nrr-scope-off-false-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 F.1 fixture — INVALID: scope_filtering_off MUST be true when block present (AJV const:true).",
+  "version": "1.0.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "community",
+  "author_type": "community",
+  "contract": "example-v1",
+  "repository": "https://github.com/Groupthink-dev/nrr-scope-off-false-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "nrr-scope-off-false-blade-mcp"
+  },
+  "tools": [
+    { "name": "dump_legacy", "description": "Legacy endpoint." }
+  ],
+  "non_conformance_rationale": {
+    "reason": "Upstream IMAP backend lacks per-folder scope.",
+    "scope_filtering_off": false,
+    "contamination_risks": ["cross-scope-packet-bleed"],
+    "affected_tools": ["dump_legacy"]
+  }
+}

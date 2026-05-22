@@ -59,6 +59,75 @@ async function validateCatalogEntry(entry) {
   };
 }
 
+/**
+ * DD-333 F.1 — procedural cross-field gate for the non_conformance_rationale
+ * top-level block (catalog-entry.schema.json declares the block shape; the
+ * cross-field invariants live here because JSON Schema 2020-12 cannot
+ * express them cleanly).
+ *
+ * Three steps in order:
+ *   1. Constraint A: every name in `non_conformance_rationale.affected_tools`
+ *      MUST appear as a `tools[].name` entry. Throws on mismatch.
+ *   2. Constraint B: every tool in `tools[]` without a `granularity` block
+ *      MUST be listed in `non_conformance_rationale.affected_tools`.
+ *      Throws otherwise (the canonical enforcement point now that
+ *      `tools[].items.required` was relaxed to `["name"]` at pack-spec 4.2.0).
+ *   3. Derivation: for each tool in `affected_tools` whose own `granularity`
+ *      block is omitted, mutate `tool.granularity` in place with the
+ *      worst-case row { scope_filtering: "non-conforming-explicit", field_projection: "none",
+ *      deterministic_ordering: "unstable", audit_surface: "minimal" }. Keeps
+ *      the catalog-row shape uniform downstream.
+ *
+ * @param {object} raw - plugin catalog entry (mutated in place on derivation)
+ * @param {string} filename - source file name for error message context
+ * @throws {Error} on either cross-field constraint failure
+ */
+function enforceNonConformanceRationale(raw, filename) {
+  const rationale = raw.non_conformance_rationale;
+  const tools = Array.isArray(raw.tools) ? raw.tools : [];
+  const toolNames = new Set(tools.map((t) => t && t.name).filter((n) => typeof n === "string"));
+  const affected = new Set(rationale && Array.isArray(rationale.affected_tools) ? rationale.affected_tools : []);
+
+  // Constraint A — affected_tools cross-reference. Only meaningful if the
+  // block is present; AJV already enforced internal shape (minItems:1,
+  // uniqueItems:true) before we got here.
+  if (rationale) {
+    const missing = [...affected].filter((name) => !toolNames.has(name));
+    if (missing.length > 0) {
+      throw new Error(
+        `Catalog entry ${raw.name || filename}: non_conformance_rationale.affected_tools references tool names not present in tools[]: ${missing.map((n) => `"${n}"`).join(", ")}. Every entry in affected_tools MUST cross-reference an actual tools[].name. See stallari-pack-spec/docs/non-conformance-rationale.md.`,
+      );
+    }
+  }
+
+  // Constraint B — per-tool granularity OR affected-tools membership.
+  for (const tool of tools) {
+    if (!tool || typeof tool.name !== "string") continue;
+    if (tool.granularity) continue;
+    if (affected.has(tool.name)) continue;
+    throw new Error(
+      `Catalog entry ${raw.name || filename}: tool '${tool.name}' is missing 'granularity' block and not listed in non_conformance_rationale.affected_tools. Either declare granularity per stallari-pack-spec/docs/granularity.md, OR list the tool in a non_conformance_rationale.affected_tools block per stallari-pack-spec/docs/non-conformance-rationale.md.`,
+    );
+  }
+
+  // Derivation step — mutate `tool.granularity` in place with the worst-case
+  // row for each affected tool that omitted its own block. Idempotent on
+  // re-runs (a tool that already has granularity declared keeps it).
+  if (rationale) {
+    for (const tool of tools) {
+      if (!tool || typeof tool.name !== "string") continue;
+      if (tool.granularity) continue;
+      if (!affected.has(tool.name)) continue;
+      tool.granularity = {
+        scope_filtering: "non-conforming-explicit",
+        field_projection: "none",
+        deterministic_ordering: "unstable",
+        audit_surface: "minimal",
+      };
+    }
+  }
+}
+
 /** Convert a pack name to a URL-safe kebab-case slug: "Business Operations" → "business-operations" */
 function slugify(name) {
   return name
@@ -256,6 +325,13 @@ function pluginToCatalogEntry(raw) {
     readiness,
     contract: raw.contract || null,
     risk_class: raw.risk_class || null,
+    // DD-333 F.1 — non-conformance rationale block (when present) flows through
+    // to the catalog row verbatim for downstream UI ([[DD-189]] amendment) and
+    // memory ([[DD-301]] amendment) consumption. Per-tool derived granularity
+    // (worst-case "non-conforming-explicit" row) is applied in-place upstream
+    // in enforceNonConformanceRationale(); consumers reading the per-tool
+    // shape see the derived row.
+    non_conformance_rationale: raw.non_conformance_rationale || null,
     not_supported: Array.isArray(raw.not_supported) && raw.not_supported.length > 0 ? raw.not_supported : null,
     runtime: raw.install?.runtime || raw.runtime || null,
     // DD-265: surface library-form-factor metadata so the harness marketplace
@@ -611,6 +687,19 @@ async function main() {
         `Catalog entry ${raw.name || file} fails schema validation:\n${verdict.errorsText}`,
       );
     }
+
+    // DD-333 F.1 — procedural cross-field gate for non_conformance_rationale.
+    // AJV cannot express cross-field constraints cleanly in JSON Schema
+    // 2020-12, so two invariants are enforced here:
+    //   (A) If non_conformance_rationale present, every affected_tools entry
+    //       MUST exist in tools[].name. Cross-ref fail throws.
+    //   (B) Every tool in tools[] that lacks `granularity` MUST be listed in
+    //       non_conformance_rationale.affected_tools. Otherwise throws.
+    // Then derives `granularity` (worst-case row) on each tool listed in
+    // affected_tools whose own block is omitted — keeps the catalog row shape
+    // uniform regardless of whether granularity was author-declared or
+    // rationale-derived.
+    enforceNonConformanceRationale(raw, file);
 
     const warnings = validatePluginUX(raw);
     if (warnings.length > 0) {

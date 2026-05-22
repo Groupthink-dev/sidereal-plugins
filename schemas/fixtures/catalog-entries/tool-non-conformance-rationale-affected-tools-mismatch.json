@@ -1,0 +1,34 @@
+{
+  "name": "nrr-affected-mismatch-blade-mcp",
+  "type": "plugin",
+  "description": "DD-333 F.1 fixture — INVALID at the procedural cross-field gate in build-catalog.js (AJV cannot express cross-field constraints in JSON Schema 2020-12). The block's affected_tools references a tool name not present in tools[]. AJV alone passes; build-catalog.js throws.",
+  "version": "1.0.0",
+  "author": "stallari",
+  "license": "MIT",
+  "tier": "community",
+  "author_type": "community",
+  "contract": "example-v1",
+  "repository": "https://github.com/Groupthink-dev/nrr-affected-mismatch-blade-mcp",
+  "install": {
+    "runtime": "uv",
+    "package": "nrr-affected-mismatch-blade-mcp"
+  },
+  "tools": [
+    {
+      "name": "list_scoped",
+      "description": "Conforming tool.",
+      "granularity": {
+        "scope_filtering": "server-side",
+        "field_projection": "per-field",
+        "deterministic_ordering": "stable",
+        "audit_surface": "structured"
+      }
+    }
+  ],
+  "non_conformance_rationale": {
+    "reason": "Upstream IMAP backend lacks per-folder scope.",
+    "scope_filtering_off": true,
+    "contamination_risks": ["cross-scope-packet-bleed"],
+    "affected_tools": ["nonexistent_tool"]
+  }
+}

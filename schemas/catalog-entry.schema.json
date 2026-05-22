@@ -84,11 +84,11 @@
     },
     "tools": {
       "type": "array",
-      "description": "DD-333 per-tool catalog inventory + granularity declarations. Required at pack-spec 4.0.0 (Phase D cutover 2026-05-21). Pairs with S-MCP-001 `.error` lint in stallari-secops-scanner. Per-tool, not per-blade: different tools in the same pack legitimately have different granularity — a blade with `list_notes` (server-side) + `dump_all` (no scope) declares each honestly.",
+      "description": "DD-333 per-tool catalog inventory + granularity declarations. Per-tool granularity is REQUIRED unless the tool is listed in non_conformance_rationale.affected_tools (DD-333 F.1, pack-spec 4.2.0). build-catalog.js enforces the cross-field constraint procedurally with actionable error output (JSON Schema 2020-12 cannot express cross-field invariants). Pairs with S-MCP-001 `.error` lint in stallari-secops-scanner. Per-tool, not per-blade: different tools in the same pack legitimately have different granularity — a blade with `list_notes` (server-side) + `dump_all` (no scope) declares each honestly.",
       "items": {
         "type": "object",
         "additionalProperties": true,
-        "required": ["name", "granularity"],
+        "required": ["name"],
         "properties": {
           "name": {
             "type": "string",
@@ -104,13 +104,13 @@
           },
           "granularity": {
             "type": "object",
-            "description": "DD-333 four-dimension granularity declaration per tool. Required at pack-spec 4.0.0 (Phase D cutover 2026-05-21). Declare honestly — `client-side`/`none`/`unstable`/`minimal` is the correct declaration when that's the actual behaviour. The assembler's verdict logic refuses evidentiary-level packets through inferred-worst-case tools; honest under-declaration passes conformance.",
+            "description": "DD-333 four-dimension granularity declaration per tool. Required at pack-spec 4.0.0 (Phase D cutover 2026-05-21) UNLESS the tool is listed in non_conformance_rationale.affected_tools (DD-333 F.1). Declare honestly — `client-side`/`none`/`unstable`/`minimal` is the correct declaration when that's the actual behaviour. The assembler's verdict logic refuses evidentiary-level packets through inferred-worst-case tools; honest under-declaration passes conformance.",
             "additionalProperties": false,
             "required": ["scope_filtering", "field_projection", "deterministic_ordering", "audit_surface"],
             "properties": {
               "scope_filtering": {
-                "enum": ["server-side", "client-side", "none"],
-                "description": "server-side: tool accepts a scope argument and the plugin honours it before bytes leave the plugin's address space (safe for over-fetch threat model). client-side: tool returns unfiltered results and the assembler filters post-hoc (carries over-fetch leak). none: tool has no concept of scope (data is naturally unscoped, or the plugin punts entirely)."
+                "enum": ["server-side", "client-side", "none", "non-conforming-explicit"],
+                "description": "server-side: tool accepts a scope argument and the plugin honours it before bytes leave the plugin's address space (safe for over-fetch threat model). client-side: tool returns unfiltered results and the assembler filters post-hoc (carries over-fetch leak). none: tool has no concept of scope (data is naturally unscoped, or the plugin punts entirely). non-conforming-explicit (DD-333 F.1): computed at build time in build-catalog.js for tools listed in non_conformance_rationale.affected_tools whose own granularity block is omitted. MUST NOT be hand-written by authors — authors declare non_conformance_rationale at top level and leave granularity off on listed tools."
               },
               "field_projection": {
                 "enum": ["per-field", "top-level", "none"],
@@ -126,6 +126,45 @@
               }
             }
           }
+        }
+      }
+    },
+    "non_conformance_rationale": {
+      "type": "object",
+      "description": "DD-333 F.1 (pack-spec 4.2.0) — explicit non-conformance declaration. When a plugin's tools[] entry lacks a `granularity:` block AND the tool name appears in `affected_tools` here, the plugin is accepted-with-rationale rather than rejected. build-catalog.js derives `granularity.scope_filtering: \"non-conforming-explicit\"` (plus worst-case row on the other three dimensions) for each listed tool. Downstream UI ([[DD-189]] amendment), memory ([[DD-301]] amendment), and assembler verdict ([[DD-333]] F.2) consume the per-tool non-conformance flag. See stallari-pack-spec/docs/non-conformance-rationale.md.",
+      "additionalProperties": false,
+      "required": ["reason", "scope_filtering_off", "contamination_risks", "affected_tools"],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Non-empty author-supplied explanation of why this pack/tool cannot meet the granularity contract. Surfaces in marketplace UI ([[DD-189]] amendment) and audit Tracks ([[DD-307]])."
+        },
+        "scope_filtering_off": {
+          "type": "boolean",
+          "const": true,
+          "description": "Explicit acknowledgment. MUST be true when the block is present (the entire block is omitted on the conforming path). const:true rather than just `true` so AJV emits a clear error if the value is false."
+        },
+        "contamination_risks": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "memory-source-tainted",
+              "audit-context-leak",
+              "cross-scope-packet-bleed",
+              "other-see-reason"
+            ]
+          },
+          "description": "Controlled vocabulary. memory-source-tainted: output flows into DD-301 memory without scope-filtering provenance. audit-context-leak: lacks _meta envelope disclosure; DD-307 audit trail blind. cross-scope-packet-bleed: unfiltered results that the assembler post-hoc filters; restricted bytes cross the plugin/assembler boundary. other-see-reason: escape hatch; the `reason` field MUST elaborate."
+        },
+        "affected_tools": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string" },
+          "description": "Tool names from this entry's tools[].name. Every entry here MUST cross-reference an actual tool name (procedural gate in build-catalog.js + S-MCP-002 in stallari-secops-scanner enforce the cross-field invariant — JSON Schema 2020-12 cannot express it)."
         }
       }
     },
