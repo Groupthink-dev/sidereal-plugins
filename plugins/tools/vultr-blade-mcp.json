@@ -1,9 +1,9 @@
 {
   "name": "vultr-blade-mcp",
   "title": "Vultr GPU Cloud",
-  "description": "Manage Vultr GPU compute infrastructure — VMs, bare metal, serverless inference, DNS, firewall, snapshots, and billing. 50 tools implementing virtualisation-v1, serverless-v1, and dns-authoritative-v1 contracts.",
-  "tagline": "GPU compute infrastructure — VMs, bare metal, inference, DNS, firewall, snapshots, billing",
-  "version": "0.3.0",
+  "description": "Manage Vultr GPU compute infrastructure \u2014 VMs, bare metal, serverless inference, DNS, firewall, snapshots, and billing. 50 tools implementing virtualisation-v1, serverless-v1, and dns-authoritative-v1 contracts.",
+  "tagline": "GPU compute infrastructure \u2014 VMs, bare metal, inference, DNS, firewall, snapshots, billing",
+  "version": "0.4.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/vultr-blade-mcp.svg",
@@ -21,20 +21,20 @@
   "multi_instance": false,
   "highlights": [
     {
-      "icon": "🖥️",
-      "text": "50 tools — VMs, bare metal, inference, DNS, firewall, snapshots, billing"
+      "icon": "\ud83d\udda5\ufe0f",
+      "text": "50 tools \u2014 VMs, bare metal, inference, DNS, firewall, snapshots, billing"
     },
     {
-      "icon": "⚡",
-      "text": "GPU-first — plans default to GPU type with VRAM and pricing"
+      "icon": "\u26a1",
+      "text": "GPU-first \u2014 plans default to GPU type with VRAM and pricing"
     },
     {
-      "icon": "🧠",
-      "text": "Serverless inference — manage subscriptions and track token usage"
+      "icon": "\ud83e\udde0",
+      "text": "Serverless inference \u2014 manage subscriptions and track token usage"
     },
     {
-      "icon": "🔒",
-      "text": "Dual write-gate — env var + per-call confirm for all 24 destructive ops"
+      "icon": "\ud83d\udd12",
+      "text": "Dual write-gate \u2014 env var + per-call confirm for all 24 destructive ops"
     }
   ],
   "links": [
@@ -55,7 +55,7 @@
       "url": "https://my.vultr.com/settings/#settingsapi"
     }
   ],
-  "readme": "### What it does\n\nVultr GPU Compute Infrastructure provides comprehensive control over Vultr's GPU-oriented services through 50 MCP tools. Provision VMs and bare metal, manage serverless inference, configure DNS and firewalls, take snapshots, and track billing — all from your AI agent.\n\n### Tool coverage\n\n| Domain | Tools | What you can do |\n|--------|-------|-----------------|\n| Instances | 11 | List, get, status, bandwidth, create, delete, start, stop, reboot, update, reverse DNS |\n| Bare Metal | 9 | List, get, bandwidth, plans, create, delete, start, stop, reboot |\n| Inference | 5 | List, get, create, delete subscriptions, track usage |\n| DNS | 5 | List domains, list/create/update/delete records |\n| Firewall | 6 | List/get/create/delete groups, list/create rules |\n| Snapshots | 4 | List, get, create, delete |\n| Scripts | 4 | List, get, create, delete startup scripts |\n| Reference | 4 | Plans (GPU specs + pricing), regions, OS images, SSH keys |\n| Account | 2 | Account info, billing history |\n\n### GPU provisioning flow\n\nList GPU plans (`type=vcg`), pick a region, select an OS image, inject cloud-init user_data (installs Docker + NVIDIA toolkit + pulls your OCI image), attach a firewall group and startup script, and create. Poll status until `server_status=ok`. Snapshot before teardown. Delete when done.\n\n### Token efficiency\n\nFormatters strip ~60% of Vultr's verbose API responses. Plans prominently display GPU specs (type, VRAM, count) and pricing. Inference API keys are masked. Responses are capped at 4000 characters with pagination guidance.\n\n### Safety\n\nAll 24 write operations require dual confirmation: `VULTR_WRITE_ENABLED=true` environment variable AND `confirm: true` per-call parameter. Creating instances and bare metal incurs compute charges immediately.",
+  "readme": "### What it does\n\nVultr GPU Compute Infrastructure provides comprehensive control over Vultr's GPU-oriented services through 50 MCP tools. Provision VMs and bare metal, manage serverless inference, configure DNS and firewalls, take snapshots, and track billing \u2014 all from your AI agent.\n\n### Tool coverage\n\n| Domain | Tools | What you can do |\n|--------|-------|-----------------|\n| Instances | 11 | List, get, status, bandwidth, create, delete, start, stop, reboot, update, reverse DNS |\n| Bare Metal | 9 | List, get, bandwidth, plans, create, delete, start, stop, reboot |\n| Inference | 5 | List, get, create, delete subscriptions, track usage |\n| DNS | 5 | List domains, list/create/update/delete records |\n| Firewall | 6 | List/get/create/delete groups, list/create rules |\n| Snapshots | 4 | List, get, create, delete |\n| Scripts | 4 | List, get, create, delete startup scripts |\n| Reference | 4 | Plans (GPU specs + pricing), regions, OS images, SSH keys |\n| Account | 2 | Account info, billing history |\n\n### GPU provisioning flow\n\nList GPU plans (`type=vcg`), pick a region, select an OS image, inject cloud-init user_data (installs Docker + NVIDIA toolkit + pulls your OCI image), attach a firewall group and startup script, and create. Poll status until `server_status=ok`. Snapshot before teardown. Delete when done.\n\n### Token efficiency\n\nFormatters strip ~60% of Vultr's verbose API responses. Plans prominently display GPU specs (type, VRAM, count) and pricing. Inference API keys are masked. Responses are capped at 4000 characters with pagination guidance.\n\n### Safety\n\nAll 24 write operations require dual confirmation: `VULTR_WRITE_ENABLED=true` environment variable AND `confirm: true` per-call parameter. Creating instances and bare metal incurs compute charges immediately.",
   "install": {
     "runtime": "npx",
     "package": "vultr-blade-mcp"
@@ -63,7 +63,7 @@
   "tools": [
     {
       "name": "vultr_account_info",
-      "description": "Get Vultr account info — email, name, balance, payment method.",
+      "description": "Get Vultr account info \u2014 email, name, balance, payment method.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
@@ -74,24 +74,24 @@
     },
     {
       "name": "vultr_billing_history",
-      "description": "Recent billing history — invoices, charges, dates.",
+      "description": "Recent billing history \u2014 invoices, charges, dates. Emits `_meta` envelope disclosing date-range filter and cursor state.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "vultr_vm_list",
-      "description": "List Vultr VM instances with server-side per_page/cursor + optional label/region/tag filters.",
+      "description": "List Vultr VM instances with server-side per_page/cursor + optional label/region/tag filters. Emits `_meta` envelope disclosing region/tag/label filters applied.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -107,7 +107,7 @@
     },
     {
       "name": "vultr_vm_status",
-      "description": "Lightweight VM status — power_status, server_status, main_ip.",
+      "description": "Lightweight VM status \u2014 power_status, server_status, main_ip.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
@@ -129,35 +129,35 @@
     },
     {
       "name": "vultr_vm_list_plans",
-      "description": "List available VM plans (CPU/RAM/storage, GPU types, regions).",
+      "description": "List available VM plans (CPU/RAM/storage, GPU types, regions). Emits `_meta` envelope disclosing no-filter applied + plan count.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "vultr_vm_list_images",
-      "description": "List available OS images and ISO IDs.",
+      "description": "List available OS images and ISO IDs. Emits `_meta` envelope disclosing no-filter applied + image count.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "vultr_vm_list_regions",
-      "description": "List available datacenter regions.",
+      "description": "List available datacenter regions. Emits `_meta` envelope disclosing region count.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -173,7 +173,7 @@
     },
     {
       "name": "vultr_vm_create",
-      "description": "Create a new VM instance. Write — gated by confirm.",
+      "description": "Create a new VM instance. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -184,7 +184,7 @@
     },
     {
       "name": "vultr_vm_delete",
-      "description": "Delete a VM instance. Destructive — gated by confirm.",
+      "description": "Delete a VM instance. Destructive \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -195,7 +195,7 @@
     },
     {
       "name": "vultr_vm_start",
-      "description": "Start a stopped VM. Write — gated by confirm.",
+      "description": "Start a stopped VM. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -206,7 +206,7 @@
     },
     {
       "name": "vultr_vm_stop",
-      "description": "Stop a running VM. Write — gated by confirm.",
+      "description": "Stop a running VM. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -217,7 +217,7 @@
     },
     {
       "name": "vultr_vm_reboot",
-      "description": "Reboot a VM. Write — gated by confirm.",
+      "description": "Reboot a VM. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -228,7 +228,7 @@
     },
     {
       "name": "vultr_vm_update",
-      "description": "Update VM label/tag/plan. Write — gated by confirm.",
+      "description": "Update VM label/tag/plan. Write \u2014 gated by confirm.",
       "risk_class": "reversible_write",
       "granularity": {
         "scope_filtering": "server-side",
@@ -239,7 +239,7 @@
     },
     {
       "name": "vultr_vm_set_reverse_dns",
-      "description": "Set reverse DNS for an IP. Write — gated by confirm.",
+      "description": "Set reverse DNS for an IP. Write \u2014 gated by confirm.",
       "risk_class": "reversible_write",
       "granularity": {
         "scope_filtering": "server-side",
@@ -250,13 +250,13 @@
     },
     {
       "name": "vultr_bm_list",
-      "description": "List bare metal instances with server-side per_page/cursor + optional label/region filters.",
+      "description": "List bare metal instances with server-side per_page/cursor + optional label/region filters. Emits `_meta` envelope disclosing filters applied.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -283,18 +283,18 @@
     },
     {
       "name": "vultr_bm_list_plans",
-      "description": "List available bare metal plans.",
+      "description": "List available bare metal plans. Emits `_meta` envelope disclosing plan count.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "vultr_bm_create",
-      "description": "Provision a new bare metal instance. Write — gated by confirm.",
+      "description": "Provision a new bare metal instance. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -305,7 +305,7 @@
     },
     {
       "name": "vultr_bm_delete",
-      "description": "Delete a bare metal instance. Destructive — gated by confirm.",
+      "description": "Delete a bare metal instance. Destructive \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -316,7 +316,7 @@
     },
     {
       "name": "vultr_bm_start",
-      "description": "Start a stopped bare metal instance. Write — gated by confirm.",
+      "description": "Start a stopped bare metal instance. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -327,7 +327,7 @@
     },
     {
       "name": "vultr_bm_stop",
-      "description": "Stop a running bare metal instance. Write — gated by confirm.",
+      "description": "Stop a running bare metal instance. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -338,7 +338,7 @@
     },
     {
       "name": "vultr_bm_reboot",
-      "description": "Reboot a bare metal instance. Write — gated by confirm.",
+      "description": "Reboot a bare metal instance. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -349,29 +349,29 @@
     },
     {
       "name": "vultr_dns_list_domains",
-      "description": "List DNS domains managed by Vultr (server-side per_page/cursor).",
+      "description": "List DNS domains managed by Vultr (server-side per_page/cursor). Emits `_meta` envelope disclosing cursor state.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "vultr_dns_list_records",
-      "description": "List DNS records for a domain (server-side domain + per_page/cursor).",
+      "description": "List DNS records for a domain (server-side domain + per_page/cursor). Emits `_meta` envelope disclosing domain scope.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "vultr_dns_create_record",
-      "description": "Create a DNS record. Write — gated by confirm.",
+      "description": "Create a DNS record. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -382,7 +382,7 @@
     },
     {
       "name": "vultr_dns_update_record",
-      "description": "Update an existing DNS record. Write — gated by confirm.",
+      "description": "Update an existing DNS record. Write \u2014 gated by confirm.",
       "risk_class": "reversible_write",
       "granularity": {
         "scope_filtering": "server-side",
@@ -393,7 +393,7 @@
     },
     {
       "name": "vultr_dns_delete_record",
-      "description": "Delete a DNS record. Destructive — gated by confirm.",
+      "description": "Delete a DNS record. Destructive \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -404,13 +404,13 @@
     },
     {
       "name": "vultr_fw_list_groups",
-      "description": "List firewall groups (server-side per_page/cursor).",
+      "description": "List firewall groups (server-side per_page/cursor). Emits `_meta` envelope.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -426,7 +426,7 @@
     },
     {
       "name": "vultr_fw_create_group",
-      "description": "Create a firewall group. Write — gated by confirm.",
+      "description": "Create a firewall group. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -437,7 +437,7 @@
     },
     {
       "name": "vultr_fw_delete_group",
-      "description": "Delete a firewall group. Destructive — gated by confirm.",
+      "description": "Delete a firewall group. Destructive \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -448,18 +448,18 @@
     },
     {
       "name": "vultr_fw_list_rules",
-      "description": "List rules in a firewall group (server-side firewall_group_id + per_page/cursor).",
+      "description": "List rules in a firewall group (server-side firewall_group_id + per_page/cursor). Emits `_meta` envelope disclosing group scope.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "vultr_fw_create_rule",
-      "description": "Create a firewall rule in a group. Write — gated by confirm.",
+      "description": "Create a firewall rule in a group. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -470,13 +470,13 @@
     },
     {
       "name": "vultr_script_list",
-      "description": "List startup scripts (server-side per_page/cursor + optional type filter).",
+      "description": "List startup scripts (server-side per_page/cursor + optional type filter). Emits `_meta` envelope.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -492,7 +492,7 @@
     },
     {
       "name": "vultr_script_create",
-      "description": "Create a startup script. Write — gated by confirm.",
+      "description": "Create a startup script. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -503,7 +503,7 @@
     },
     {
       "name": "vultr_script_delete",
-      "description": "Delete a startup script. Destructive — gated by confirm.",
+      "description": "Delete a startup script. Destructive \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -514,13 +514,13 @@
     },
     {
       "name": "vultr_snap_list",
-      "description": "List snapshots (server-side per_page/cursor + optional description filter).",
+      "description": "List snapshots (server-side per_page/cursor + optional description filter). Emits `_meta` envelope.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -536,7 +536,7 @@
     },
     {
       "name": "vultr_snap_create",
-      "description": "Create a snapshot from a VM. Write — gated by confirm.",
+      "description": "Create a snapshot from a VM. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -547,7 +547,7 @@
     },
     {
       "name": "vultr_snap_delete",
-      "description": "Delete a snapshot. Destructive — gated by confirm.",
+      "description": "Delete a snapshot. Destructive \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -558,13 +558,13 @@
     },
     {
       "name": "vultr_inference_list",
-      "description": "List inference (Serverless Inference) subscriptions (server-side per_page/cursor).",
+      "description": "List inference (Serverless Inference) subscriptions (server-side per_page/cursor). Emits `_meta` envelope.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -580,7 +580,7 @@
     },
     {
       "name": "vultr_inference_create",
-      "description": "Create an inference subscription. Write — gated by confirm.",
+      "description": "Create an inference subscription. Write \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -591,7 +591,7 @@
     },
     {
       "name": "vultr_inference_delete",
-      "description": "Delete an inference subscription. Destructive — gated by confirm.",
+      "description": "Delete an inference subscription. Destructive \u2014 gated by confirm.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -615,7 +615,7 @@
   "env": [
     {
       "name": "VULTR_API_KEY",
-      "description": "Vultr API key for authentication — all tools require this",
+      "description": "Vultr API key for authentication \u2014 all tools require this",
       "secret": true
     },
     {
@@ -630,7 +630,7 @@
     "icon": "cpu",
     "product": "Vultr",
     "setup_guide": "docs/setup-guide.md",
-    "blurb": "GPU compute infrastructure — 50 tools for VMs, bare metal, inference, DNS, firewall, snapshots, and billing across Vultr's global datacentres.",
+    "blurb": "GPU compute infrastructure \u2014 50 tools for VMs, bare metal, inference, DNS, firewall, snapshots, and billing across Vultr's global datacentres.",
     "help_text": "Create an API key at my.vultr.com/settings/#settingsapi. The key provides access to your Vultr account including creating instances (which incur compute charges).",
     "help_url": "https://www.vultr.com/api/",
     "fields": [
@@ -638,7 +638,7 @@
         "key": "VULTR_API_KEY",
         "label": "API Key",
         "secret": true,
-        "placeholder": "Create at my.vultr.com → Settings → API",
+        "placeholder": "Create at my.vultr.com \u2192 Settings \u2192 API",
         "required": true,
         "help": "Full-access API key. Instance creation incurs GPU compute charges immediately."
       }
@@ -685,7 +685,7 @@
       "shared_services": [
         "virtualisation"
       ],
-      "label": "Cost audit — find idle instances",
+      "label": "Cost audit \u2014 find idle instances",
       "body": "List all instances, check their power status and cost, identify stopped instances still incurring charges, and delete any that are no longer needed."
     },
     {
