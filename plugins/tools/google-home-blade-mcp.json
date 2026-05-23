@@ -80,7 +80,7 @@
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -91,7 +91,7 @@
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -102,7 +102,7 @@
       "granularity": {
         "scope_filtering": "client-side",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -201,7 +201,7 @@
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -212,7 +212,7 @@
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -223,7 +223,7 @@
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     }
