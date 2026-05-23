@@ -3,7 +3,7 @@
   "title": "Tailscale",
   "description": "Tailscale network monitoring and security — device inventory, ACL policy review, DNS configuration, auth key auditing, users, and audit logs",
   "tagline": "Monitor and secure your tailnet — devices, ACLs, keys, DNS, and audit trail",
-  "version": "0.1.1",
+  "version": "0.4.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/tailscale-blade-mcp.svg",
@@ -76,12 +76,12 @@
     },
     {
       "name": "ts_devices",
-      "description": "List devices — hostname, OS, IP, online/offline, key expiry, tags, update status. DD-278 scope-tag filter applied client-side.",
+      "description": "List devices — hostname, OS, IP, online/offline, key expiry, tags, update status. DD-278 scope-tag filter applied client-side. (Track 2 — canonical sort on nodeId ascending, legacy id tie-break.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "client-side",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "structured"
       }
     },
@@ -142,34 +142,34 @@
     },
     {
       "name": "ts_keys",
-      "description": "List auth keys — ID, description, reusable/ephemeral/preauth flags, tags, expiry. DD-278 scope-tag filter applied client-side over capabilities.devices.create.tags.",
+      "description": "List auth keys — ID, description, reusable/ephemeral/preauth flags, tags, expiry. DD-278 scope-tag filter applied client-side over capabilities.devices.create.tags. (Track 2 — canonical sort on key id ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "client-side",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "structured"
       }
     },
     {
       "name": "ts_users",
-      "description": "List users — name, login, role, status, device count, online/last seen.",
+      "description": "List users — name, login, role, status, device count, online/last seen. (Track 2 — canonical sort on case-folded loginName ascending, numeric id tie-break.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
     {
       "name": "ts_webhooks",
-      "description": "List configured webhooks — endpoint URL, event subscriptions, created date.",
+      "description": "List configured webhooks — endpoint URL, event subscriptions, created date. (Track 2 — canonical sort on endpointId ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },

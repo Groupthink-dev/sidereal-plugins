@@ -3,7 +3,7 @@
   "title": "Home Assistant",
   "description": "Home Assistant operations \u2014 entities, state, history, device control, automations, energy, multi-site management",
   "tagline": "Multi-site Home Assistant control with write gating",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/home-assistant-blade-mcp.svg",
@@ -98,78 +98,78 @@
     },
     {
       "name": "ha_areas",
-      "description": "List all areas with entity counts.",
+      "description": "List all areas with entity counts. (Track 2 — canonical sort on area_id ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unsorted",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
     {
       "name": "ha_devices",
-      "description": "List all devices with manufacturer, model, area assignment.",
+      "description": "List all devices with manufacturer, model, area assignment. (Track 2 — canonical sort on device id ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
-        "deterministic_ordering": "unsorted",
+        "deterministic_ordering": "stable",
         "audit_surface": "structured"
       }
     },
     {
       "name": "ha_entities",
-      "description": "List entities, optionally filtered by domain, area, or label.",
+      "description": "List entities, optionally filtered by domain, area, or label. (Track 2 — canonical sort on entity_id ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
-        "deterministic_ordering": "unsorted",
+        "deterministic_ordering": "stable",
         "audit_surface": "structured"
       }
     },
     {
       "name": "ha_floors",
-      "description": "List all floors with area assignments.",
+      "description": "List all floors with area assignments. (Track 2 — canonical sort on floor_id ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unsorted",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
     {
       "name": "ha_labels",
-      "description": "List all labels with entity counts.",
+      "description": "List all labels with entity counts. (Track 2 — canonical sort on label_id ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unsorted",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
     {
       "name": "ha_search",
-      "description": "Fuzzy search across entities, devices, areas, and automations.",
+      "description": "Fuzzy search across entities, devices, areas, and automations. (Track 2 — outer item-type relevance order preserved; each inner per-type list sorted ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "client-side",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
     {
       "name": "ha_services_list",
-      "description": "List all available services across loaded components.",
+      "description": "List all available services across loaded components. (Track 2 — domains sorted ascending; service names sorted ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unsorted",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -186,23 +186,23 @@
     },
     {
       "name": "ha_states",
-      "description": "Current state of all entities \u2014 bulk state snapshot.",
+      "description": "Current state of all entities \u2014 bulk state snapshot. (Track 2 \u2014 canonical sort on entity_id ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unsorted",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
     {
       "name": "ha_states_by_domain",
-      "description": "Current state of all entities within a domain (light, switch, sensor, etc.).",
+      "description": "Current state of all entities within a domain (light, switch, sensor, etc.). (Track 2 — canonical sort on entity_id ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
-        "deterministic_ordering": "unsorted",
+        "deterministic_ordering": "stable",
         "audit_surface": "structured"
       }
     },
@@ -241,12 +241,12 @@
     },
     {
       "name": "ha_statistics_list",
-      "description": "List all entities with long-term statistics available.",
+      "description": "List all entities with long-term statistics available. (Track 2 — canonical sort on statistic_id ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unsorted",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -329,12 +329,12 @@
     },
     {
       "name": "ha_automations",
-      "description": "List all automation entities with state and last triggered.",
+      "description": "List all automation entities with state and last triggered. (Track 2 — canonical sort on entity_id ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unsorted",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },

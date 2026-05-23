@@ -4,7 +4,7 @@
   "title": "Syncthing",
   "description": "Syncthing replication management MCP \u2014 multi-instance, token-efficient output, safe disk-space reclamation. Read and control access to Syncthing's REST API with a focus on replication awareness: knowing which folders are fully replicated across devices so you can confidently reclaim local disk space.",
   "tagline": "Mesh file sync with replication-aware disk reclamation",
-  "version": "0.5.0",
+  "version": "0.6.1",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/syncthing-blade-mcp.svg",
@@ -50,12 +50,12 @@
     },
     {
       "name": "syncthing_connections",
-      "description": "Active peer connections \u2014 addresses, throughput, latency.",
+      "description": "Active peer connections \u2014 addresses, throughput, latency. (Track 2 \u2014 canonical sort on deviceID ascending.)",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
