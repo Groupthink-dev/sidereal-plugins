@@ -3,7 +3,7 @@
   "title": "Home Assistant",
   "description": "Home Assistant operations \u2014 entities, state, history, device control, automations, energy, multi-site management",
   "tagline": "Multi-site Home Assistant control with write gating",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/home-assistant-blade-mcp.svg",
@@ -156,10 +156,10 @@
       "description": "Fuzzy search across entities, devices, areas, and automations. (Track 2 — outer item-type relevance order preserved; each inner per-type list sorted ascending.)",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "client-side",
+        "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -189,10 +189,10 @@
       "description": "Current state of all entities \u2014 bulk state snapshot. (Track 2 \u2014 canonical sort on entity_id ascending.)",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "none",
+        "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -214,7 +214,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -225,7 +225,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -258,7 +258,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -423,7 +423,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "none"
       }
     },
     {
