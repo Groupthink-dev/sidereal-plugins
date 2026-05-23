@@ -1,9 +1,9 @@
 {
   "name": "mastodon-blade-mcp",
   "title": "Mastodon",
-  "description": "Mastodon operations \u2014 timelines, statuses, notifications, search, interactions, multi-instance",
+  "description": "Mastodon operations — timelines, statuses, notifications, search, interactions, multi-instance",
   "tagline": "Browse, post, and interact across the fediverse",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/mastodon-blade-mcp.svg",
@@ -20,7 +20,7 @@
   "tools": [
     {
       "name": "mastodon_info",
-      "description": "Health check \u2014 instance URL, account, write gate status.",
+      "description": "Health check — instance URL, account, write gate status.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
@@ -42,7 +42,7 @@
     },
     {
       "name": "mastodon_timeline_home",
-      "description": "Home timeline \u2014 accounts you follow. Cursor pagination. Accepts scope=public|personal|family|work mapped to Mastodon lists via MASTODON_*_LIST_ID env vars.",
+      "description": "Home timeline — accounts you follow. Cursor pagination. Accepts scope=public|personal|family|work mapped to Mastodon lists via MASTODON_*_LIST_ID env vars.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
@@ -59,7 +59,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -70,7 +70,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -81,7 +81,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -92,7 +92,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -114,7 +114,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -141,7 +141,7 @@
     },
     {
       "name": "mastodon_account_statuses",
-      "description": "Statuses authored by an account. Accepts scope=public|personal|family|work as a membership precondition \u2014 refuses if account_id is outside the scope's list.",
+      "description": "Statuses authored by an account. Accepts scope=public|personal|family|work as a membership precondition — refuses if account_id is outside the scope's list.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
@@ -158,7 +158,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -169,7 +169,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -180,12 +180,12 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "mastodon_notifications",
-      "description": "Recent notifications \u2014 mentions, follows, boosts, favourites. Accepts scope=public|personal|family|work to filter to actors in the scope's list.",
+      "description": "Recent notifications — mentions, follows, boosts, favourites. Accepts scope=public|personal|family|work to filter to actors in the scope's list.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
@@ -202,7 +202,7 @@
         "scope_filtering": "none",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -213,7 +213,7 @@
         "scope_filtering": "none",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -224,7 +224,7 @@
         "scope_filtering": "none",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -268,7 +268,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -295,7 +295,7 @@
     },
     {
       "name": "mastodon_post",
-      "description": "Post a new status. Write \u2014 gated.",
+      "description": "Post a new status. Write — gated.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "none",
@@ -306,7 +306,7 @@
     },
     {
       "name": "mastodon_reply",
-      "description": "Reply to a status. Write \u2014 gated.",
+      "description": "Reply to a status. Write — gated.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -317,7 +317,7 @@
     },
     {
       "name": "mastodon_edit",
-      "description": "Edit an existing status. Write \u2014 gated.",
+      "description": "Edit an existing status. Write — gated.",
       "risk_class": "reversible_write",
       "granularity": {
         "scope_filtering": "server-side",
@@ -328,7 +328,7 @@
     },
     {
       "name": "mastodon_delete",
-      "description": "Delete a status. Destructive \u2014 gated.",
+      "description": "Delete a status. Destructive — gated.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -449,7 +449,7 @@
     },
     {
       "name": "mastodon_block",
-      "description": "Block an account. Reversible write \u2014 destructive social impact.",
+      "description": "Block an account. Reversible write — destructive social impact.",
       "risk_class": "external_side_effect",
       "granularity": {
         "scope_filtering": "server-side",
@@ -535,7 +535,7 @@
     },
     {
       "name": "MASTODON_PERSONAL_LIST_ID",
-      "description": "Mastodon list ID mapped to scope=personal. Per-instance form: MASTODON_PERSONAL_LIST_ID_<INSTANCE>. Leave unset \u2192 scope=personal degrades to passthrough.",
+      "description": "Mastodon list ID mapped to scope=personal. Per-instance form: MASTODON_PERSONAL_LIST_ID_<INSTANCE>. Leave unset → scope=personal degrades to passthrough.",
       "default": ""
     },
     {
@@ -601,28 +601,28 @@
   },
   "highlights": [
     {
-      "icon": "\ud83d\udce8",
-      "text": "Timelines \u2014 home, local, federated, hashtag, and list feeds"
+      "icon": "📨",
+      "text": "Timelines — home, local, federated, hashtag, and list feeds"
     },
     {
-      "icon": "\ud83d\udd0d",
-      "text": "Search \u2014 accounts, statuses, and hashtags across the fediverse"
+      "icon": "🔍",
+      "text": "Search — accounts, statuses, and hashtags across the fediverse"
     },
     {
-      "icon": "\ud83d\udd14",
-      "text": "Notifications \u2014 mentions, boosts, favourites, follow requests"
+      "icon": "🔔",
+      "text": "Notifications — mentions, boosts, favourites, follow requests"
     },
     {
-      "icon": "\u270d\ufe0f",
-      "text": "Compose \u2014 post, reply, boost, favourite, bookmark"
+      "icon": "✍️",
+      "text": "Compose — post, reply, boost, favourite, bookmark"
     },
     {
-      "icon": "\ud83c\udf10",
-      "text": "Multi-instance \u2014 manage multiple accounts from one server"
+      "icon": "🌐",
+      "text": "Multi-instance — manage multiple accounts from one server"
     },
     {
-      "icon": "\ud83d\udd12",
-      "text": "Write-gated \u2014 posting disabled by default, explicit opt-in"
+      "icon": "🔒",
+      "text": "Write-gated — posting disabled by default, explicit opt-in"
     }
   ],
   "links": [
@@ -643,7 +643,7 @@
       "url": "https://docs.joinmastodon.org/api/oauth-scopes/"
     }
   ],
-  "readme": "### What it does\n\nMastodon Blade MCP gives your AI agent access to the Mastodon social network \u2014 reading timelines, searching content, managing notifications, and composing posts. It works with any Mastodon-compatible instance (Mastodon, Pleroma, GoToSocial, Akkoma) through the standard Mastodon API.\n\nYour agent can catch up on your home timeline, search for discussions on a topic, check notifications, and draft or publish posts \u2014 all from a single conversation.\n\n### Multi-instance support\n\nConfigure multiple accounts across different instances using `MASTODON_PROVIDERS`. Each provider gets its own instance URL and token, and your agent can switch between them within a session. Useful for managing personal and project accounts separately.\n\n### Safety model\n\nAll write operations (posting, replying, boosting, favouriting, following) are disabled by default:\n\n- **Read-only by default** \u2014 timelines, search, and notifications work immediately\n- **Write gate** \u2014 set `MASTODON_WRITE_ENABLED=true` to unlock posting and interactions\n- **Confirm gate** \u2014 each write tool requires `confirm: true` per call\n\nThis prevents accidental posts or follows while still allowing full read access for monitoring and research.",
+  "readme": "### What it does\n\nMastodon Blade MCP gives your AI agent access to the Mastodon social network — reading timelines, searching content, managing notifications, and composing posts. It works with any Mastodon-compatible instance (Mastodon, Pleroma, GoToSocial, Akkoma) through the standard Mastodon API.\n\nYour agent can catch up on your home timeline, search for discussions on a topic, check notifications, and draft or publish posts — all from a single conversation.\n\n### Multi-instance support\n\nConfigure multiple accounts across different instances using `MASTODON_PROVIDERS`. Each provider gets its own instance URL and token, and your agent can switch between them within a session. Useful for managing personal and project accounts separately.\n\n### Safety model\n\nAll write operations (posting, replying, boosting, favouriting, following) are disabled by default:\n\n- **Read-only by default** — timelines, search, and notifications work immediately\n- **Write gate** — set `MASTODON_WRITE_ENABLED=true` to unlock posting and interactions\n- **Confirm gate** — each write tool requires `confirm: true` per call\n\nThis prevents accidental posts or follows while still allowing full read access for monitoring and research.",
   "scenarios": [
     {
       "type": "workflow",
