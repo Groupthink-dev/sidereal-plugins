@@ -3,7 +3,7 @@
   "title": "Calendar (CalDAV)",
   "description": "CalDAV calendar operations \u2014 protocol-level access to any CalDAV server",
   "tagline": "Universal calendar access over the CalDAV protocol",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/caldav-blade-mcp.svg",
@@ -81,7 +81,7 @@
         "scope_filtering": "none",
         "field_projection": "none",
         "deterministic_ordering": "unsorted",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -92,7 +92,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -103,7 +103,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unsorted",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -122,10 +122,10 @@
       "description": "Search events by text, attendee email, or location. Optional calendar and date scope.",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "client-side",
+        "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unsorted",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -136,7 +136,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unsorted",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -147,7 +147,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "unsorted",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -158,7 +158,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {

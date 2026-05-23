@@ -3,7 +3,7 @@
   "title": "Tailscale",
   "description": "Tailscale network monitoring and security — device inventory, ACL policy review, DNS configuration, auth key auditing, users, and audit logs",
   "tagline": "Monitor and secure your tailnet — devices, ACLs, keys, DNS, and audit trail",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/tailscale-blade-mcp.svg",
@@ -104,7 +104,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
