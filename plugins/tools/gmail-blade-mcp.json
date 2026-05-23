@@ -3,7 +3,7 @@
   "title": "Google Gmail",
   "description": "Gmail email operations via Google API \u2014 search, read, send, threads, labels, drafts, filters. Gemini-powered classification and summarisation.",
   "tagline": "Gmail management with Gemini-powered classification",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/gmail-blade-mcp.svg",
@@ -141,13 +141,13 @@
     },
     {
       "name": "gmail_changes",
-      "description": "Incremental changes since a history ID.",
+      "description": "Incremental changes since a history ID. Emits `_meta` envelope disclosing history watermark + label filter.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {

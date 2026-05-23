@@ -3,7 +3,7 @@
   "title": "Fastmail",
   "description": "Fastmail email operations via JMAP — search, read, send, manage, masked email, push notifications",
   "tagline": "Full Fastmail control via JMAP with masked email",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/fastmail-blade-mcp.svg",
@@ -108,35 +108,35 @@
     },
     {
       "name": "mail_search",
-      "description": "Search emails with rich JMAP server-side filters (from, to, subject, body, after/before, in_mailbox, has_keyword, not_keyword, limit).",
+      "description": "Search emails with rich JMAP server-side filters (from, to, subject, body, after/before, in_mailbox, has_keyword, not_keyword, limit). Emits `_meta` envelope disclosing JMAP filter set + match cardinality.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "mail_threads",
-      "description": "Get all messages in a thread by ID, ordered chronologically.",
+      "description": "Get all messages in a thread by ID, ordered chronologically. Emits `_meta` envelope disclosing thread scope + message count.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
       "name": "mail_snippets",
-      "description": "Search emails returning short snippets — JMAP server-side filters (from, subject, body, after/before, in_mailbox, limit).",
+      "description": "Search emails returning short snippets — JMAP server-side filters (from, subject, body, after/before, in_mailbox, limit). Emits `_meta` envelope disclosing filter set + match cardinality.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -152,13 +152,13 @@
     },
     {
       "name": "mail_changes",
-      "description": "Get email changes since a previous state — server-side since_state + max_changes.",
+      "description": "Get email changes since a previous state — server-side since_state + max_changes. Emits `_meta` envelope disclosing since-state + change cardinality.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -229,13 +229,13 @@
     },
     {
       "name": "masked_list",
-      "description": "List masked email aliases with server-side state + for_domain + limit filters.",
+      "description": "List masked email aliases with server-side state + for_domain + limit filters. Emits `_meta` envelope disclosing filter set + cardinality.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
