@@ -3,7 +3,7 @@
   "title": "Fastmail",
   "description": "Fastmail email operations via JMAP — search, read, send, manage, masked email, push notifications",
   "tagline": "Full Fastmail control via JMAP with masked email",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/fastmail-blade-mcp.svg",
@@ -75,23 +75,23 @@
     },
     {
       "name": "fastmail_identities",
-      "description": "List sender identities (ID, name, email) — used by mail_send + mail_reply.",
+      "description": "List sender identities (ID, name, email) — used by mail_send + mail_reply. Stable ordering by id asc.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
     {
       "name": "mail_mailboxes",
-      "description": "List all mailboxes — ID, name, total/unread counts, role.",
+      "description": "List all mailboxes — ID, name, total/unread counts, role. Stable ordering by sortOrder asc (then name, id).",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -353,6 +353,6 @@
     "required": "3/3",
     "recommended": "2/2",
     "optional": "3/3",
-    "last_tested": "2026-03-25"
+    "last_tested": "2026-05-23"
   }
 }
