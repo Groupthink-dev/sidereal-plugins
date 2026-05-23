@@ -3,7 +3,7 @@
   "title": "Google Gmail",
   "description": "Gmail email operations via Google API \u2014 search, read, send, threads, labels, drafts, filters. Gemini-powered classification and summarisation.",
   "tagline": "Gmail management with Gemini-powered classification",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/gmail-blade-mcp.svg",
@@ -64,12 +64,12 @@
   "tools": [
     {
       "name": "gmail_search",
-      "description": "Search messages by Gmail query language (from:, to:, subject:, has:, newer_than:, etc.). Server-side filter with DD-278 scope-tag wrapper (scope=work|personal|family|public).",
+      "description": "Search messages by Gmail query language (from:, to:, subject:, has:, newer_than:, etc.). Server-side filter with DD-278 scope-tag wrapper (scope=work|personal|family|public). Stable ordering by internalDate desc, id asc.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "structured"
       }
     },
@@ -86,12 +86,12 @@
     },
     {
       "name": "gmail_snippets",
-      "description": "Compact snippet view across recent or filtered messages. DD-278 scope-tag wrapper (scope=work|personal|family|public).",
+      "description": "Compact snippet view across recent or filtered messages. DD-278 scope-tag wrapper (scope=work|personal|family|public). Stable ordering by internalDate desc, id asc.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "server-side",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "structured"
       }
     },
@@ -108,12 +108,12 @@
     },
     {
       "name": "gmail_mailboxes",
-      "description": "List all labels (mailboxes) in the account.",
+      "description": "List all labels (mailboxes) in the account. Stable ordering by name asc (case-folded), id asc.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -152,23 +152,23 @@
     },
     {
       "name": "gmail_identities",
-      "description": "Send-as identities and aliases configured in the account.",
+      "description": "Send-as identities and aliases configured in the account. Stable ordering by sendAsEmail asc (case-folded).",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
     {
       "name": "gmail_filters",
-      "description": "Server-side filter rules configured in the account.",
+      "description": "Server-side filter rules configured in the account. Stable ordering by id asc.",
       "risk_class": "read_only",
       "granularity": {
         "scope_filtering": "none",
         "field_projection": "none",
-        "deterministic_ordering": "unstable",
+        "deterministic_ordering": "stable",
         "audit_surface": "minimal"
       }
     },
@@ -400,6 +400,6 @@
     "required": "3/3",
     "recommended": "2/2",
     "optional": "3/3",
-    "last_tested": "2026-03-27"
+    "last_tested": "2026-05-23"
   }
 }
