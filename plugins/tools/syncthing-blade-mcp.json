@@ -4,7 +4,7 @@
   "title": "Syncthing",
   "description": "Syncthing replication management MCP \u2014 multi-instance, token-efficient output, safe disk-space reclamation. Read and control access to Syncthing's REST API with a focus on replication awareness: knowing which folders are fully replicated across devices so you can confidently reclaim local disk space.",
   "tagline": "Mesh file sync with replication-aware disk reclamation",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/syncthing-blade-mcp.svg",
@@ -336,13 +336,13 @@
     },
     {
       "name": "syncthing_list_folders",
-      "description": "List all folders configured on an instance.",
+      "description": "List all folders configured on an instance. (DD-278 `scope=` tag accepted; folder set resolved via `SYNCTHING_<SCOPE>_FOLDERS` env var; _meta envelope tail.)",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "none",
+        "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -391,13 +391,13 @@
     },
     {
       "name": "syncthing_recent_changes",
-      "description": "Recent file changes across all folders.",
+      "description": "Recent file changes across all folders. (DD-278 `scope=` tag accepted; filters the event stream to events whose `data.folderID` is in the resolved `SYNCTHING_<SCOPE>_FOLDERS` set; _meta envelope tail.)",
       "risk_class": "read_only",
       "granularity": {
-        "scope_filtering": "none",
+        "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
