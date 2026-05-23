@@ -3,7 +3,7 @@
   "title": "Apple Messages",
   "description": "Apple Messages (iMessage) operations — conversations, search, contacts, attachments, send",
   "tagline": "Read, search, and send via iMessage on macOS",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/apple-messages-blade-mcp.svg",
@@ -49,7 +49,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -71,7 +71,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -82,7 +82,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -93,7 +93,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -104,7 +104,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -126,7 +126,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {

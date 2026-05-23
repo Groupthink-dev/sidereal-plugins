@@ -3,7 +3,7 @@
   "title": "Apple Reminders",
   "description": "Apple Reminders operations — lists, reminders, search, due dates, create, complete, update, delete",
   "tagline": "Native Apple Reminders access on macOS",
-  "version": "0.1.2",
+  "version": "0.3.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "tier": "certified",
@@ -55,7 +55,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -77,7 +77,7 @@
         "scope_filtering": "client-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -88,7 +88,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
