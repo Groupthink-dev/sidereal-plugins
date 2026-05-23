@@ -3,7 +3,7 @@
   "title": "Google Home",
   "description": "Google Home / Nest device control via SDM API \u2014 thermostats, cameras, doorbells, event streams",
   "tagline": "Nest thermostat, camera, and doorbell control via SDM",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/google-home-blade-mcp.svg",
@@ -92,7 +92,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -103,7 +103,7 @@
         "scope_filtering": "client-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -180,7 +180,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "none"
       }
     },
     {
@@ -202,7 +202,7 @@
         "scope_filtering": "server-side",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -213,7 +213,7 @@
         "scope_filtering": "none",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -224,7 +224,7 @@
         "scope_filtering": "none",
         "field_projection": "none",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     }
   ],
