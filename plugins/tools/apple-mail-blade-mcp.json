@@ -6,7 +6,7 @@
   "title": "Apple Mail",
   "description": "On-disk Apple Mail reader — Envelope Index SQLite + .emlx bodies + attachments. Read-only; never opens the network. NLTagger entity extraction under the deterministic-extraction carve-out (DD-240).",
   "tagline": "Tens of GB of personal correspondence, on-device, no network",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/apple-mail-blade-mcp.svg",
@@ -30,7 +30,7 @@
         "scope_filtering": "none",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -41,7 +41,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -52,7 +52,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -63,7 +63,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -107,7 +107,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
