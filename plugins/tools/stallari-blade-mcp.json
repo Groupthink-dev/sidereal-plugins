@@ -5,7 +5,7 @@
   ],
   "title": "Stallari Vault",
   "description": "Obsidian vault operations via Swift MCP — read, write, search, properties, graph analysis, lens semantic tools",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": "groupthink-dev",
   "license": "MIT",
   "icon": "/icons/stallari-blade-mcp.svg",
@@ -100,7 +100,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -133,7 +133,7 @@
         "scope_filtering": "none",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -199,7 +199,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -210,7 +210,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -287,7 +287,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -342,7 +342,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -419,7 +419,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
@@ -430,7 +430,7 @@
         "scope_filtering": "server-side",
         "field_projection": "top-level",
         "deterministic_ordering": "stable",
-        "audit_surface": "minimal"
+        "audit_surface": "structured"
       }
     },
     {
