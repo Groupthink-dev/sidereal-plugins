@@ -3,8 +3,10 @@ spec_version: "3.0.0"
 slug: gaming-lounge
 trust_tier: first-party
 source:
-  type: vault
-  vault_path: packs/gaming-lounge/
+  type: repo
+  repo: groupthink-dev/stallari-packs
+  path: packs/gaming-lounge/
+  commit: 4847f7956121d44206a43c2042f8914e05687a19
 runtime:
   distribution: none
   publish_targets: []

@@ -3,8 +3,10 @@ spec_version: "3.0.0"
 slug: network-observatory
 trust_tier: first-party
 source:
-  type: vault
-  vault_path: packs/network-observatory/
+  type: repo
+  repo: groupthink-dev/stallari-packs
+  path: packs/network-observatory/
+  commit: 4847f7956121d44206a43c2042f8914e05687a19
 runtime:
   distribution: none
   publish_targets: []
